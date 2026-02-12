@@ -14,6 +14,7 @@
             --success-hover: #059669;
             --danger: #ef4444;
             --danger-hover: #dc2626;
+            --warning: #f59e0b;
             
             --bg-primary: #ffffff;
             --bg-secondary: #f8fafc;
@@ -113,7 +114,8 @@
         }
 
         .input-group input,
-        .input-group select {
+        .input-group select,
+        .input-group textarea {
             width: 100%;
             padding: 12px 16px;
             border: 2px solid var(--border-color);
@@ -122,10 +124,17 @@
             transition: all 0.3s;
             background: var(--bg-primary);
             color: var(--text-primary);
+            font-family: inherit;
+        }
+
+        .input-group textarea {
+            min-height: 80px;
+            resize: vertical;
         }
 
         .input-group input:focus,
-        .input-group select:focus {
+        .input-group select:focus,
+        .input-group textarea:focus {
             outline: none;
             border-color: var(--primary);
         }
@@ -154,6 +163,22 @@
 
         .btn-success:hover {
             background: var(--success-hover);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: var(--danger-hover);
         }
 
         .btn-secondary {
@@ -532,14 +557,14 @@
             letter-spacing: 0.5px;
         }
 
-        /* === VEHICULES GRID === */
-        .vehicules-grid {
+        /* === GRIDS === */
+        .vehicules-grid, .clients-grid, .frais-grid, .ventes-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
         }
 
-        .vehicule-card {
+        .vehicule-card, .client-card, .frais-card, .vente-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 16px;
@@ -549,7 +574,7 @@
             position: relative;
         }
 
-        .vehicule-card:hover {
+        .vehicule-card:hover, .client-card:hover, .frais-card:hover, .vente-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 12px 24px var(--shadow-hover);
             border-color: var(--primary);
@@ -575,34 +600,42 @@
             color: var(--danger);
         }
 
-        .vehicule-card h3 {
+        .vehicule-card h3, .client-card h3, .frais-card h3, .vente-card h3 {
             font-size: 20px;
             margin-bottom: 16px;
             color: var(--text-primary);
         }
 
-        .vehicule-info {
+        .vehicule-info, .client-info, .frais-info, .vente-info {
             display: flex;
             flex-direction: column;
             gap: 8px;
             margin-bottom: 16px;
         }
 
-        .vehicule-info-row {
+        .vehicule-info-row, .info-row {
             display: flex;
             justify-content: space-between;
             font-size: 14px;
         }
 
-        .vehicule-info-label {
+        .vehicule-info-label, .info-label {
             color: var(--text-secondary);
         }
 
-        .vehicule-price {
+        .vehicule-price, .amount {
             font-size: 24px;
             font-weight: 700;
             color: var(--primary);
             margin-top: 8px;
+        }
+
+        .amount.positive {
+            color: var(--success);
+        }
+
+        .amount.negative {
+            color: var(--danger);
         }
 
         .empty-state {
@@ -803,7 +836,7 @@
                 font-size: 22px;
             }
 
-            .vehicules-grid {
+            .vehicules-grid, .clients-grid, .frais-grid, .ventes-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -998,33 +1031,67 @@
                     </div>
                 </div>
 
-                <!-- AUTRES PAGES -->
+                <!-- PAGE CLIENTS -->
                 <div class="page-content" id="pageClients">
                     <div class="page-header">
                         <div class="page-header-left">
                             <h1>Clients</h1>
                             <p>Gestion de vos clients</p>
                         </div>
+                        <div class="page-header-right">
+                            <button class="btn btn-small" onclick="openAddClientModal()">➕ Ajouter un client</button>
+                        </div>
                     </div>
-                    <div class="welcome-card">
-                        <h2>Page en cours de développement 🚧</h2>
-                        <p>Cette fonctionnalité sera bientôt disponible.</p>
+
+                    <div class="filters">
+                        <div class="filters-row">
+                            <div class="filter-group">
+                                <label>Recherche</label>
+                                <input type="text" id="searchClient" placeholder="Nom, prénom, email..." onkeyup="filterClients()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="clientsContainer">
+                        <div class="loading">Chargement des clients...</div>
                     </div>
                 </div>
 
+                <!-- PAGE FRAIS -->
                 <div class="page-content" id="pageFrais">
                     <div class="page-header">
                         <div class="page-header-left">
                             <h1>Frais</h1>
-                            <p>Gestion de vos frais</p>
+                            <p>Gestion de vos frais véhicules</p>
+                        </div>
+                        <div class="page-header-right">
+                            <button class="btn btn-small" onclick="openAddFraisModal()">➕ Ajouter des frais</button>
                         </div>
                     </div>
-                    <div class="welcome-card">
-                        <h2>Page en cours de développement 🚧</h2>
-                        <p>Cette fonctionnalité sera bientôt disponible.</p>
+
+                    <div class="filters">
+                        <div class="filters-row">
+                            <div class="filter-group">
+                                <label>Type de frais</label>
+                                <select id="filterTypeFrais" onchange="filterFrais()">
+                                    <option value="">Tous</option>
+                                    <option value="Réparation">Réparation</option>
+                                    <option value="Entretien">Entretien</option>
+                                    <option value="Peinture">Peinture</option>
+                                    <option value="Pneus">Pneus</option>
+                                    <option value="Contrôle technique">Contrôle technique</option>
+                                    <option value="Autre">Autre</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="fraisContainer">
+                        <div class="loading">Chargement des frais...</div>
                     </div>
                 </div>
 
+                <!-- PAGE VENTES -->
                 <div class="page-content" id="pageVentes">
                     <div class="page-header">
                         <div class="page-header-left">
@@ -1032,9 +1099,9 @@
                             <p>Historique de vos ventes</p>
                         </div>
                     </div>
-                    <div class="welcome-card">
-                        <h2>Page en cours de développement 🚧</h2>
-                        <p>Cette fonctionnalité sera bientôt disponible.</p>
+
+                    <div id="ventesContainer">
+                        <div class="loading">Chargement des ventes...</div>
                     </div>
                 </div>
             </div>
@@ -1211,7 +1278,101 @@
                     <label>Date de vente *</label>
                     <input type="date" id="dateVente" required>
                 </div>
+                <div class="input-group">
+                    <label>Client (optionnel)</label>
+                    <select id="clientVente">
+                        <option value="">Aucun client</option>
+                    </select>
+                </div>
                 <button type="submit" class="btn btn-success">Confirmer la vente</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL AJOUT CLIENT -->
+    <div class="modal" id="modalAddClient">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Ajouter un client</h2>
+                <button class="modal-close" onclick="closeAddClientModal()">✕</button>
+            </div>
+            <form id="formAddClient">
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Nom *</label>
+                        <input type="text" name="nom" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Prénom *</label>
+                        <input type="text" name="prenom" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Téléphone</label>
+                        <input type="tel" name="telephone">
+                    </div>
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="email" name="email">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Adresse</label>
+                    <textarea name="adresse" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn">Ajouter le client</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL AJOUT FRAIS -->
+    <div class="modal" id="modalAddFrais">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Ajouter des frais</h2>
+                <button class="modal-close" onclick="closeAddFraisModal()">✕</button>
+            </div>
+            <form id="formAddFrais">
+                <div class="input-group">
+                    <label>Véhicule concerné *</label>
+                    <select name="vehicule_id" id="selectVehicule" required>
+                        <option value="">Sélectionnez un véhicule</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Type de frais *</label>
+                        <select name="type" required>
+                            <option value="">Sélectionnez</option>
+                            <option value="Réparation">Réparation</option>
+                            <option value="Entretien">Entretien</option>
+                            <option value="Peinture">Peinture</option>
+                            <option value="Pneus">Pneus</option>
+                            <option value="Contrôle technique">Contrôle technique</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Montant (€) *</label>
+                        <input type="number" name="montant" step="0.01" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Date *</label>
+                        <input type="date" name="date" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Prestataire</label>
+                        <input type="text" name="prestataire">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Description</label>
+                    <textarea name="description" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn">Ajouter les frais</button>
             </form>
         </div>
     </div>
@@ -1219,6 +1380,9 @@
         // Variables globales
         let supabaseClient = null;
         let allVehicules = [];
+        let allClients = [];
+        let allFrais = [];
+        let allVentes = [];
         
         // Initialiser Supabase
         function initSupabase() {
@@ -1228,6 +1392,11 @@
             if (window.supabase && !supabaseClient) {
                 supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             }
+        }
+
+        // Générer un ID unique
+        function generateId() {
+            return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         }
 
         // Mode Dark/Light
@@ -1339,6 +1508,12 @@
             // Charger les données si nécessaire
             if (page === 'vehicules') {
                 loadVehicules();
+            } else if (page === 'clients') {
+                loadClients();
+            } else if (page === 'frais') {
+                loadFrais();
+            } else if (page === 'ventes') {
+                loadVentes();
             }
         }
 
@@ -1357,10 +1532,14 @@
                     document.getElementById('vehiculesVendus').textContent = vendus;
                 }
 
-                const { data: ventes } = await supabaseClient.from('ventes').select('marge');
+                const { data: ventes } = await supabaseClient.from('ventes').select('*, vehicules(prix_achat)');
                 
                 if (ventes && ventes.length > 0) {
-                    const beneficeTotal = ventes.reduce((sum, v) => sum + (parseFloat(v.marge) || 0), 0);
+                    const beneficeTotal = ventes.reduce((sum, v) => {
+                        const prixVente = parseFloat(v.prix_vente) || 0;
+                        const prixAchat = parseFloat(v.vehicules?.prix_achat) || 0;
+                        return sum + (prixVente - prixAchat);
+                    }, 0);
                     document.getElementById('beneficeTotal').textContent = Math.round(beneficeTotal).toLocaleString('fr-FR') + ' €';
                 }
                 
@@ -1369,7 +1548,8 @@
             }
         }
 
-        // Charger les véhicules
+        // ========== VEHICULES ==========
+        
         async function loadVehicules() {
             if (!supabaseClient) return;
             
@@ -1393,7 +1573,6 @@
             }
         }
 
-        // Afficher les véhicules
         function displayVehicules(vehicules) {
             const container = document.getElementById('vehiculesContainer');
             
@@ -1446,7 +1625,6 @@
             container.innerHTML = html;
         }
 
-        // Filtrer les véhicules
         function filterVehicules() {
             const search = document.getElementById('searchVehicule').value.toLowerCase();
             const statut = document.getElementById('filterStatut').value;
@@ -1468,7 +1646,6 @@
             displayVehicules(filtered);
         }
 
-        // Modal ajout véhicule
         function openAddVehiculeModal() {
             document.getElementById('modalAddVehicule').classList.add('active');
             document.getElementById('formAddVehicule').reset();
@@ -1478,12 +1655,12 @@
             document.getElementById('modalAddVehicule').classList.remove('active');
         }
 
-        // Soumettre formulaire ajout véhicule
         document.getElementById('formAddVehicule').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const formData = new FormData(e.target);
             const vehicule = {
+                id: generateId(),
                 marque: formData.get('marque'),
                 modele: formData.get('modele'),
                 annee: parseInt(formData.get('annee')),
@@ -1513,7 +1690,6 @@
             }
         });
 
-        // Détails véhicule
         function openVehiculeDetails(id) {
             const vehicule = allVehicules.find(v => v.id === id);
             if (!vehicule) return;
@@ -1580,35 +1756,9 @@
                             <div class="detail-label">Date d'achat</div>
                             <div class="detail-value">${new Date(vehicule.date_achat).toLocaleDateString('fr-FR')}</div>
                         </div>
+                    </div>
+                </div>
             `;
-            
-            if (vehicule.statut === 'vendu' && vehicule.prix_vente) {
-                const benefice = parseFloat(vehicule.prix_vente) - parseFloat(vehicule.prix_achat);
-                detailsHTML += `
-                        <div class="detail-item">
-                            <div class="detail-label">Prix de vente</div>
-                            <div class="detail-value">${parseFloat(vehicule.prix_vente).toLocaleString('fr-FR')} €</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Date de vente</div>
-                            <div class="detail-value">${vehicule.date_vente ? new Date(vehicule.date_vente).toLocaleDateString('fr-FR') : '-'}</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="detail-section">
-                    <h3>Bénéfice réalisé</h3>
-                    <div class="detail-item">
-                        <div class="detail-value large">${benefice.toLocaleString('fr-FR')} €</div>
-                    </div>
-                </div>
-                `;
-            } else {
-                detailsHTML += `
-                    </div>
-                </div>
-                `;
-            }
             
             content.innerHTML = detailsHTML;
             
@@ -1630,7 +1780,6 @@
             document.getElementById('modalDetailsVehicule').classList.remove('active');
         }
 
-        // Modal modifier
         function openEditModal(id) {
             const vehicule = allVehicules.find(v => v.id === id);
             if (!vehicule) return;
@@ -1654,7 +1803,6 @@
             document.getElementById('modalEditVehicule').classList.remove('active');
         }
 
-        // Soumettre modification
         document.getElementById('formEditVehicule').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -1691,11 +1839,26 @@
             }
         });
 
-        // Modal vendre
-        function openVendreModal(vehiculeId) {
+        async function openVendreModal(vehiculeId) {
             document.getElementById('vehiculeIdVente').value = vehiculeId;
             document.getElementById('prixVente').value = '';
             document.getElementById('dateVente').value = new Date().toISOString().split('T')[0];
+            
+            // Charger la liste des clients
+            try {
+                const { data: clients } = await supabaseClient.from('clients').select('*').order('nom');
+                const select = document.getElementById('clientVente');
+                select.innerHTML = '<option value="">Aucun client</option>';
+                
+                if (clients) {
+                    clients.forEach(c => {
+                        select.innerHTML += `<option value="${c.id}">${c.nom} ${c.prenom}</option>`;
+                    });
+                }
+            } catch (error) {
+                console.error('Erreur chargement clients:', error);
+            }
+            
             document.getElementById('modalVendreVehicule').classList.add('active');
         }
 
@@ -1703,37 +1866,31 @@
             document.getElementById('modalVendreVehicule').classList.remove('active');
         }
 
-        // Soumettre vente
         document.getElementById('formVendreVehicule').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const vehiculeId = document.getElementById('vehiculeIdVente').value;
             const prixVente = parseFloat(document.getElementById('prixVente').value);
             const dateVente = document.getElementById('dateVente').value;
-            
-            const vehicule = allVehicules.find(v => v.id === vehiculeId);
-            if (!vehicule) return;
+            const clientId = document.getElementById('clientVente').value || null;
             
             try {
+                // Mettre à jour le statut du véhicule
                 const { error: errorVehicule } = await supabaseClient
                     .from('vehicules')
-                    .update({ 
-                        statut: 'vendu',
-                        prix_vente: prixVente,
-                        date_vente: dateVente
-                    })
+                    .update({ statut: 'vendu' })
                     .eq('id', vehiculeId);
                 
                 if (errorVehicule) throw errorVehicule;
                 
-                const marge = prixVente - parseFloat(vehicule.prix_achat);
-                
+                // Créer la vente
                 const { error: errorVente } = await supabaseClient
                     .from('ventes')
                     .insert([{
+                        id: generateId(),
                         vehicule_id: vehiculeId,
+                        client_id: clientId,
                         prix_vente: prixVente,
-                        marge: marge,
                         date_vente: dateVente
                     }]);
                 
@@ -1742,7 +1899,7 @@
                 closeVendreModal();
                 loadVehicules();
                 loadStats();
-                alert('✅ Véhicule marqué comme vendu !');
+                alert('✅ Véhicule vendu avec succès !');
                 
             } catch (error) {
                 console.error('Erreur:', error);
@@ -1750,9 +1907,364 @@
             }
         });
 
-        // ========== NOUVELLES FONCTIONS POUR LES CARTES CLIQUABLES ==========
+        // ========== CLIENTS ==========
         
-        // Afficher véhicules en stock
+        async function loadClients() {
+            if (!supabaseClient) return;
+            
+            const container = document.getElementById('clientsContainer');
+            container.innerHTML = '<div class="loading">Chargement des clients...</div>';
+            
+            try {
+                const { data: clients, error } = await supabaseClient
+                    .from('clients')
+                    .select('*')
+                    .order('nom');
+                
+                if (error) throw error;
+                
+                allClients = clients || [];
+                displayClients(allClients);
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>Erreur de chargement</h3></div>';
+            }
+        }
+
+        function displayClients(clients) {
+            const container = document.getElementById('clientsContainer');
+            
+            if (clients.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👥</div>
+                        <h3>Aucun client</h3>
+                        <p>Commencez par ajouter votre premier client</p>
+                        <button class="btn btn-small" onclick="openAddClientModal()">➕ Ajouter un client</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = `
+                <div class="clients-grid">
+                    ${clients.map(c => `
+                        <div class="client-card">
+                            <h3>${c.nom} ${c.prenom}</h3>
+                            <div class="client-info">
+                                ${c.telephone ? `
+                                <div class="info-row">
+                                    <span class="info-label">📞 Téléphone:</span>
+                                    <span>${c.telephone}</span>
+                                </div>
+                                ` : ''}
+                                ${c.email ? `
+                                <div class="info-row">
+                                    <span class="info-label">✉️ Email:</span>
+                                    <span>${c.email}</span>
+                                </div>
+                                ` : ''}
+                                ${c.adresse ? `
+                                <div class="info-row">
+                                    <span class="info-label">📍 Adresse:</span>
+                                    <span>${c.adresse}</span>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function filterClients() {
+            const search = document.getElementById('searchClient').value.toLowerCase();
+            
+            let filtered = allClients;
+            
+            if (search) {
+                filtered = filtered.filter(c => 
+                    c.nom.toLowerCase().includes(search) ||
+                    c.prenom.toLowerCase().includes(search) ||
+                    (c.email && c.email.toLowerCase().includes(search))
+                );
+            }
+            
+            displayClients(filtered);
+        }
+
+        function openAddClientModal() {
+            document.getElementById('modalAddClient').classList.add('active');
+            document.getElementById('formAddClient').reset();
+        }
+
+        function closeAddClientModal() {
+            document.getElementById('modalAddClient').classList.remove('active');
+        }
+
+        document.getElementById('formAddClient').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const client = {
+                id: generateId(),
+                nom: formData.get('nom'),
+                prenom: formData.get('prenom'),
+                telephone: formData.get('telephone') || null,
+                email: formData.get('email') || null,
+                adresse: formData.get('adresse') || null
+            };
+            
+            try {
+                const { error } = await supabaseClient.from('clients').insert([client]);
+                
+                if (error) throw error;
+                
+                closeAddClientModal();
+                loadClients();
+                alert('✅ Client ajouté avec succès !');
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('❌ Erreur lors de l\'ajout du client');
+            }
+        });
+
+        // ========== FRAIS ==========
+        
+        async function loadFrais() {
+            if (!supabaseClient) return;
+            
+            const container = document.getElementById('fraisContainer');
+            container.innerHTML = '<div class="loading">Chargement des frais...</div>';
+            
+            try {
+                const { data: frais, error } = await supabaseClient
+                    .from('frais')
+                    .select('*, vehicules(marque, modele, immatriculation)')
+                    .order('date', { ascending: false });
+                
+                if (error) throw error;
+                
+                allFrais = frais || [];
+                displayFrais(allFrais);
+                
+                // Charger la liste des véhicules pour le formulaire
+                await loadVehiculesForSelect();
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>Erreur de chargement</h3></div>';
+            }
+        }
+
+        async function loadVehiculesForSelect() {
+            try {
+                const { data: vehicules } = await supabaseClient
+                    .from('vehicules')
+                    .select('*')
+                    .order('marque');
+                
+                const select = document.getElementById('selectVehicule');
+                select.innerHTML = '<option value="">Sélectionnez un véhicule</option>';
+                
+                if (vehicules) {
+                    vehicules.forEach(v => {
+                        select.innerHTML += `<option value="${v.id}">${v.marque} ${v.modele} - ${v.immatriculation}</option>`;
+                    });
+                }
+            } catch (error) {
+                console.error('Erreur chargement véhicules:', error);
+            }
+        }
+
+        function displayFrais(frais) {
+            const container = document.getElementById('fraisContainer');
+            
+            if (frais.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💰</div>
+                        <h3>Aucun frais</h3>
+                        <p>Commencez par ajouter vos premiers frais</p>
+                        <button class="btn btn-small" onclick="openAddFraisModal()">➕ Ajouter des frais</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = `
+                <div class="frais-grid">
+                    ${frais.map(f => `
+                        <div class="frais-card">
+                            <h3>${f.type}</h3>
+                            <div class="frais-info">
+                                <div class="info-row">
+                                    <span class="info-label">Véhicule:</span>
+                                    <span>${f.vehicules?.marque} ${f.vehicules?.modele}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Date:</span>
+                                    <span>${new Date(f.date).toLocaleDateString('fr-FR')}</span>
+                                </div>
+                                ${f.prestataire ? `
+                                <div class="info-row">
+                                    <span class="info-label">Prestataire:</span>
+                                    <span>${f.prestataire}</span>
+                                </div>
+                                ` : ''}
+                                ${f.description ? `
+                                <div class="info-row">
+                                    <span class="info-label">Description:</span>
+                                    <span>${f.description}</span>
+                                </div>
+                                ` : ''}
+                            </div>
+                            <div class="amount negative">${parseFloat(f.montant).toLocaleString('fr-FR')} €</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function filterFrais() {
+            const type = document.getElementById('filterTypeFrais').value;
+            
+            let filtered = allFrais;
+            
+            if (type) {
+                filtered = filtered.filter(f => f.type === type);
+            }
+            
+            displayFrais(filtered);
+        }
+
+        function openAddFraisModal() {
+            document.getElementById('modalAddFrais').classList.add('active');
+            document.getElementById('formAddFrais').reset();
+        }
+
+        function closeAddFraisModal() {
+            document.getElementById('modalAddFrais').classList.remove('active');
+        }
+
+        document.getElementById('formAddFrais').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const frais = {
+                id: generateId(),
+                vehicule_id: formData.get('vehicule_id'),
+                type: formData.get('type'),
+                montant: parseFloat(formData.get('montant')),
+                date: formData.get('date'),
+                prestataire: formData.get('prestataire') || null,
+                description: formData.get('description') || null
+            };
+            
+            try {
+                const { error } = await supabaseClient.from('frais').insert([frais]);
+                
+                if (error) throw error;
+                
+                closeAddFraisModal();
+                loadFrais();
+                alert('✅ Frais ajoutés avec succès !');
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('❌ Erreur lors de l\'ajout des frais');
+            }
+        });
+
+        // ========== VENTES ==========
+        
+        async function loadVentes() {
+            if (!supabaseClient) return;
+            
+            const container = document.getElementById('ventesContainer');
+            container.innerHTML = '<div class="loading">Chargement des ventes...</div>';
+            
+            try {
+                const { data: ventes, error } = await supabaseClient
+                    .from('ventes')
+                    .select('*, vehicules(marque, modele, immatriculation, prix_achat), clients(nom, prenom)')
+                    .order('date_vente', { ascending: false });
+                
+                if (error) throw error;
+                
+                allVentes = ventes || [];
+                displayVentes(allVentes);
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>Erreur de chargement</h3></div>';
+            }
+        }
+
+        function displayVentes(ventes) {
+            const container = document.getElementById('ventesContainer');
+            
+            if (ventes.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📈</div>
+                        <h3>Aucune vente</h3>
+                        <p>Vos ventes apparaîtront ici</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = `
+                <div class="ventes-grid">
+                    ${ventes.map(v => {
+                        const benefice = parseFloat(v.prix_vente) - parseFloat(v.vehicules?.prix_achat || 0);
+                        return `
+                        <div class="vente-card">
+                            <h3>${v.vehicules?.marque} ${v.vehicules?.modele}</h3>
+                            <div class="vente-info">
+                                <div class="info-row">
+                                    <span class="info-label">Immatriculation:</span>
+                                    <span>${v.vehicules?.immatriculation}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Date de vente:</span>
+                                    <span>${new Date(v.date_vente).toLocaleDateString('fr-FR')}</span>
+                                </div>
+                                ${v.clients ? `
+                                <div class="info-row">
+                                    <span class="info-label">Client:</span>
+                                    <span>${v.clients.nom} ${v.clients.prenom}</span>
+                                </div>
+                                ` : ''}
+                                <div class="info-row">
+                                    <span class="info-label">Prix d'achat:</span>
+                                    <span>${parseFloat(v.vehicules?.prix_achat || 0).toLocaleString('fr-FR')} €</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Prix de vente:</span>
+                                    <span>${parseFloat(v.prix_vente).toLocaleString('fr-FR')} €</span>
+                                </div>
+                            </div>
+                            <div class="amount ${benefice >= 0 ? 'positive' : 'negative'}">
+                                ${benefice >= 0 ? '+' : ''}${Math.round(benefice).toLocaleString('fr-FR')} €
+                            </div>
+                        </div>
+                    `}).join('')}
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        // ========== FONCTIONS POUR LES CARTES CLIQUABLES ==========
+        
         function showVehiculesStock() {
             navigateToPage('vehicules');
             setTimeout(() => {
@@ -1761,7 +2273,6 @@
             }, 300);
         }
 
-        // Afficher véhicules vendus
         function showVehiculesVendus() {
             navigateToPage('vehicules');
             setTimeout(() => {
@@ -1770,7 +2281,6 @@
             }, 300);
         }
 
-        // Voir détails ventes
         function showVentesDetails() {
             navigateToPage('ventes');
         }
