@@ -10,11 +10,30 @@
         
         html { overflow-x: hidden; }
         
+        :root {
+            --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            --bg-card: rgba(255, 255, 255, 0.98);
+            --text-primary: #191970;
+            --text-secondary: #64748b;
+            --border-color: rgba(255,255,255,0.3);
+            --shadow: rgba(0,0,0,0.12);
+        }
+        
+        body.dark-mode {
+            --bg-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            --bg-card: rgba(30, 30, 46, 0.98);
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --border-color: rgba(100,100,100,0.3);
+            --shadow: rgba(0,0,0,0.5);
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background: var(--bg-primary);
             min-height: 100vh;
             position: relative;
+            transition: all 0.3s ease;
         }
         
         body::before {
@@ -68,12 +87,12 @@
         }
         
         .card {
-            background: rgba(255, 255, 255, 0.98);
+            background: var(--bg-card);
             backdrop-filter: blur(20px);
             border-radius: 28px;
             padding: 56px 48px;
-            box-shadow: 0 25px 70px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 25px 70px var(--shadow);
+            border: 1px solid var(--border-color);
         }
         
         .logo-container {
@@ -128,7 +147,7 @@
         
         .subtitle {
             text-align: center;
-            color: #64748b;
+            color: var(--text-secondary);
             font-size: 16px;
             margin-bottom: 40px;
             font-weight: 500;
@@ -143,7 +162,7 @@
             display: block;
             font-size: 14px;
             font-weight: 600;
-            color: #334155;
+            color: var(--text-primary);
             margin-bottom: 10px;
         }
         
@@ -156,6 +175,15 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             background: white;
             font-family: inherit;
+            color: #1a1a1a;
+        }
+        
+        body.dark-mode .input-group input,
+        body.dark-mode .input-group select,
+        body.dark-mode .input-group textarea {
+            background: #2a2a3e;
+            border-color: #404055;
+            color: #e0e0e0;
         }
         
         .input-group textarea {
@@ -210,6 +238,15 @@
         .btn-success:hover {
             box-shadow: 0 18px 40px rgba(16,185,129,0.4);
         }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            box-shadow: 0 12px 28px rgba(245,158,11,0.3);
+        }
+
+        .btn-warning:hover {
+            box-shadow: 0 18px 40px rgba(245,158,11,0.4);
+        }
         
         .alert {
             padding: 16px 18px;
@@ -262,9 +299,9 @@
         /* SIDEBAR */
         .sidebar {
             width: 280px;
-            background: rgba(255,255,255,0.98);
+            background: var(--bg-card);
             backdrop-filter: blur(20px);
-            box-shadow: 2px 0 20px rgba(0,0,0,0.1);
+            box-shadow: 2px 0 20px var(--shadow);
             display: flex;
             flex-direction: column;
             position: relative;
@@ -277,6 +314,10 @@
             display: flex;
             align-items: center;
             gap: 12px;
+        }
+        
+        body.dark-mode .sidebar-header {
+            border-color: #404055;
         }
         
         .sidebar-logo {
@@ -305,6 +346,12 @@
             background-clip: text;
         }
         
+        body.dark-mode .sidebar-title {
+            background: linear-gradient(135deg, #a0a0ff 0%, #8080ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
         .sidebar-nav {
             flex: 1;
             padding: 20px 0;
@@ -316,7 +363,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            color: #64748b;
+            color: var(--text-secondary);
             text-decoration: none;
             font-size: 15px;
             font-weight: 500;
@@ -327,14 +374,23 @@
         
         .nav-item:hover {
             background: rgba(25,25,112,0.05);
-            color: #191970;
+            color: var(--text-primary);
+        }
+        
+        body.dark-mode .nav-item:hover {
+            background: rgba(160,160,255,0.1);
         }
         
         .nav-item.active {
             background: rgba(25,25,112,0.1);
-            color: #191970;
+            color: var(--text-primary);
             border-left-color: #191970;
             font-weight: 600;
+        }
+        
+        body.dark-mode .nav-item.active {
+            background: rgba(160,160,255,0.15);
+            border-left-color: #8080ff;
         }
         
         .nav-icon {
@@ -346,6 +402,32 @@
         .sidebar-footer {
             padding: 20px;
             border-top: 1px solid #e2e8f0;
+        }
+        
+        body.dark-mode .sidebar-footer {
+            border-color: #404055;
+        }
+
+        .theme-toggle {
+            width: 100%;
+            padding: 12px;
+            background: rgba(100,116,139,0.1);
+            border: 2px solid rgba(100,116,139,0.2);
+            color: var(--text-primary);
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(100,116,139,0.2);
         }
         
         .btn-logout-sidebar {
@@ -416,19 +498,19 @@
         }
         
         .stat-card {
-            background: rgba(255,255,255,0.98);
+            background: var(--bg-card);
             backdrop-filter: blur(20px);
             border-radius: 20px;
             padding: 28px 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 10px 30px var(--shadow);
+            border: 1px solid var(--border-color);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
         }
         
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.18);
+            box-shadow: 0 20px 40px var(--shadow);
         }
         
         .stat-card-header {
@@ -439,7 +521,7 @@
         }
         
         .stat-card-title {
-            color: #64748b;
+            color: var(--text-secondary);
             font-size: 14px;
             font-weight: 600;
             text-transform: uppercase;
@@ -469,20 +551,26 @@
             margin-bottom: 4px;
         }
         
+        body.dark-mode .stat-card-value {
+            background: linear-gradient(135deg, #a0a0ff 0%, #8080ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
         .stat-card-subtitle {
-            color: #94a3b8;
+            color: var(--text-secondary);
             font-size: 13px;
             font-weight: 500;
         }
         
         .welcome-card {
-            background: rgba(255,255,255,0.98);
+            background: var(--bg-card);
             backdrop-filter: blur(20px);
             border-radius: 20px;
             padding: 40px 36px;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 10px 30px var(--shadow);
+            border: 1px solid var(--border-color);
         }
         
         .welcome-card h2 {
@@ -495,8 +583,14 @@
             font-weight: 700;
         }
         
+        body.dark-mode .welcome-card h2 {
+            background: linear-gradient(135deg, #a0a0ff 0%, #8080ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
         .welcome-card p {
-            color: #64748b;
+            color: var(--text-secondary);
             font-size: 16px;
             line-height: 1.6;
             max-width: 600px;
@@ -514,13 +608,13 @@
 
         /* FILTERS */
         .filters {
-            background: rgba(255,255,255,0.98);
+            background: var(--bg-card);
             backdrop-filter: blur(20px);
             border-radius: 20px;
             padding: 24px;
             margin-bottom: 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 10px 30px var(--shadow);
+            border: 1px solid var(--border-color);
         }
 
         .filters-row {
@@ -538,7 +632,7 @@
         .filter-group label {
             font-size: 13px;
             font-weight: 600;
-            color: #64748b;
+            color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -550,6 +644,14 @@
             font-size: 15px;
             background: white;
             transition: all 0.2s;
+            color: #1a1a1a;
+        }
+
+        body.dark-mode .filter-group input,
+        body.dark-mode .filter-group select {
+            background: #2a2a3e;
+            border-color: #404055;
+            color: #e0e0e0;
         }
 
         .filter-group input:focus, .filter-group select:focus {
@@ -565,12 +667,12 @@
         }
 
         .vehicule-card {
-            background: rgba(255,255,255,0.98);
+            background: var(--bg-card);
             backdrop-filter: blur(20px);
             border-radius: 20px;
             padding: 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 10px 30px var(--shadow);
+            border: 1px solid var(--border-color);
             transition: all 0.3s;
             cursor: pointer;
             position: relative;
@@ -578,7 +680,7 @@
 
         .vehicule-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.18);
+            box-shadow: 0 20px 40px var(--shadow);
         }
 
         .vehicule-badge {
@@ -606,7 +708,7 @@
         .vehicule-card h3 {
             font-size: 20px;
             font-weight: 700;
-            color: #191970;
+            color: var(--text-primary);
             margin-bottom: 8px;
         }
 
@@ -614,7 +716,7 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
-            color: #64748b;
+            color: var(--text-secondary);
             font-size: 14px;
         }
 
@@ -630,7 +732,7 @@
         .vehicule-price {
             font-size: 24px;
             font-weight: 700;
-            color: #191970;
+            color: var(--text-primary);
             margin-top: 12px;
         }
 
@@ -655,7 +757,7 @@
         }
 
         .modal-content {
-            background: white;
+            background: var(--bg-card);
             border-radius: 24px;
             padding: 40px;
             max-width: 600px;
@@ -687,7 +789,7 @@
         .modal-header h2 {
             font-size: 24px;
             font-weight: 700;
-            color: #191970;
+            color: var(--text-primary);
         }
 
         .modal-close {
@@ -702,9 +804,70 @@
             transition: all 0.2s;
         }
 
+        body.dark-mode .modal-close {
+            background: #404055;
+            color: #a0a0a0;
+        }
+
         .modal-close:hover {
             background: #e2e8f0;
             color: #191970;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .modal-actions .btn {
+            flex: 1;
+        }
+
+        .detail-section {
+            margin-bottom: 24px;
+        }
+
+        .detail-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .detail-value.large {
+            font-size: 28px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .form-row {
@@ -714,13 +877,13 @@
         }
 
         .empty-state {
-            background: rgba(255,255,255,0.98);
+            background: var(--bg-card);
             backdrop-filter: blur(20px);
             border-radius: 20px;
             padding: 60px 40px;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 10px 30px var(--shadow);
+            border: 1px solid var(--border-color);
         }
 
         .empty-state-icon {
@@ -731,12 +894,12 @@
         .empty-state h3 {
             font-size: 24px;
             font-weight: 700;
-            color: #191970;
+            color: var(--text-primary);
             margin-bottom: 12px;
         }
 
         .empty-state p {
-            color: #64748b;
+            color: var(--text-secondary);
             font-size: 16px;
             margin-bottom: 24px;
         }
@@ -798,8 +961,16 @@
                 grid-template-columns: 1fr;
             }
 
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
             .modal-content {
                 padding: 24px;
+            }
+
+            .modal-actions {
+                flex-direction: column;
             }
         }
     </style>
@@ -870,6 +1041,10 @@
                 </nav>
                 
                 <div class="sidebar-footer">
+                    <button class="theme-toggle" onclick="toggleTheme()">
+                        <span id="themeIcon">🌙</span>
+                        <span id="themeText">Mode Sombre</span>
+                    </button>
                     <button class="btn-logout-sidebar" onclick="logout()">Déconnexion</button>
                 </div>
             </div>
@@ -1066,6 +1241,90 @@
         </div>
     </div>
 
+    <!-- MODAL DÉTAILS VEHICULE -->
+    <div class="modal" id="modalDetailsVehicule">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="detailsTitle">Détails du véhicule</h2>
+                <button class="modal-close" onclick="closeDetailsModal()">✕</button>
+            </div>
+            
+            <div id="detailsContent"></div>
+            
+            <div class="modal-actions" id="detailsActions"></div>
+        </div>
+    </div>
+
+    <!-- MODAL MODIFIER VEHICULE -->
+    <div class="modal" id="modalEditVehicule">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Modifier le véhicule</h2>
+                <button class="modal-close" onclick="closeEditModal()">✕</button>
+            </div>
+            <form id="formEditVehicule">
+                <input type="hidden" id="editVehiculeId">
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Marque *</label>
+                        <input type="text" id="editMarque" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Modèle *</label>
+                        <input type="text" id="editModele" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Année *</label>
+                        <input type="number" id="editAnnee" min="1900" max="2099" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Immatriculation *</label>
+                        <input type="text" id="editImmatriculation" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Prix d'achat (€) *</label>
+                        <input type="number" id="editPrixAchat" step="0.01" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Kilométrage (km) *</label>
+                        <input type="number" id="editKilometrage" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Date d'achat *</label>
+                        <input type="date" id="editDateAchat" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Couleur</label>
+                        <input type="text" id="editCouleur">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Type de carburant</label>
+                        <select id="editCarburant">
+                            <option value="">Non renseigné</option>
+                            <option value="Essence">Essence</option>
+                            <option value="Diesel">Diesel</option>
+                            <option value="Électrique">Électrique</option>
+                            <option value="Hybride">Hybride</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Fournisseur</label>
+                        <input type="text" id="editFournisseur">
+                    </div>
+                </div>
+                <button type="submit" class="btn">Enregistrer les modifications</button>
+            </form>
+        </div>
+    </div>
+
     <!-- MODAL VENDRE VEHICULE -->
     <div class="modal" id="modalVendreVehicule">
         <div class="modal-content">
@@ -1087,7 +1346,6 @@
             </form>
         </div>
     </div>
-
     <script>
         // Variables globales
         let supabaseClient = null;
@@ -1103,8 +1361,32 @@
             }
         }
 
+        // Mode Dark/Light
+        function toggleTheme() {
+            const body = document.body;
+            const isDark = body.classList.toggle('dark-mode');
+            
+            // Sauvegarder la préférence
+            localStorage.setItem('autovox_theme', isDark ? 'dark' : 'light');
+            
+            // Mettre à jour le bouton
+            document.getElementById('themeIcon').textContent = isDark ? '☀️' : '🌙';
+            document.getElementById('themeText').textContent = isDark ? 'Mode Clair' : 'Mode Sombre';
+        }
+
+        // Charger le thème au démarrage
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('autovox_theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('themeIcon').textContent = '☀️';
+                document.getElementById('themeText').textContent = 'Mode Clair';
+            }
+        }
+
         // Vérification de la session au chargement
         window.addEventListener('DOMContentLoaded', function() {
+            loadTheme();
             if (localStorage.getItem('autovox_session') === 'active') {
                 showDashboard();
             }
@@ -1342,14 +1624,180 @@
             const vehicule = allVehicules.find(v => v.id === id);
             if (!vehicule) return;
             
-            if (vehicule.statut === 'en_stock') {
-                if (confirm(`Voulez-vous marquer "${vehicule.marque} ${vehicule.modele}" comme vendu ?`)) {
-                    openVendreModal(id);
-                }
+            const modal = document.getElementById('modalDetailsVehicule');
+            const content = document.getElementById('detailsContent');
+            const actions = document.getElementById('detailsActions');
+            
+            document.getElementById('detailsTitle').textContent = `${vehicule.marque} ${vehicule.modele}`;
+            
+            // Contenu des détails
+            let detailsHTML = `
+                <div class="detail-section">
+                    <h3>Informations générales</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Marque</div>
+                            <div class="detail-value">${vehicule.marque}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Modèle</div>
+                            <div class="detail-value">${vehicule.modele}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Année</div>
+                            <div class="detail-value">${vehicule.annee}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Immatriculation</div>
+                            <div class="detail-value">${vehicule.immatriculation}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Kilométrage</div>
+                            <div class="detail-value">${parseInt(vehicule.kilometrage).toLocaleString('fr-FR')} km</div>
+                        </div>
+                        ${vehicule.couleur ? `
+                        <div class="detail-item">
+                            <div class="detail-label">Couleur</div>
+                            <div class="detail-value">${vehicule.couleur}</div>
+                        </div>
+                        ` : ''}
+                        ${vehicule.carburant ? `
+                        <div class="detail-item">
+                            <div class="detail-label">Carburant</div>
+                            <div class="detail-value">${vehicule.carburant}</div>
+                        </div>
+                        ` : ''}
+                        ${vehicule.fournisseur ? `
+                        <div class="detail-item">
+                            <div class="detail-label">Fournisseur</div>
+                            <div class="detail-value">${vehicule.fournisseur}</div>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>Informations financières</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Prix d'achat</div>
+                            <div class="detail-value">${parseFloat(vehicule.prix_achat).toLocaleString('fr-FR')} €</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Date d'achat</div>
+                            <div class="detail-value">${new Date(vehicule.date_achat).toLocaleDateString('fr-FR')}</div>
+                        </div>
+            `;
+            
+            if (vehicule.statut === 'vendu' && vehicule.prix_vente) {
+                const benefice = parseFloat(vehicule.prix_vente) - parseFloat(vehicule.prix_achat);
+                detailsHTML += `
+                        <div class="detail-item">
+                            <div class="detail-label">Prix de vente</div>
+                            <div class="detail-value">${parseFloat(vehicule.prix_vente).toLocaleString('fr-FR')} €</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Date de vente</div>
+                            <div class="detail-value">${vehicule.date_vente ? new Date(vehicule.date_vente).toLocaleDateString('fr-FR') : '-'}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h3>Bénéfice réalisé</h3>
+                    <div class="detail-item">
+                        <div class="detail-value large">${benefice.toLocaleString('fr-FR')} €</div>
+                    </div>
+                </div>
+                `;
             } else {
-                alert(`${vehicule.marque} ${vehicule.modele}\n\nCe véhicule a été vendu.\n\nPage de détails complète en cours de développement...`);
+                detailsHTML += `
+                    </div>
+                </div>
+                `;
             }
+            
+            content.innerHTML = detailsHTML;
+            
+            // Actions
+            if (vehicule.statut === 'en_stock') {
+                actions.innerHTML = `
+                    <button class="btn btn-secondary" onclick="closeDetailsModal(); openEditModal('${vehicule.id}')">✏️ Modifier</button>
+                    <button class="btn btn-success" onclick="closeDetailsModal(); openVendreModal('${vehicule.id}')">💰 Vendre</button>
+                `;
+            } else {
+                actions.innerHTML = `
+                    <button class="btn btn-secondary" onclick="closeDetailsModal()">Fermer</button>
+                `;
+            }
+            
+            modal.classList.add('active');
         }
+
+        function closeDetailsModal() {
+            document.getElementById('modalDetailsVehicule').classList.remove('active');
+        }
+
+        // Modal modifier
+        function openEditModal(id) {
+            const vehicule = allVehicules.find(v => v.id === id);
+            if (!vehicule) return;
+            
+            document.getElementById('editVehiculeId').value = vehicule.id;
+            document.getElementById('editMarque').value = vehicule.marque;
+            document.getElementById('editModele').value = vehicule.modele;
+            document.getElementById('editAnnee').value = vehicule.annee;
+            document.getElementById('editImmatriculation').value = vehicule.immatriculation;
+            document.getElementById('editPrixAchat').value = vehicule.prix_achat;
+            document.getElementById('editKilometrage').value = vehicule.kilometrage;
+            document.getElementById('editDateAchat').value = vehicule.date_achat;
+            document.getElementById('editCouleur').value = vehicule.couleur || '';
+            document.getElementById('editCarburant').value = vehicule.carburant || '';
+            document.getElementById('editFournisseur').value = vehicule.fournisseur || '';
+            
+            document.getElementById('modalEditVehicule').classList.add('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('modalEditVehicule').classList.remove('active');
+        }
+
+        // Soumettre modification
+        document.getElementById('formEditVehicule').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const vehiculeId = document.getElementById('editVehiculeId').value;
+            const updatedData = {
+                marque: document.getElementById('editMarque').value,
+                modele: document.getElementById('editModele').value,
+                annee: parseInt(document.getElementById('editAnnee').value),
+                immatriculation: document.getElementById('editImmatriculation').value,
+                prix_achat: parseFloat(document.getElementById('editPrixAchat').value),
+                kilometrage: parseInt(document.getElementById('editKilometrage').value),
+                date_achat: document.getElementById('editDateAchat').value,
+                couleur: document.getElementById('editCouleur').value || null,
+                carburant: document.getElementById('editCarburant').value || null,
+                fournisseur: document.getElementById('editFournisseur').value || null
+            };
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('vehicules')
+                    .update(updatedData)
+                    .eq('id', vehiculeId);
+                
+                if (error) throw error;
+                
+                closeEditModal();
+                loadVehicules();
+                loadStats();
+                alert('✅ Véhicule modifié avec succès !');
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('❌ Erreur lors de la modification');
+            }
+        });
 
         // Modal vendre
         function openVendreModal(vehiculeId) {
