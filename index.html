@@ -1045,15 +1045,21 @@
                         <input type="text" name="couleur">
                     </div>
                 </div>
-                <div class="input-group">
-                    <label>Type de carburant</label>
-                    <select name="carburant">
-                        <option value="">Non renseigné</option>
-                        <option value="Essence">Essence</option>
-                        <option value="Diesel">Diesel</option>
-                        <option value="Électrique">Électrique</option>
-                        <option value="Hybride">Hybride</option>
-                    </select>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Type de carburant</label>
+                        <select name="carburant">
+                            <option value="">Non renseigné</option>
+                            <option value="Essence">Essence</option>
+                            <option value="Diesel">Diesel</option>
+                            <option value="Électrique">Électrique</option>
+                            <option value="Hybride">Hybride</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Fournisseur</label>
+                        <input type="text" name="fournisseur">
+                    </div>
                 </div>
                 <button type="submit" class="btn">Ajouter le véhicule</button>
             </form>
@@ -1230,7 +1236,7 @@
             const html = `
                 <div class="vehicules-grid">
                     ${vehicules.map(v => `
-                        <div class="vehicule-card" onclick="openVehiculeDetails(${v.id})">
+                        <div class="vehicule-card" onclick="openVehiculeDetails('${v.id}')">
                             <div class="vehicule-badge ${v.statut === 'en_stock' ? 'badge-stock' : 'badge-vendu'}">
                                 ${v.statut === 'en_stock' ? '🟢 En stock' : '🔴 Vendu'}
                             </div>
@@ -1255,7 +1261,7 @@
                                 </div>
                                 ` : ''}
                             </div>
-                            <div class="vehicule-price">${parseInt(v.prix_achat).toLocaleString('fr-FR')} €</div>
+                            <div class="vehicule-price">${parseFloat(v.prix_achat).toLocaleString('fr-FR')} €</div>
                         </div>
                     `).join('')}
                 </div>
@@ -1311,6 +1317,7 @@
                 date_achat: formData.get('date_achat'),
                 couleur: formData.get('couleur') || null,
                 carburant: formData.get('carburant') || null,
+                fournisseur: formData.get('fournisseur') || null,
                 statut: 'en_stock'
             };
             
@@ -1330,7 +1337,7 @@
             }
         });
 
-        // Détails véhicule (simplifié pour l'instant)
+        // Détails véhicule
         function openVehiculeDetails(id) {
             const vehicule = allVehicules.find(v => v.id === id);
             if (!vehicule) return;
@@ -1360,7 +1367,7 @@
         document.getElementById('formVendreVehicule').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const vehiculeId = parseInt(document.getElementById('vehiculeIdVente').value);
+            const vehiculeId = document.getElementById('vehiculeIdVente').value;
             const prixVente = parseFloat(document.getElementById('prixVente').value);
             const dateVente = document.getElementById('dateVente').value;
             
@@ -1381,7 +1388,7 @@
                 if (errorVehicule) throw errorVehicule;
                 
                 // Créer la vente avec marge
-                const marge = prixVente - vehicule.prix_achat;
+                const marge = prixVente - parseFloat(vehicule.prix_achat);
                 
                 const { error: errorVente } = await supabaseClient
                     .from('ventes')
