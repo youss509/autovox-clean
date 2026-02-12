@@ -584,23 +584,23 @@
                 </div>
                 
                 <nav class="sidebar-nav">
-                    <div class="nav-item active" onclick="showPage('dashboard')">
+                    <div class="nav-item active" onclick="showPageNav('dashboard')">
                         <span class="nav-icon">📊</span>
                         <span>Dashboard</span>
                     </div>
-                    <div class="nav-item" onclick="showPage('vehicules')">
+                    <div class="nav-item" onclick="showPageNav('vehicules')">
                         <span class="nav-icon">🚗</span>
                         <span>Véhicules</span>
                     </div>
-                    <div class="nav-item" onclick="showPage('clients')">
+                    <div class="nav-item" onclick="showPageNav('clients')">
                         <span class="nav-icon">👥</span>
                         <span>Clients</span>
                     </div>
-                    <div class="nav-item" onclick="showPage('frais')">
+                    <div class="nav-item" onclick="showPageNav('frais')">
                         <span class="nav-icon">💰</span>
                         <span>Frais</span>
                     </div>
-                    <div class="nav-item" onclick="showPage('ventes')">
+                    <div class="nav-item" onclick="showPageNav('ventes')">
                         <span class="nav-icon">📈</span>
                         <span>Ventes</span>
                     </div>
@@ -624,7 +624,7 @@
                             <div class="stat-card-title">Véhicules en stock</div>
                             <div class="stat-card-icon">🚗</div>
                         </div>
-                        <div class="stat-card-value" id="vehiculesStock">-</div>
+                        <div class="stat-card-value" id="vehiculesStock">0</div>
                         <div class="stat-card-subtitle">Disponibles à la vente</div>
                     </div>
                     
@@ -633,7 +633,7 @@
                             <div class="stat-card-title">Véhicules vendus</div>
                             <div class="stat-card-icon">✅</div>
                         </div>
-                        <div class="stat-card-value" id="vehiculesVendus">-</div>
+                        <div class="stat-card-value" id="vehiculesVendus">0</div>
                         <div class="stat-card-subtitle">Total des ventes</div>
                     </div>
                     
@@ -642,7 +642,7 @@
                             <div class="stat-card-title">Bénéfice total</div>
                             <div class="stat-card-icon">💰</div>
                         </div>
-                        <div class="stat-card-value" id="beneficeTotal">-</div>
+                        <div class="stat-card-value" id="beneficeTotal">0 €</div>
                         <div class="stat-card-subtitle">Marge globale</div>
                     </div>
                     
@@ -651,7 +651,7 @@
                             <div class="stat-card-title">Bénéfice moyen</div>
                             <div class="stat-card-icon">📊</div>
                         </div>
-                        <div class="stat-card-value" id="beneficeMoyen">-</div>
+                        <div class="stat-card-value" id="beneficeMoyen">0 €</div>
                         <div class="stat-card-subtitle">Par véhicule vendu</div>
                     </div>
                 </div>
@@ -661,21 +661,32 @@
                     <p>Gérez efficacement votre parc automobile, vos clients, vos frais et vos ventes. Toutes vos données sont synchronisées en temps réel.</p>
                 </div>
                 
-                <div class="loading" id="loadingStats">Chargement des statistiques...</div>
+                <div class="loading" id="loadingStats" style="display: none;">Chargement des statistiques...</div>
             </div>
         </div>
     </div>
 
     <script>
-        // Configuration Supabase
-        const SUPABASE_URL = 'https://htmpyspelscwftpdrzov.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0bXB5c3BlbHNjd2Z0cGRyem92Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NDQ5NTAsImV4cCI6MjA4NjQyMDk1MH0.FKv8RO32kNEI8KQACWlTgvKTn9X8N39HyKza03Rq0lY';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // Variables globales
+        let supabaseClient = null;
+        
+        // Initialiser Supabase
+        function initSupabase() {
+            const SUPABASE_URL = 'https://htmpyspelscwftpdrzov.supabase.co';
+            const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0bXB5c3BlbHNjd2Z0cGRyem92Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NDQ5NTAsImV4cCI6MjA4NjQyMDk1MH0.FKv8RO32kNEI8KQACWlTgvKTn9X8N39HyKza03Rq0lY';
+            
+            if (window.supabase && !supabaseClient) {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                console.log('Supabase initialisé');
+            }
+        }
 
         // Vérification de la session au chargement
-        if (localStorage.getItem('autovox_session') === 'active') {
-            showDashboard();
-        }
+        window.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('autovox_session') === 'active') {
+                showDashboard();
+            }
+        });
 
         // Soumission du formulaire de connexion
         document.getElementById('loginForm').addEventListener('submit', function(e) {
@@ -694,49 +705,54 @@
         });
 
         // Afficher le dashboard
-        async function showDashboard() {
+        function showDashboard() {
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('dashboardPage').classList.add('active');
-            await loadStats();
+            initSupabase();
+            loadStats();
         }
 
         // Charger les statistiques depuis Supabase
         async function loadStats() {
+            if (!supabaseClient) {
+                console.error('Supabase non initialisé');
+                return;
+            }
+            
+            document.getElementById('loadingStats').style.display = 'block';
+            
             try {
                 // Véhicules en stock
-                const { data: vehiculesStock, error: errorStock } = await supabase
+                const { data: vehiculesStock, error: errorStock } = await supabaseClient
                     .from('vehicules')
                     .select('*', { count: 'exact' })
                     .eq('statut', 'en_stock');
                 
-                if (!errorStock) {
+                if (!errorStock && vehiculesStock) {
                     document.getElementById('vehiculesStock').textContent = vehiculesStock.length;
                 }
                 
                 // Véhicules vendus
-                const { data: vehiculesVendus, error: errorVendus } = await supabase
+                const { data: vehiculesVendus, error: errorVendus } = await supabaseClient
                     .from('vehicules')
                     .select('*', { count: 'exact' })
                     .eq('statut', 'vendu');
                 
-                if (!errorVendus) {
+                if (!errorVendus && vehiculesVendus) {
                     document.getElementById('vehiculesVendus').textContent = vehiculesVendus.length;
                 }
                 
                 // Bénéfice total et moyen
-                const { data: ventes, error: errorVentes } = await supabase
+                const { data: ventes, error: errorVentes } = await supabaseClient
                     .from('ventes')
                     .select('marge');
                 
-                if (!errorVentes && ventes) {
-                    const beneficeTotal = ventes.reduce((sum, v) => sum + (v.marge || 0), 0);
-                    const beneficeMoyen = ventes.length > 0 ? beneficeTotal / ventes.length : 0;
+                if (!errorVentes && ventes && ventes.length > 0) {
+                    const beneficeTotal = ventes.reduce((sum, v) => sum + (parseFloat(v.marge) || 0), 0);
+                    const beneficeMoyen = beneficeTotal / ventes.length;
                     
-                    document.getElementById('beneficeTotal').textContent = beneficeTotal.toLocaleString('fr-FR') + ' €';
+                    document.getElementById('beneficeTotal').textContent = Math.round(beneficeTotal).toLocaleString('fr-FR') + ' €';
                     document.getElementById('beneficeMoyen').textContent = Math.round(beneficeMoyen).toLocaleString('fr-FR') + ' €';
-                } else {
-                    document.getElementById('beneficeTotal').textContent = '0 €';
-                    document.getElementById('beneficeMoyen').textContent = '0 €';
                 }
                 
                 document.getElementById('loadingStats').style.display = 'none';
@@ -748,13 +764,15 @@
         }
 
         // Navigation
-        function showPage(page) {
+        function showPageNav(page) {
             // Mettre à jour le menu actif
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             event.currentTarget.classList.add('active');
             
             // TODO: Afficher la page correspondante
-            alert('Page "' + page + '" en cours de développement');
+            if (page !== 'dashboard') {
+                alert('Page "' + page + '" en cours de développement');
+            }
         }
 
         // Déconnexion
