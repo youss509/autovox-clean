@@ -1519,18 +1519,70 @@
 
         // Charger les statistiques
         async function loadStats() {
-            if (!supabaseClient) return;
-            
             try {
-                const { data: vehicules } = await supabaseClient.from('vehicules').select('*');
-                
-                if (vehicules) {
-                    const stock = vehicules.filter(v => v.statut === 'en_stock').length;
-                    const vendus = vehicules.filter(v => v.statut === 'vendu').length;
-                    
-                    document.getElementById('vehiculesStock').textContent = stock;
-                    document.getElementById('vehiculesVendus').textContent = vendus;
+                const { count: stockCount } = await supabaseClient
+                    .from('vehicules')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('statut', 'en_stock');
+
+                const { count: vendusCount } = await supabaseClient
+                    .from('vehicules')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('statut', 'vendu');
+
+                // Récupérer toutes les ventes avec véhicules
+                const { data: ventes, error: ventesError } = await supabaseClient
+                    .from('ventes')
+                    .select(`
+                        *,
+                        vehicules (
+                            id,
+                            prix_achat
+                        )
+                    `);
+
+                if (ventesError) throw ventesError;
+
+                // Calculer le bénéfice net total
+                let beneficeNetTotal = 0;
+
+                for (const vente of ventes) {
+                    const prixAchat = parseFloat(vente.vehicules?.prix_achat || 0);
+                    const prixVente = parseFloat(vente.prix_vente || 0);
+
+                    // Récupérer les frais du véhicule
+                    const { data: frais, error: fraisError } = await supabaseClient
+                        .from('frais')
+                        .select('montant')
+                        .eq('vehicule_id', vente.vehicule_id);
+
+                    if (fraisError) throw fraisError;
+
+                    const totalFrais = frais.reduce((sum, f) => sum + parseFloat(f.montant || 0), 0);
+                    const beneficeNet = (prixVente - prixAchat) - totalFrais;
+
+                    beneficeNetTotal += beneficeNet;
                 }
+
+                document.getElementById('vehiculesStock').textContent = stockCount || 0;
+                document.getElementById('vehiculesVendus').textContent = vendusCount || 0;
+
+                const beneficeElement = document.getElementById('beneficeTotal');
+                beneficeElement.textContent = beneficeNetTotal.toFixed(2) + ' €';
+
+                if (beneficeNetTotal >= 0) {
+                    beneficeElement.style.color = 'var(--success)';
+                } else {
+                    beneficeElement.style.color = 'var(--danger)';
+                }
+
+            } catch (error) {
+                console.error('Erreur chargement stats:', error);
+                document.getElementById('vehiculesStock').textContent = '0';
+                document.getElementById('vehiculesVendus').textContent = '0';
+                document.getElementById('beneficeTotal').textContent = '0.00 €';
+            }
+        }
 
                 const { data: ventes } = await supabaseClient.from('ventes').select('*, vehicules(prix_achat)');
                 
@@ -2185,83 +2237,132 @@
         // ========== VENTES ==========
         
         async function loadVentes() {
-            if (!supabaseClient) return;
-            
-            const container = document.getElementById('ventesContainer');
-            container.innerHTML = '<div class="loading">Chargement des ventes...</div>';
-            
             try {
+                // Récupérer les ventes avec les véhicules et clients
                 const { data: ventes, error } = await supabaseClient
                     .from('ventes')
-                    .select('*, vehicules(marque, modele, immatriculation, prix_achat), clients(nom, prenom)')
+                    .select(`
+                        *,
+                        vehicules (
+                            id,
+                            immatriculation,
+                            marque,
+                            modele,
+                            prix_achat
+                        ),
+                        clients (
+                            nom,
+                            prenom
+                        )
+                    `)
                     .order('date_vente', { ascending: false });
-                
+
                 if (error) throw error;
-                
-                allVentes = ventes || [];
-                displayVentes(allVentes);
-                
+
+                // Pour chaque vente, récupérer les frais du véhicule
+                const ventesAvecFrais = await Promise.all(
+                    ventes.map(async (vente) => {
+                        const { data: frais, error: fraisError } = await supabaseClient
+                            .from('frais')
+                            .select('montant')
+                            .eq('vehicule_id', vente.vehicule_id);
+
+                        if (fraisError) throw fraisError;
+
+                        // Calculer le total des frais
+                        const totalFrais = frais.reduce((sum, f) => sum + parseFloat(f.montant || 0), 0);
+
+                        return {
+                            ...vente,
+                            totalFrais: totalFrais
+                        };
+                    })
+                );
+
+                const container = document.getElementById('ventesContainer');
+
+                if (ventesAvecFrais.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📈</div>
+                            <h3>Aucune vente</h3>
+                            <p>Vous n'avez pas encore enregistré de vente.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const venteCardsHTML = ventesAvecFrais.map(vente => {
+                    const vehicule = vente.vehicules;
+                    const client = vente.clients;
+
+                    const prixAchat = parseFloat(vehicule?.prix_achat || 0);
+                    const prixVente = parseFloat(vente.prix_vente || 0);
+                    const totalFrais = vente.totalFrais;
+
+                    const beneficeBrut = prixVente - prixAchat;
+                    const beneficeNet = beneficeBrut - totalFrais;
+
+                    const brutClass = beneficeBrut >= 0 ? 'positive' : 'negative';
+                    const netClass = beneficeNet >= 0 ? 'positive' : 'negative';
+
+                    return `
+                        <div class="vente-card">
+                            <h3>${vehicule?.marque || ''} ${vehicule?.modele || ''}</h3>
+                            <div class="vente-info">
+                                <div class="info-row">
+                                    <span class="info-label">Immatriculation</span>
+                                    <span>${vehicule?.immatriculation || 'N/A'}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Client</span>
+                                    <span>${client ? client.prenom + ' ' + client.nom : 'Non renseigné'}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Date de vente</span>
+                                    <span>${vente.date_vente || 'N/A'}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Prix d'achat</span>
+                                    <span>${prixAchat.toFixed(2)} €</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Prix de vente</span>
+                                    <span>${prixVente.toFixed(2)} €</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Frais associés</span>
+                                    <span style="color: var(--danger);">-${totalFrais.toFixed(2)} €</span>
+                                </div>
+                                <div style="border-top: 1px solid var(--border-color); margin: 12px 0; padding-top: 12px;">
+                                    <div class="info-row">
+                                        <span class="info-label">Bénéfice brut</span>
+                                        <span class="amount ${brutClass}" style="font-size: 18px;">${beneficeBrut.toFixed(2)} €</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label" style="font-weight: 600;">Bénéfice net</span>
+                                        <span class="amount ${netClass}" style="font-size: 24px; font-weight: bold;">${beneficeNet.toFixed(2)} €</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                container.innerHTML = `<div class="ventes-grid">${venteCardsHTML}</div>`;
+
             } catch (error) {
-                console.error('Erreur:', error);
-                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>Erreur de chargement</h3></div>';
+                console.error('Erreur chargement ventes:', error);
+                document.getElementById('ventesContainer').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">❌</div>
+                        <h3>Erreur</h3>
+                        <p>Impossible de charger les ventes.</p>
+                    </div>
+                `;
             }
         }
 
-        function displayVentes(ventes) {
-            const container = document.getElementById('ventesContainer');
-            
-            if (ventes.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">📈</div>
-                        <h3>Aucune vente</h3>
-                        <p>Vos ventes apparaîtront ici</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            const html = `
-                <div class="ventes-grid">
-                    ${ventes.map(v => {
-                        const benefice = parseFloat(v.prix_vente) - parseFloat(v.vehicules?.prix_achat || 0);
-                        return `
-                        <div class="vente-card">
-                            <h3>${v.vehicules?.marque} ${v.vehicules?.modele}</h3>
-                            <div class="vente-info">
-                                <div class="info-row">
-                                    <span class="info-label">Immatriculation:</span>
-                                    <span>${v.vehicules?.immatriculation}</span>
-                                </div>
-                                <div class="info-row">
-                                    <span class="info-label">Date de vente:</span>
-                                    <span>${new Date(v.date_vente).toLocaleDateString('fr-FR')}</span>
-                                </div>
-                                ${v.clients ? `
-                                <div class="info-row">
-                                    <span class="info-label">Client:</span>
-                                    <span>${v.clients.nom} ${v.clients.prenom}</span>
-                                </div>
-                                ` : ''}
-                                <div class="info-row">
-                                    <span class="info-label">Prix d'achat:</span>
-                                    <span>${parseFloat(v.vehicules?.prix_achat || 0).toLocaleString('fr-FR')} €</span>
-                                </div>
-                                <div class="info-row">
-                                    <span class="info-label">Prix de vente:</span>
-                                    <span>${parseFloat(v.prix_vente).toLocaleString('fr-FR')} €</span>
-                                </div>
-                            </div>
-                            <div class="amount ${benefice >= 0 ? 'positive' : 'negative'}">
-                                ${benefice >= 0 ? '+' : ''}${Math.round(benefice).toLocaleString('fr-FR')} €
-                            </div>
-                        </div>
-                    `}).join('')}
-                </div>
-            `;
-            
-            container.innerHTML = html;
-        }
 
         // ========== FONCTIONS POUR LES CARTES CLIQUABLES ==========
         
