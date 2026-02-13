@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Autovox - Gestion de flotte automobile</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     
     <style>
         :root {
@@ -460,19 +461,19 @@
             font-size: 15px;
         }
 
-        /* === STATS CARDS === */
+        /* === STATS CARDS (4 CARTES COMPACTES) === */
         .stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
             margin-bottom: 32px;
         }
 
         .stat-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 24px;
+            border-radius: 12px;
+            padding: 20px;
             transition: all 0.3s;
             cursor: pointer;
         }
@@ -487,11 +488,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
         .stat-card-title {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 600;
             color: var(--text-secondary);
             text-transform: uppercase;
@@ -499,37 +500,64 @@
         }
 
         .stat-card-icon {
-            font-size: 32px;
+            font-size: 24px;
         }
 
         .stat-card-value {
-            font-size: 36px;
+            font-size: 32px;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: var(--text-primary);
         }
 
         .stat-card-subtitle {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-secondary);
         }
 
-        .welcome-card {
-            background: linear-gradient(135deg, var(--primary), #1e40af);
-            border-radius: 20px;
-            padding: 48px 32px;
-            text-align: center;
-            color: white;
+        /* === SECTION GRAPHIQUES === */
+        .charts-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
         }
 
-        .welcome-card h2 {
-            font-size: 28px;
-            margin-bottom: 12px;
+        .charts-section h2 {
+            font-size: 24px;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .welcome-card p {
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+        }
+
+        .chart-container {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 300px;
+        }
+
+        .chart-container h3 {
             font-size: 16px;
-            opacity: 0.9;
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .chart-canvas {
+            position: relative;
+            height: 250px;
         }
 
         /* === FILTERS === */
@@ -566,7 +594,7 @@
 
         .vehicule-card, .client-card, .frais-card, .vente-card {
             background: var(--bg-card);
-            border: 1px solid var(--border-color);
+            border: 2px solid var(--border-color);
             border-radius: 16px;
             padding: 24px;
             cursor: pointer;
@@ -578,6 +606,17 @@
             transform: translateY(-4px);
             box-shadow: 0 12px 24px var(--shadow-hover);
             border-color: var(--primary);
+        }
+
+        /* NOUVEAU : Couleurs par bénéfice */
+        .vente-card.profit {
+            border-color: var(--success);
+            background: linear-gradient(to bottom right, var(--bg-card) 0%, rgba(16, 185, 129, 0.05) 100%);
+        }
+
+        .vente-card.loss {
+            border-color: var(--danger);
+            background: linear-gradient(to bottom right, var(--bg-card) 0%, rgba(239, 68, 68, 0.05) 100%);
         }
 
         .vehicule-badge {
@@ -845,12 +884,12 @@
                 font-size: 28px;
             }
 
-            .welcome-card {
-                padding: 32px 24px;
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
             }
 
-            .welcome-card h2 {
-                font-size: 22px;
+            .charts-grid {
+                grid-template-columns: 1fr;
             }
 
             .vehicules-grid, .clients-grid, .frais-grid, .ventes-grid {
@@ -979,38 +1018,70 @@
                         </div>
                     </div>
                     
+                    <!-- 4 CARTES COMPACTES -->
                     <div class="stats">
                         <div class="stat-card" onclick="showVehiculesStock()">
                             <div class="stat-card-header">
-                                <div class="stat-card-title">Véhicules en stock</div>
+                                <div class="stat-card-title">En stock</div>
                                 <div class="stat-card-icon">🚗</div>
                             </div>
                             <div class="stat-card-value" id="vehiculesStock">0</div>
-                            <div class="stat-card-subtitle">Cliquez pour voir la liste</div>
+                            <div class="stat-card-subtitle">Véhicules disponibles</div>
                         </div>
                         
                         <div class="stat-card" onclick="showVehiculesVendus()">
                             <div class="stat-card-header">
-                                <div class="stat-card-title">Véhicules vendus</div>
+                                <div class="stat-card-title">Vendus</div>
                                 <div class="stat-card-icon">✅</div>
                             </div>
                             <div class="stat-card-value" id="vehiculesVendus">0</div>
-                            <div class="stat-card-subtitle">Cliquez pour voir la liste</div>
+                            <div class="stat-card-subtitle">Véhicules vendus</div>
                         </div>
                         
                         <div class="stat-card" onclick="showVentesDetails()">
                             <div class="stat-card-header">
-                                <div class="stat-card-title">Bénéfice net total</div>
+                                <div class="stat-card-title">Bénéfice net</div>
                                 <div class="stat-card-icon">💰</div>
                             </div>
                             <div class="stat-card-value" id="beneficeTotal">0 €</div>
-                            <div class="stat-card-subtitle">Avec frais déduits • Cliquez pour détails</div>
+                            <div class="stat-card-subtitle">Avec frais déduits</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-card-header">
+                                <div class="stat-card-title">Statistiques</div>
+                                <div class="stat-card-icon">📊</div>
+                            </div>
+                            <div class="stat-card-value" id="totalVentesCount">0</div>
+                            <div class="stat-card-subtitle">Ventes ce mois</div>
                         </div>
                     </div>
-                    
-                    <div class="welcome-card">
-                        <h2>Bienvenue sur Autovox ✨</h2>
-                        <p>Gérez efficacement votre parc automobile</p>
+
+                    <!-- SECTION GRAPHIQUES -->
+                    <div class="charts-section">
+                        <h2>📊 Vue d'ensemble - Statistiques</h2>
+                        <div class="charts-grid">
+                            <div class="chart-container">
+                                <h3>📈 Chiffre d'affaires mensuel</h3>
+                                <div class="chart-canvas">
+                                    <canvas id="chartCA"></canvas>
+                                </div>
+                            </div>
+                            
+                            <div class="chart-container">
+                                <h3>💰 Bénéfice net mensuel</h3>
+                                <div class="chart-canvas">
+                                    <canvas id="chartBenefice"></canvas>
+                                </div>
+                            </div>
+                            
+                            <div class="chart-container" style="grid-column: 1 / -1;">
+                                <h3>🚗 Véhicules vendus par mois</h3>
+                                <div class="chart-canvas">
+                                    <canvas id="chartVentes"></canvas>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1504,6 +1575,9 @@
         let allClients = [];
         let allFrais = [];
         let allVentes = [];
+        let chartCA = null;
+        let chartBenefice = null;
+        let chartVentes = null;
         
         // Initialiser Supabase
         function initSupabase() {
@@ -1527,6 +1601,9 @@
             
             localStorage.setItem('autovox_theme', isDark ? 'dark' : 'light');
             document.getElementById('themeIcon').textContent = isDark ? '☀️' : '🌙';
+            
+            // Recharger les graphiques avec les nouvelles couleurs
+            loadCharts();
         }
 
         // Charger le thème au démarrage
@@ -1638,11 +1715,10 @@
             }
         }
 
-        // ========== CALCUL BÉNÉFICE NET (CORRECTIF) ==========
+        // ========== CALCUL BÉNÉFICE NET ==========
         
         async function calculateBeneficeNet(vehiculeId, prixVente, prixAchat) {
             try {
-                // Récupérer tous les frais du véhicule
                 const { data: frais } = await supabaseClient
                     .from('frais')
                     .select('montant')
@@ -1667,7 +1743,223 @@
             }
         }
 
-        // Charger les statistiques (CORRIGÉ)
+        // ========== GRAPHIQUES ==========
+        
+        async function loadCharts() {
+            if (!supabaseClient) return;
+            
+            try {
+                const { data: ventes } = await supabaseClient
+                    .from('ventes')
+                    .select('*, vehicules(id, prix_achat)')
+                    .order('date_vente', { ascending: true });
+                
+                if (!ventes || ventes.length === 0) {
+                    // Pas de données, afficher des graphiques vides
+                    createEmptyCharts();
+                    return;
+                }
+                
+                // Calculer les données par mois (6 derniers mois)
+                const now = new Date();
+                const months = [];
+                const labels = [];
+                
+                for (let i = 5; i >= 0; i--) {
+                    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                    months.push({
+                        year: date.getFullYear(),
+                        month: date.getMonth(),
+                        label: date.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' }),
+                        ca: 0,
+                        benefice: 0,
+                        count: 0
+                    });
+                    labels.push(date.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' }));
+                }
+                
+                // Remplir les données
+                for (const vente of ventes) {
+                    const venteDate = new Date(vente.date_vente);
+                    const venteMonth = venteDate.getMonth();
+                    const venteYear = venteDate.getFullYear();
+                    
+                    const monthData = months.find(m => m.month === venteMonth && m.year === venteYear);
+                    
+                    if (monthData) {
+                        monthData.ca += parseFloat(vente.prix_vente);
+                        monthData.count += 1;
+                        
+                        const calcul = await calculateBeneficeNet(
+                            vente.vehicule_id,
+                            vente.prix_vente,
+                            vente.vehicules?.prix_achat || 0
+                        );
+                        monthData.benefice += calcul.beneficeNet;
+                    }
+                }
+                
+                const dataCA = months.map(m => Math.round(m.ca));
+                const dataBenefice = months.map(m => Math.round(m.benefice));
+                const dataCount = months.map(m => m.count);
+                
+                // Créer les graphiques
+                createCharts(labels, dataCA, dataBenefice, dataCount);
+                
+            } catch (error) {
+                console.error('Erreur chargement graphiques:', error);
+                createEmptyCharts();
+            }
+        }
+
+        function createCharts(labels, dataCA, dataBenefice, dataCount) {
+            const isDark = document.body.classList.contains('dark-mode');
+            const textColor = isDark ? '#94a3b8' : '#64748b';
+            const gridColor = isDark ? '#334155' : '#e2e8f0';
+            
+            // Détruire les anciens graphiques
+            if (chartCA) chartCA.destroy();
+            if (chartBenefice) chartBenefice.destroy();
+            if (chartVentes) chartVentes.destroy();
+            
+            // Graphique CA
+            const ctxCA = document.getElementById('chartCA').getContext('2d');
+            chartCA = new Chart(ctxCA, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Chiffre d\'affaires (€)',
+                        data: dataCA,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y.toLocaleString('fr-FR') + ' €';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: textColor },
+                            grid: { color: gridColor }
+                        },
+                        x: {
+                            ticks: { color: textColor },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+            
+            // Graphique Bénéfices
+            const ctxBenefice = document.getElementById('chartBenefice').getContext('2d');
+            chartBenefice = new Chart(ctxBenefice, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Bénéfice net (€)',
+                        data: dataBenefice,
+                        backgroundColor: dataBenefice.map(v => v >= 0 ? 'rgba(16, 185, 129, 0.6)' : 'rgba(239, 68, 68, 0.6)'),
+                        borderColor: dataBenefice.map(v => v >= 0 ? '#10b981' : '#ef4444'),
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y.toLocaleString('fr-FR') + ' €';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: textColor },
+                            grid: { color: gridColor }
+                        },
+                        x: {
+                            ticks: { color: textColor },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+            
+            // Graphique Ventes
+            const ctxVentes = document.getElementById('chartVentes').getContext('2d');
+            chartVentes = new Chart(ctxVentes, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Véhicules vendus',
+                        data: dataCount,
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y + ' véhicule(s)';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { 
+                                color: textColor,
+                                stepSize: 1
+                            },
+                            grid: { color: gridColor }
+                        },
+                        x: {
+                            ticks: { color: textColor },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createEmptyCharts() {
+            const labels = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'];
+            const emptyData = [0, 0, 0, 0, 0, 0];
+            createCharts(labels, emptyData, emptyData, emptyData);
+        }
+
+        // Charger les statistiques
         async function loadStats() {
             if (!supabaseClient) return;
             
@@ -1682,13 +1974,20 @@
                     document.getElementById('vehiculesVendus').textContent = vendus;
                 }
 
-                // Calcul du bénéfice NET total (CORRIGÉ)
+                // Calcul du bénéfice NET total
                 const { data: ventes } = await supabaseClient
                     .from('ventes')
                     .select('*, vehicules(id, prix_achat)');
                 
                 if (ventes && ventes.length > 0) {
                     let beneficeNetTotal = 0;
+                    
+                    // Calculer ventes du mois en cours
+                    const now = new Date();
+                    const currentMonth = now.getMonth();
+                    const currentYear = now.getFullYear();
+                    
+                    let ventesThisMonth = 0;
                     
                     for (const vente of ventes) {
                         const calcul = await calculateBeneficeNet(
@@ -1697,11 +1996,22 @@
                             vente.vehicules?.prix_achat || 0
                         );
                         beneficeNetTotal += calcul.beneficeNet;
+                        
+                        // Compter ventes du mois
+                        const venteDate = new Date(vente.date_vente);
+                        if (venteDate.getMonth() === currentMonth && venteDate.getFullYear() === currentYear) {
+                            ventesThisMonth++;
+                        }
                     }
                     
                     document.getElementById('beneficeTotal').textContent = 
                         Math.round(beneficeNetTotal).toLocaleString('fr-FR') + ' €';
+                    
+                    document.getElementById('totalVentesCount').textContent = ventesThisMonth;
                 }
+                
+                // Charger les graphiques
+                loadCharts();
                 
             } catch (error) {
                 console.error('Erreur:', error);
@@ -1850,7 +2160,7 @@
             }
         });
 
-        // Détails véhicule (CORRIGÉ - avec frais)
+        // Détails véhicule (avec frais)
         async function openVehiculeDetails(id) {
             const vehicule = allVehicules.find(v => v.id === id);
             if (!vehicule) return;
@@ -2017,13 +2327,16 @@
             
             content.innerHTML = detailsHTML;
             
+            // NOUVEAU : Bouton supprimer sur TOUS les véhicules
             if (vehicule.statut === 'en_stock') {
                 actions.innerHTML = `
                     <button class="btn btn-secondary" onclick="closeDetailsModal(); openEditModal('${vehicule.id}')">✏️ Modifier</button>
                     <button class="btn btn-success" onclick="closeDetailsModal(); openVendreModal('${vehicule.id}')">💰 Vendre</button>
+                    <button class="btn btn-danger" onclick="closeDetailsModal(); deleteVehicule('${vehicule.id}')">🗑️ Supprimer</button>
                 `;
             } else {
                 actions.innerHTML = `
+                    <button class="btn btn-danger" onclick="closeDetailsModal(); deleteVehicule('${vehicule.id}')">🗑️ Supprimer</button>
                     <button class="btn btn-secondary" onclick="closeDetailsModal()">Fermer</button>
                 `;
             }
@@ -2094,6 +2407,35 @@
             }
         });
 
+        // NOUVEAU : Supprimer un véhicule (même vendu)
+        async function deleteVehicule(id) {
+            const vehicule = allVehicules.find(v => v.id === id);
+            if (!vehicule) return;
+            
+            const message = vehicule.statut === 'vendu' 
+                ? '⚠️ ATTENTION !\n\nCe véhicule est vendu. Sa suppression supprimera aussi :\n- La vente associée\n- Tous ses frais\n\nCette action est irréversible.\n\nÊtes-vous sûr de vouloir supprimer ce véhicule ?'
+                : '⚠️ ATTENTION !\n\nVous allez supprimer ce véhicule et tous ses frais associés.\n\nCette action est irréversible.\n\nÊtes-vous sûr de continuer ?';
+            
+            if (!confirm(message)) return;
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('vehicules')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) throw error;
+                
+                loadVehicules();
+                loadStats();
+                alert('✅ Véhicule supprimé avec succès !');
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('❌ Erreur lors de la suppression du véhicule');
+            }
+        }
+
         async function openVendreModal(vehiculeId) {
             document.getElementById('vehiculeIdVente').value = vehiculeId;
             document.getElementById('prixVente').value = '';
@@ -2162,7 +2504,7 @@
             }
         });
 
-        // ========== CLIENTS (AVEC MODIFICATION/SUPPRESSION) ==========
+        // ========== CLIENTS ==========
         
         async function loadClients() {
             if (!supabaseClient) return;
@@ -2292,7 +2634,6 @@
             }
         });
 
-        // NOUVEAU : Modifier un client
         function openEditClientModal(id) {
             const client = allClients.find(c => c.id === id);
             if (!client) return;
@@ -2341,7 +2682,6 @@
             }
         });
 
-        // NOUVEAU : Supprimer un client
         async function deleteClient(id) {
             if (!confirm('Êtes-vous sûr de vouloir supprimer ce client ?')) return;
             
@@ -2362,7 +2702,6 @@
             }
         }
 
-        // NOUVEAU : Détails client avec historique
         async function openClientDetails(id) {
             const client = allClients.find(c => c.id === id);
             if (!client) return;
@@ -2373,7 +2712,6 @@
             
             document.getElementById('detailsClientTitle').textContent = `${client.nom} ${client.prenom}`;
             
-            // Récupérer l'historique des achats
             const { data: ventes } = await supabaseClient
                 .from('ventes')
                 .select('*, vehicules(marque, modele, immatriculation)')
@@ -2410,7 +2748,6 @@
                 </div>
             `;
             
-            // Historique des achats
             if (ventes && ventes.length > 0) {
                 detailsHTML += `
                     <div class="detail-section">
@@ -2459,7 +2796,7 @@
             document.getElementById('modalDetailsClient').classList.remove('active');
         }
 
-        // ========== FRAIS (AVEC MODIFICATION/SUPPRESSION) ==========
+        // ========== FRAIS ==========
         
         async function loadFrais() {
             if (!supabaseClient) return;
@@ -2478,7 +2815,6 @@
                 allFrais = frais || [];
                 displayFrais(allFrais);
                 
-                // Charger la liste des véhicules pour les formulaires
                 await loadVehiculesForSelect();
                 
             } catch (error) {
@@ -2612,7 +2948,7 @@
                 
                 closeAddFraisModal();
                 loadFrais();
-                loadStats(); // Recalculer les stats
+                loadStats();
                 alert('✅ Frais ajoutés avec succès !');
                 
             } catch (error) {
@@ -2621,7 +2957,6 @@
             }
         });
 
-        // NOUVEAU : Modifier un frais
         function openEditFraisModal(id) {
             const frais = allFrais.find(f => f.id === id);
             if (!frais) return;
@@ -2664,7 +2999,7 @@
                 
                 closeEditFraisModal();
                 loadFrais();
-                loadStats(); // Recalculer les stats
+                loadStats();
                 alert('✅ Frais modifié avec succès !');
                 
             } catch (error) {
@@ -2673,7 +3008,6 @@
             }
         });
 
-        // NOUVEAU : Supprimer un frais
         async function deleteFrais(id) {
             if (!confirm('Êtes-vous sûr de vouloir supprimer ces frais ?')) return;
             
@@ -2686,7 +3020,7 @@
                 if (error) throw error;
                 
                 loadFrais();
-                loadStats(); // Recalculer les stats
+                loadStats();
                 alert('✅ Frais supprimé avec succès !');
                 
             } catch (error) {
@@ -2695,7 +3029,7 @@
             }
         }
 
-        // ========== VENTES (AVEC BÉNÉFICE NET CORRIGÉ) ==========
+        // ========== VENTES (AVEC COULEURS) ==========
         
         async function loadVentes() {
             if (!supabaseClient) return;
@@ -2734,7 +3068,6 @@
                 return;
             }
             
-            // Calculer tous les bénéfices nets
             const ventesAvecBenefice = await Promise.all(ventes.map(async v => {
                 const calcul = await calculateBeneficeNet(
                     v.vehicule_id,
@@ -2747,7 +3080,7 @@
             const html = `
                 <div class="ventes-grid">
                     ${ventesAvecBenefice.map(v => `
-                        <div class="vente-card">
+                        <div class="vente-card ${v.beneficeNet >= 0 ? 'profit' : 'loss'}">
                             <h3>${v.vehicules?.marque} ${v.vehicules?.modele}</h3>
                             <div class="vente-info">
                                 <div class="info-row">
@@ -2774,7 +3107,7 @@
                                 </div>
                                 <div class="info-row">
                                     <span class="info-label">Bénéfice brut:</span>
-                                    <span class="${v.beneficeBrut >= 0 ? 'positive' : 'negative'}" style="font-weight: 600;">
+                                    <span style="font-weight: 600; color: ${v.beneficeBrut >= 0 ? 'var(--success)' : 'var(--danger)'};">
                                         ${v.beneficeBrut >= 0 ? '+' : ''}${Math.round(v.beneficeBrut).toLocaleString('fr-FR')} €
                                     </span>
                                 </div>
