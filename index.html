@@ -515,6 +515,25 @@
             color: var(--text-secondary);
         }
 
+        /* === WELCOME CARD === */
+        .welcome-card {
+            background: linear-gradient(135deg, var(--primary), #1e40af);
+            border-radius: 20px;
+            padding: 48px 32px;
+            text-align: center;
+            color: white;
+        }
+
+        .welcome-card h2 {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+
+        .welcome-card p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
         /* === SECTION GRAPHIQUES === */
         .charts-section {
             background: var(--bg-card);
@@ -965,6 +984,10 @@
                         <span class="nav-icon">📈</span>
                         <span>Ventes</span>
                     </div>
+                    <div class="nav-link" data-page="statistiques">
+                        <span class="nav-icon">📊</span>
+                        <span>Statistiques</span>
+                    </div>
                 </nav>
             </div>
             
@@ -1000,6 +1023,10 @@
             <div class="mobile-menu-item" data-page="ventes">
                 <span class="nav-icon">📈</span>
                 <span>Ventes</span>
+            </div>
+            <div class="mobile-menu-item" data-page="statistiques">
+                <span class="nav-icon">📊</span>
+                <span>Statistiques</span>
             </div>
             <div style="border-top: 1px solid var(--border-color); margin: 20px 0; padding-top: 20px;">
                 <button class="btn btn-secondary" onclick="logout()" style="width: 100%;">Déconnexion</button>
@@ -1047,7 +1074,7 @@
                             <div class="stat-card-subtitle">Avec frais déduits</div>
                         </div>
 
-                        <div class="stat-card">
+                        <div class="stat-card" onclick="navigateToPage('statistiques')">
                             <div class="stat-card-header">
                                 <div class="stat-card-title">Statistiques</div>
                                 <div class="stat-card-icon">📊</div>
@@ -1057,9 +1084,25 @@
                         </div>
                     </div>
 
+                    <!-- WELCOME CARD -->
+                    <div class="welcome-card">
+                        <h2>Bienvenue sur Autovox ✨</h2>
+                        <p>Gérez efficacement votre parc automobile</p>
+                    </div>
+                </div>
+
+                <!-- PAGE STATISTIQUES (NOUVELLE) -->
+                <div class="page-content" id="pageStatistiques">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h1>Statistiques</h1>
+                            <p>Analyse de vos performances</p>
+                        </div>
+                    </div>
+
                     <!-- SECTION GRAPHIQUES -->
                     <div class="charts-section">
-                        <h2>📊 Vue d'ensemble - Statistiques</h2>
+                        <h2>📊 Vue d'ensemble</h2>
                         <div class="charts-grid">
                             <div class="chart-container">
                                 <h3>📈 Chiffre d'affaires mensuel</h3>
@@ -1602,8 +1645,11 @@
             localStorage.setItem('autovox_theme', isDark ? 'dark' : 'light');
             document.getElementById('themeIcon').textContent = isDark ? '☀️' : '🌙';
             
-            // Recharger les graphiques avec les nouvelles couleurs
-            loadCharts();
+            // Recharger les graphiques avec les nouvelles couleurs si on est sur la page stats
+            const currentPage = document.querySelector('.page-content.active');
+            if (currentPage && currentPage.id === 'pageStatistiques') {
+                loadCharts();
+            }
         }
 
         // Charger le thème au démarrage
@@ -1712,6 +1758,8 @@
                 loadFrais();
             } else if (page === 'ventes') {
                 loadVentes();
+            } else if (page === 'statistiques') {
+                loadCharts();
             }
         }
 
@@ -2009,9 +2057,6 @@
                     
                     document.getElementById('totalVentesCount').textContent = ventesThisMonth;
                 }
-                
-                // Charger les graphiques
-                loadCharts();
                 
             } catch (error) {
                 console.error('Erreur:', error);
@@ -2327,7 +2372,7 @@
             
             content.innerHTML = detailsHTML;
             
-            // NOUVEAU : Bouton supprimer sur TOUS les véhicules
+            // Boutons avec suppression
             if (vehicule.statut === 'en_stock') {
                 actions.innerHTML = `
                     <button class="btn btn-secondary" onclick="closeDetailsModal(); openEditModal('${vehicule.id}')">✏️ Modifier</button>
@@ -2407,7 +2452,7 @@
             }
         });
 
-        // NOUVEAU : Supprimer un véhicule (même vendu)
+        // Supprimer un véhicule (même vendu)
         async function deleteVehicule(id) {
             const vehicule = allVehicules.find(v => v.id === id);
             if (!vehicule) return;
