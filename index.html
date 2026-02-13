@@ -3,6 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="description" content="Autovox - Gestion professionnelle de flotte automobile">
+    
+    <!-- PWA MANIFEST -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- ICONS PWA -->
+    <link rel="icon" type="image/png" sizes="192x192" href="logo sans fond.jpg">
+    <link rel="apple-touch-icon" href="logo sans fond.jpg">
+    
     <title>Autovox - Gestion de flotte automobile</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -44,11 +54,21 @@
             box-sizing: border-box;
         }
 
+        html {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100vw;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             transition: background 0.3s, color 0.3s;
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100vw;
+            position: relative;
         }
 
         /* === PAGE DE CONNEXION === */
@@ -247,6 +267,9 @@
             display: none;
             min-height: 100vh;
             background: var(--bg-primary);
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100vw;
         }
 
         .dashboard.active {
@@ -266,6 +289,9 @@
             top: 0;
             z-index: 100;
             box-shadow: 0 2px 8px var(--shadow);
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100vw;
         }
 
         .header-left {
@@ -273,6 +299,7 @@
             align-items: center;
             gap: 32px;
             flex: 1;
+            min-width: 0;
         }
 
         .header-logo {
@@ -281,6 +308,7 @@
             gap: 12px;
             text-decoration: none;
             color: var(--text-primary);
+            flex-shrink: 0;
         }
 
         .header-logo-icon {
@@ -290,6 +318,7 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            flex-shrink: 0;
         }
 
         .header-logo-icon img {
@@ -305,6 +334,9 @@
         .header-nav {
             display: flex;
             gap: 4px;
+            overflow-x: auto;
+            flex: 1;
+            min-width: 0;
         }
 
         .nav-link {
@@ -319,6 +351,7 @@
             font-size: 14px;
             font-weight: 500;
             white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .nav-link:hover {
@@ -339,6 +372,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            flex-shrink: 0;
         }
 
         .theme-toggle-btn {
@@ -353,6 +387,7 @@
             justify-content: center;
             font-size: 20px;
             transition: all 0.3s;
+            flex-shrink: 0;
         }
 
         .theme-toggle-btn:hover {
@@ -371,6 +406,7 @@
             font-size: 20px;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
 
         /* === MOBILE MENU === */
@@ -382,6 +418,9 @@
             flex-direction: column;
             gap: 8px;
             box-shadow: 0 4px 12px var(--shadow);
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
         }
 
         .mobile-menu.active {
@@ -415,12 +454,16 @@
         .main-wrapper {
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100vw;
         }
 
         .main-content {
             max-width: 1400px;
             margin: 0 auto;
             padding: 32px 24px;
+            width: 100%;
         }
 
         .page-content {
@@ -878,10 +921,16 @@
             .header-logo-icon {
                 width: 80px;
                 height: 80px;
+                flex-shrink: 0;
             }
 
             .header-nav {
                 display: none;
+            }
+
+            .header {
+                padding: 8px 16px;
+                overflow-x: hidden;
             }
 
             .hamburger {
@@ -914,6 +963,10 @@
 
             .form-row {
                 grid-template-columns: 1fr;
+            }
+
+            .main-content {
+                padding: 16px;
             }
         }
     </style>
@@ -1609,6 +1662,19 @@
         </div>
     </div>
     <script>
+        // ========== ENREGISTREMENT SERVICE WORKER (PWA) ==========
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(function(registration) {
+                        console.log('✅ PWA activée ! Service Worker enregistré');
+                    })
+                    .catch(function(error) {
+                        console.log('⚠️ Service Worker non enregistré:', error);
+                    });
+            });
+        }
+
         // Variables globales
         let supabaseClient = null;
         let allVehicules = [];
@@ -1629,12 +1695,10 @@
             }
         }
 
-        // Générer un ID unique
         function generateId() {
             return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         }
 
-        // Mode Dark/Light
         function toggleTheme() {
             const body = document.body;
             const isDark = body.classList.toggle('dark-mode');
@@ -1642,14 +1706,12 @@
             localStorage.setItem('autovox_theme', isDark ? 'dark' : 'light');
             document.getElementById('themeIcon').textContent = isDark ? '☀️' : '🌙';
             
-            // Recharger les graphiques avec les nouvelles couleurs si on est sur la page stats
             const currentPage = document.querySelector('.page-content.active');
             if (currentPage && currentPage.id === 'pageStatistiques') {
                 loadCharts();
             }
         }
 
-        // Charger le thème au démarrage
         function loadTheme() {
             const savedTheme = localStorage.getItem('autovox_theme');
             if (savedTheme === 'dark') {
@@ -1658,7 +1720,6 @@
             }
         }
 
-        // Menu mobile
         function toggleMobileMenu() {
             const menu = document.getElementById('mobileMenu');
             const isActive = menu.classList.toggle('active');
@@ -1670,7 +1731,6 @@
             document.getElementById('hamburgerIcon').textContent = '☰';
         }
 
-        // Vérification de la session au chargement
         window.addEventListener('DOMContentLoaded', function() {
             loadTheme();
             if (localStorage.getItem('autovox_session') === 'active') {
@@ -1678,7 +1738,6 @@
             }
         });
 
-        // Soumission du formulaire de connexion
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const username = document.getElementById('username').value;
@@ -1694,7 +1753,6 @@
             }
         });
 
-        // Afficher le dashboard
         function showDashboard() {
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('dashboardPage').classList.add('active');
@@ -1703,9 +1761,7 @@
             setupNavigation();
         }
 
-        // Navigation
         function setupNavigation() {
-            // Desktop nav
             document.querySelectorAll('#desktopNav .nav-link').forEach(item => {
                 item.addEventListener('click', function() {
                     const page = this.getAttribute('data-page');
@@ -1713,7 +1769,6 @@
                 });
             });
 
-            // Mobile nav
             document.querySelectorAll('.mobile-menu-item').forEach(item => {
                 item.addEventListener('click', function() {
                     const page = this.getAttribute('data-page');
@@ -1724,7 +1779,6 @@
         }
 
         function navigateToPage(page) {
-            // Mettre à jour desktop nav
             document.querySelectorAll('#desktopNav .nav-link').forEach(item => {
                 item.classList.remove('active');
                 if (item.getAttribute('data-page') === page) {
@@ -1732,7 +1786,6 @@
                 }
             });
 
-            // Mettre à jour mobile nav
             document.querySelectorAll('.mobile-menu-item').forEach(item => {
                 item.classList.remove('active');
                 if (item.getAttribute('data-page') === page) {
@@ -1740,13 +1793,11 @@
                 }
             });
 
-            // Afficher la page
             document.querySelectorAll('.page-content').forEach(content => {
                 content.classList.remove('active');
             });
             document.getElementById('page' + page.charAt(0).toUpperCase() + page.slice(1)).classList.add('active');
 
-            // Charger les données si nécessaire
             if (page === 'vehicules') {
                 loadVehicules();
             } else if (page === 'clients') {
@@ -1760,8 +1811,6 @@
             }
         }
 
-        // ========== CALCUL BÉNÉFICE NET ==========
-        
         async function calculateBeneficeNet(vehiculeId, prixVente, prixAchat) {
             try {
                 const { data: frais } = await supabaseClient
@@ -1788,8 +1837,6 @@
             }
         }
 
-        // ========== GRAPHIQUES ==========
-        
         async function loadCharts() {
             if (!supabaseClient) return;
             
@@ -1800,12 +1847,10 @@
                     .order('date_vente', { ascending: true });
                 
                 if (!ventes || ventes.length === 0) {
-                    // Pas de données, afficher des graphiques vides
                     createEmptyCharts();
                     return;
                 }
                 
-                // Calculer les données par mois (6 derniers mois)
                 const now = new Date();
                 const months = [];
                 const labels = [];
@@ -1823,7 +1868,6 @@
                     labels.push(date.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' }));
                 }
                 
-                // Remplir les données
                 for (const vente of ventes) {
                     const venteDate = new Date(vente.date_vente);
                     const venteMonth = venteDate.getMonth();
@@ -1848,7 +1892,6 @@
                 const dataBenefice = months.map(m => Math.round(m.benefice));
                 const dataCount = months.map(m => m.count);
                 
-                // Créer les graphiques
                 createCharts(labels, dataCA, dataBenefice, dataCount);
                 
             } catch (error) {
@@ -1862,12 +1905,10 @@
             const textColor = isDark ? '#94a3b8' : '#64748b';
             const gridColor = isDark ? '#334155' : '#e2e8f0';
             
-            // Détruire les anciens graphiques
             if (chartCA) chartCA.destroy();
             if (chartBenefice) chartBenefice.destroy();
             if (chartVentes) chartVentes.destroy();
             
-            // Graphique CA
             const ctxCA = document.getElementById('chartCA').getContext('2d');
             chartCA = new Chart(ctxCA, {
                 type: 'line',
@@ -1909,7 +1950,6 @@
                 }
             });
             
-            // Graphique Bénéfices
             const ctxBenefice = document.getElementById('chartBenefice').getContext('2d');
             chartBenefice = new Chart(ctxBenefice, {
                 type: 'bar',
@@ -1950,7 +1990,6 @@
                 }
             });
             
-            // Graphique Ventes
             const ctxVentes = document.getElementById('chartVentes').getContext('2d');
             chartVentes = new Chart(ctxVentes, {
                 type: 'line',
@@ -2004,7 +2043,6 @@
             createCharts(labels, emptyData, emptyData, emptyData);
         }
 
-        // Charger les statistiques
         async function loadStats() {
             if (!supabaseClient) return;
             
@@ -2019,7 +2057,6 @@
                     document.getElementById('vehiculesVendus').textContent = vendus;
                 }
 
-                // Calcul du bénéfice NET total
                 const { data: ventes } = await supabaseClient
                     .from('ventes')
                     .select('*, vehicules(id, prix_achat)');
@@ -2027,7 +2064,6 @@
                 if (ventes && ventes.length > 0) {
                     let beneficeNetTotal = 0;
                     
-                    // Calculer ventes du mois en cours
                     const now = new Date();
                     const currentMonth = now.getMonth();
                     const currentYear = now.getFullYear();
@@ -2042,7 +2078,6 @@
                         );
                         beneficeNetTotal += calcul.beneficeNet;
                         
-                        // Compter ventes du mois
                         const venteDate = new Date(vente.date_vente);
                         if (venteDate.getMonth() === currentMonth && venteDate.getFullYear() === currentYear) {
                             ventesThisMonth++;
@@ -2060,8 +2095,6 @@
             }
         }
 
-        // ========== VEHICULES ==========
-        
         async function loadVehicules() {
             if (!supabaseClient) return;
             
@@ -2202,7 +2235,6 @@
             }
         });
 
-        // Détails véhicule (avec frais)
         async function openVehiculeDetails(id) {
             const vehicule = allVehicules.find(v => v.id === id);
             if (!vehicule) return;
@@ -2213,7 +2245,6 @@
             
             document.getElementById('detailsTitle').textContent = `${vehicule.marque} ${vehicule.modele}`;
             
-            // Récupérer les frais du véhicule
             const { data: frais } = await supabaseClient
                 .from('frais')
                 .select('*')
@@ -2285,7 +2316,6 @@
                 </div>
             `;
             
-            // Afficher les frais détaillés
             if (frais && frais.length > 0) {
                 detailsHTML += `
                     <div class="detail-section">
@@ -2310,7 +2340,6 @@
                 `;
             }
             
-            // Si le véhicule est vendu, afficher les infos de vente
             if (vehicule.statut === 'vendu') {
                 const { data: vente } = await supabaseClient
                     .from('ventes')
@@ -2369,7 +2398,6 @@
             
             content.innerHTML = detailsHTML;
             
-            // Boutons avec suppression
             if (vehicule.statut === 'en_stock') {
                 actions.innerHTML = `
                     <button class="btn btn-secondary" onclick="closeDetailsModal(); openEditModal('${vehicule.id}')">✏️ Modifier</button>
@@ -2449,7 +2477,6 @@
             }
         });
 
-        // Supprimer un véhicule (même vendu)
         async function deleteVehicule(id) {
             const vehicule = allVehicules.find(v => v.id === id);
             if (!vehicule) return;
@@ -2483,7 +2510,6 @@
             document.getElementById('prixVente').value = '';
             document.getElementById('dateVente').value = new Date().toISOString().split('T')[0];
             
-            // Charger la liste des clients
             try {
                 const { data: clients } = await supabaseClient.from('clients').select('*').order('nom');
                 const select = document.getElementById('clientVente');
@@ -2514,7 +2540,6 @@
             const clientId = document.getElementById('clientVente').value || null;
             
             try {
-                // Mettre à jour le statut du véhicule
                 const { error: errorVehicule } = await supabaseClient
                     .from('vehicules')
                     .update({ statut: 'vendu' })
@@ -2522,7 +2547,6 @@
                 
                 if (errorVehicule) throw errorVehicule;
                 
-                // Créer la vente
                 const { error: errorVente } = await supabaseClient
                     .from('ventes')
                     .insert([{
@@ -2546,8 +2570,6 @@
             }
         });
 
-        // ========== CLIENTS ==========
-        
         async function loadClients() {
             if (!supabaseClient) return;
             
@@ -2838,8 +2860,6 @@
             document.getElementById('modalDetailsClient').classList.remove('active');
         }
 
-        // ========== FRAIS ==========
-        
         async function loadFrais() {
             if (!supabaseClient) return;
             
@@ -3071,8 +3091,6 @@
             }
         }
 
-        // ========== VENTES (AVEC COULEURS) ==========
-        
         async function loadVentes() {
             if (!supabaseClient) return;
             
@@ -3172,8 +3190,6 @@
             container.innerHTML = html;
         }
 
-        // ========== FONCTIONS POUR LES CARTES CLIQUABLES ==========
-        
         function showVehiculesStock() {
             navigateToPage('vehicules');
             setTimeout(() => {
@@ -3194,7 +3210,6 @@
             navigateToPage('ventes');
         }
 
-        // Déconnexion
         function logout() {
             localStorage.removeItem('autovox_session');
             location.reload();
