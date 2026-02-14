@@ -3357,6 +3357,186 @@
             localStorage.removeItem('autovox_session');
             location.reload();
         }
+                // ========== GESTION CAISSE ==========
+        
+        // Ouvrir le modal d'ajout d'argent
+        function openModalAjoutCaisse() {
+            document.getElementById('modalAjoutCaisse').classList.add('active');
+            // Mettre la date du jour par défaut
+            const today = new Date().toISOString().split('T')[0];
+            document.querySelector('#formAjoutCaisse input[name="date"]').value = today;
+        }
+        
+        // Fermer le modal
+        function closeModalAjoutCaisse() {
+            document.getElementById('modalAjoutCaisse').classList.remove('active');
+            document.getElementById('formAjoutCaisse').reset();
+        }
+        
+        // Charger les données de la caisse
+        async function loadCaisse() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('caisse')
+                    .select('*')
+                    .order('date', { ascending: false });
+                
+                if (error) throw error;
+                
+                allCaisse = data || [];
+                displayCaisse(allCaisse);
+                updateSoldeCaisse();
+                updateFilterPersonnes();
+                
+            } catch (error) {
+                console.error('Erreur chargement caisse:', error);
+                showNotification('Erreur lors du chargement de la caisse', 'error');
+            }
+        }
+        
+        // Afficher l'historique de la caisse
+        function displayCaisse(caisse) {
+            const tbody = document.getElementById('caisseTableBody');
+            
+            if (!caisse || caisse.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                            💰 Aucune transaction pour le moment
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = caisse.map(c => {
+                const isEntree = c.type === 'entree';
+                const typeIcon = isEntree ? '➕' : '➖';
+                const typeClass = isEntree ? 'badge-success' : 'badge-danger';
+                const montantSign = isEntree ? '+' : '-';
+                
+                return `
+                    <tr>
+                        <td>${formatDate(c.date)}</td>
+                        <td><span class="badge ${typeClass}">${typeIcon} ${isEntree ? 'Entrée' : 'Sortie'}</span></td>
+                        <td style="font-weight: 600; color: ${isEntree ? 'var(--success-color)' : 'var(--danger-color)'}">
+                            ${montantSign}${c.montant.toFixed(2)} €
+                        </td>
+                        <td>${c.personne || '-'}</td>
+                        <td>${c.motif || '-'}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        // Mettre à jour le solde de la caisse
+        async function updateSoldeCaisse() {
+            try {
+                const { data, error } = await supabaseClient
+                    .rpc('get_solde_caisse');
+                
+                if (error) throw error;
+                
+                const solde = data || 0;
+                const soldeFormate = solde.toFixed(2) + ' €';
+                
+                // Mettre à jour le solde dans la page Caisse
+                const soldeCaisseGrand = document.getElementById('soldeCaisseGrand');
+                if (soldeCaisseGrand) {
+                    soldeCaisseGrand.textContent = soldeFormate;
+                    soldeCaisseGrand.style.color = solde >= 0 ? 'var(--success-color)' : 'var(--danger-color)';
+                }
+                
+                // Mettre à jour le solde dans la carte du dashboard
+                const soldeCaisse = document.getElementById('soldeCaisse');
+                if (soldeCaisse) {
+                    soldeCaisse.textContent = soldeFormate;
+                }
+                
+                // Mettre à jour la date
+                const derniereMaj = document.getElementById('derniereMaj');
+                if (derniereMaj) {
+                    derniereMaj.textContent = new Date().toLocaleString('fr-FR');
+                }
+                
+            } catch (error) {
+                console.error('Erreur calcul solde:', error);
+            }
+        }
+        
+        // Ajouter de l'argent dans la caisse
+        async function ajouterArgentCaisse(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const formData = new FormData(form);
+            
+            const caisse = {
+                date: formData.get('date'),
+                type: 'entree',
+                montant: parseFloat(formData.get('montant')),
+                personne: formData.get('personne'),
+                motif: formData.get('motif')
+            };
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('caisse')
+                    .insert([caisse])
+                    .select();
+                
+                if (error) throw error;
+                
+                showNotification('💰 Argent ajouté avec succès !', 'success');
+                closeModalAjoutCaisse();
+                loadCaisse();
+                
+            } catch (error) {
+                console.error('Erreur ajout argent:', error);
+                showNotification('Erreur lors de l\'ajout', 'error');
+            }
+        }
+        
+        // Filtrer la caisse
+        function filterCaisse() {
+            const typeCaisse = document.getElementById('filterTypeCaisse').value;
+            const personne = document.getElementById('filterPersonne').value;
+            const dateDebut = document.getElementById('filterDateDebut').value;
+            const dateFin = document.getElementById('filterDateFin').value;
+            
+            let filtered = allCaisse;
+            
+            if (typeCaisse) {
+                filtered = filtered.filter(c => c.type === typeCaisse);
+            }
+            
+            if (personne) {
+                filtered = filtered.filter(c => c.personne === personne);
+            }
+            
+            if (dateDebut) {
+                filtered = filtered.filter(c => c.date >= dateDebut);
+            }
+            
+            if (dateFin) {
+                filtered = filtered.filter(c => c.date <= dateFin);
+            }
+            
+            displayCaisse(filtered);
+        }
+        
+        // Mettre à jour le filtre des personnes
+        function updateFilterPersonnes() {
+            const select = document.getElementById('filterPersonne');
+            const personnes = [...new Set(allCaisse
+                .filter(c => c.personne)
+                .map(c => c.personne))];
+            
+            select.innerHTML = '<option value="">Toutes</option>';
+            personnes.forEach(p => {
+                select.innerHTML += `<option value="${p}">${p}</option>`;
+            });
+        }
     </script>
 </body>
 </html>
