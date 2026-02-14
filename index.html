@@ -3459,39 +3459,39 @@
         }
 
         // Afficher l'historique de la caisse
-        function displayCaisse(caisse) {
-            const tbody = document.getElementById('caisseTableBody');
-            
-            if (!caisse || caisse.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="5" style="text-align: center; padding: 40px; color: var(--text-secondary);">
-                            💰 Aucune transaction pour le moment
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            tbody.innerHTML = caisse.map(c => {
-                const isEntree = c.type === 'entree';
-                const typeIcon = isEntree ? '➕' : '➖';
-                const typeClass = isEntree ? 'badge-success' : 'badge-danger';
-                const montantSign = isEntree ? '+' : '-';
-                
-                return `
-                    <tr>
-                        <td>${formatDate(c.date)}</td>
-                        <td><span class="badge ${typeClass}">${typeIcon} ${isEntree ? 'Entrée' : 'Sortie'}</span></td>
-                        <td style="font-weight: 600; color: ${isEntree ? 'var(--success-color)' : 'var(--danger-color)'}">
-                            ${montantSign}${c.montant.toFixed(2)} €
-                        </td>
-                        <td>${c.personne || '-'}</td>
-                        <td>${c.motif || '-'}</td>
-                    </tr>
-                `;
-            }).join('');
-        }
+function displayCaisse(caisse) {
+    const tbody = document.getElementById('caisseTableBody');
+    
+    if (!caisse || caisse.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                    💰 Aucune transaction pour le moment
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = caisse.map(c => {
+        const isEntree = c.type === 'entree';
+        const typeIcon = isEntree ? '➕' : '➖';
+        const typeClass = isEntree ? 'badge-success' : 'badge-danger';
+        const montantSign = isEntree ? '+' : '';
+        
+        return `
+            <tr>
+                <td>${formatDate(c.date)}</td>
+                <td><span class="badge ${typeClass}">${typeIcon} ${isEntree ? 'Entrée' : 'Sortie'}</span></td>
+                <td style="font-weight: 600; ${isEntree ? 'color: #4ade80 !important;' : ''}">
+                    ${montantSign}${c.montant.toFixed(2)} €
+                </td>
+                <td>${c.personne || '-'}</td>
+                <td>${c.motif || '-'}</td>
+            </tr>
+        `;
+    }).join('');
+}
         
         // Mettre à jour le solde de la caisse
         async function updateSoldeCaisse() {
