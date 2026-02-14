@@ -1454,6 +1454,45 @@
             </form>
         </div>
     </div>
+    
+    <!-- MODAL AJOUT ARGENT CAISSE -->
+    <div class="modal" id="modalAjoutCaisse">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>💰 Ajouter de l'argent</h2>
+                <button class="modal-close" onclick="closeModalAjoutCaisse()">✕</button>
+            </div>
+            <form id="formAjoutCaisse" onsubmit="ajouterArgentCaisse(event)">
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Date *</label>
+                        <input type="date" name="date" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Montant (€) *</label>
+                        <input type="number" name="montant" step="0.01" min="0.01" required placeholder="Ex: 3000">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Personne *</label>
+                        <select name="personne" required>
+                            <option value="">Sélectionnez</option>
+                            <option value="Fouad">Fouad</option>
+                            <option value="Tarek">Tarek</option>
+                            <option value="Walid">Walid</option>
+                            <option value="Riad">Riad</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Motif *</label>
+                        <input type="text" name="motif" required placeholder="Ex: Apport initial, Complément caisse...">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">💰 Ajouter l'argent</button>
+            </form>
+        </div>
+    </div>
 
     <!-- MODAL DÉTAILS VEHICULE -->
     <div class="modal" id="modalDetailsVehicule">
