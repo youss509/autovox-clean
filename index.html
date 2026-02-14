@@ -1197,6 +1197,78 @@
                     </div>
                 </div>
 
+                                <!-- PAGE CAISSE -->
+                <div class="page-content" id="pageCaisse">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h1>💼 Gestion de la Caisse</h1>
+                            <p>Suivi des entrées et sorties d'argent</p>
+                        </div>
+                        <div class="page-header-right">
+                            <button class="btn btn-primary" onclick="openModalAjoutCaisse()">
+                                ➕ Ajouter de l'argent
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SOLDE ACTUEL EN GRAND -->
+                    <div class="caisse-solde-card">
+                        <div class="caisse-solde-label">Solde actuel</div>
+                        <div class="caisse-solde-value" id="soldeCaisseGrand">0 €</div>
+                        <div class="caisse-solde-subtitle">Dernière mise à jour : <span id="derniereMaj">-</span></div>
+                    </div>
+
+                    <!-- FILTRES -->
+                    <div class="filters">
+                        <div class="filters-row">
+                            <div class="filter-group">
+                                <label>Type</label>
+                                <select id="filterTypeCaisse" onchange="filterCaisse()">
+                                    <option value="">Tous</option>
+                                    <option value="entree">Entrées</option>
+                                    <option value="sortie">Sorties</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>Personne</label>
+                                <select id="filterPersonne" onchange="filterCaisse()">
+                                    <option value="">Toutes</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>Date début</label>
+                                <input type="date" id="filterDateDebut" onchange="filterCaisse()">
+                            </div>
+                            <div class="filter-group">
+                                <label>Date fin</label>
+                                <input type="date" id="filterDateFin" onchange="filterCaisse()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TABLEAU HISTORIQUE -->
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Montant</th>
+                                    <th>Personne</th>
+                                    <th>Motif</th>
+                                </tr>
+                            </thead>
+                            <tbody id="caisseTableBody">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: 40px;">
+                                        Chargement...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
                 <!-- PAGE VEHICULES -->
                 <div class="page-content" id="pageVehicules">
                     <div class="page-header">
