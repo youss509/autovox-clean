@@ -3395,7 +3395,69 @@
                 showNotification('Erreur lors du chargement de la caisse', 'error');
             }
         }
-        
+
+                // Charger les données de la caisse
+        async function loadCaisse() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('caisse')
+                    .select('*')
+                    .order('date', { ascending: false });
+                
+                if (error) throw error;
+                
+                allCaisse = data || [];
+                displayCaisse(allCaisse);
+                updateSoldeCaisse();
+                updateFilterPersonnes();
+                
+            } catch (error) {
+                console.error('Erreur chargement caisse:', error);
+                showNotification('Erreur lors du chargement de la caisse', 'error');
+            }
+        } // ← ICI SE TERMINE loadCaisse
+
+        // ========================================
+        // FONCTION POUR FORMATER LES DATES
+        // ========================================
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        // ========================================
+        // FONCTION POUR AFFICHER LES NOTIFICATIONS
+        // ========================================
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                background: ${type === 'success' ? '#10b981' : '#ef4444'};
+                color: white;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                font-weight: 500;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
         // Afficher l'historique de la caisse
         function displayCaisse(caisse) {
             const tbody = document.getElementById('caisseTableBody');
