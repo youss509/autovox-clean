@@ -642,14 +642,22 @@
         }
         
         .frais-total {
-            margin-top: auto;
-            padding-top: 20px;
-            border-top: 2px solid rgba(255,255,255,0.2);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-        }
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 2px solid rgba(255,255,255,0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    flex-wrap: nowrap; /* AJOUTÉ : Empêche le retour à la ligne */
+    gap: 10px; /* AJOUTÉ : Espacement entre les éléments */
+}
+
+.frais-total span:last-child {
+    white-space: nowrap; /* AJOUTÉ : Le montant ne coupe jamais */
+    flex-shrink: 0; /* AJOUTÉ : Le montant garde sa taille */
+}
+
         
         @media (max-width: 1200px) {
             .charts-grid-2x2 {
