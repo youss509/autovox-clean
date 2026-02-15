@@ -1441,7 +1441,7 @@
                     </div>
                 </div>
 
-                <!-- PAGE CAISSE -->
+               <!-- PAGE CAISSE -->
                 <div class="page-content" id="pageCaisse">
                     <div class="page-header">
                         <div class="page-header-left">
@@ -1453,49 +1453,91 @@
                                 ➕ Ajouter de l'argent
                             </button>
                         </div>
-                       <!-- 1. ON FINIT LA PAGE CAISSE PROPREMENT -->
-<div class="page-content" id="pageCaisse">
-    <div class="page-header">
-        <div class="page-header-left">
-            <h1>💼 Gestion de la Caisse</h1>
-            <p>Suivi des entrées et sorties d'argent</p>
-        </div>
-        <div class="page-header-right">
-            <button class="btn btn-primary" onclick="openModalAjoutCaisse()">
-                ➕ Ajouter de l'argent
-            </button>
-        </div>
-    </div> <!-- Fin du header -->
+                    </div>
 
-    <!-- ICI VOTRE CODE DE LA CAISSE (SOLDE, TABLEAU, ETC.) -->
-    <div class="caisse-solde-card">...</div>
-    <div class="table-container">...</div>
+                    <!-- SOLDE ACTUEL EN GRAND -->
+                    <div class="caisse-solde-card">
+                        <div class="caisse-solde-label">Solde actuel</div>
+                        <div class="caisse-solde-value" id="soldeCaisseGrand">0 €</div>
+                        <div class="caisse-solde-subtitle">Dernière mise à jour : <span id="derniereMaj">-</span></div>
+                    </div>
 
-</div> <!-- CETTE BALISE EST VITALE : ELLE FERME LA PAGE CAISSE -->
+                    <!-- FILTRES -->
+                    <div class="filters">
+                        <div class="filters-row">
+                            <div class="filter-group">
+                                <label>Type</label>
+                                <select id="filterTypeCaisse" onchange="filterCaisse()">
+                                    <option value="">Tous</option>
+                                    <option value="entree">Entrées</option>
+                                    <option value="sortie">Sorties</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>Personne</label>
+                                <select id="filterPersonne" onchange="filterCaisse()">
+                                    <option value="">Toutes</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>Date début</label>
+                                <input type="date" id="filterDateDebut" onchange="filterCaisse()">
+                            </div>
+                            <div class="filter-group">
+                                <label>Date fin</label>
+                                <input type="date" id="filterDateFin" onchange="filterCaisse()">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- TABLEAU HISTORIQUE -->
+                    <div class="table-container">
+                        <div class="caisse-table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Montant</th>
+                                        <th>Motif</th>
+                                        <th>Personne</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="caisseTableBody">
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; padding: 40px;">
+                                            Chargement...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div> <!-- FIN DE LA PAGE CAISSE -->
 
-<!-- 2. ON COMMENCE LA PAGE DISTRIBUTION APRÈS -->
-<div class="page-content" id="pageDistributions">
-    <div class="page-header">
-        <div class="page-header-left">
-            <h1>💸 Distribution des bénéfices</h1>
-            <p>Suivi des retraits (Fouad, Tarek, Walid, Riad)</p>
-        </div>
-        <div class="page-header-right">
-            <button class="btn btn-small btn-warning" onclick="openAddDistribModal()">
-                ➕ Nouveau retrait
-            </button>
-        </div>
-    </div>
+                <!-- PAGE DISTRIBUTIONS -->
+                <div class="page-content" id="pageDistributions">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h1>💸 Distribution des bénéfices</h1>
+                            <p>Suivi des retraits des associés (Fouad, Tarek, Walid, Riad)</p>
+                        </div>
+                        <div class="page-header-right">
+                            <button class="btn btn-small btn-warning" onclick="openAddDistribModal()">
+                                ➕ Nouveau retrait
+                            </button>
+                        </div>
+                    </div>
 
-    <!-- RÉCAP PAR PERSONNE -->
-    <div id="distribSummary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 30px;">
-        <!-- JS remplira ici -->
-    </div>
+                    <!-- RÉCAPITULATIF PAR PERSONNE -->
+                    <div id="distribSummary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 30px;">
+                        <!-- Rempli par le JavaScript -->
+                    </div>
 
-    <div id="distributionsContainer">
-        <div class="loading">Chargement des distributions...</div>
-    </div>
-</div> <!-- Ferme la page Distribution -->
+                    <div id="distributionsContainer">
+                        <div class="loading">Chargement des distributions...</div>
+                    </div>
+                </div> <!-- FIN DE LA PAGE DISTRIBUTIONS -->
 
                     <!-- SOLDE ACTUEL EN GRAND -->
                     <div class="caisse-solde-card">
