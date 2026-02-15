@@ -2249,7 +2249,9 @@
             });
             document.getElementById('page' + page.charAt(0).toUpperCase() + page.slice(1)).classList.add('active');
 
-            if (page === 'vehicules') {
+            if (page === 'dashboard') {
+                loadStats();
+            } else if (page === 'vehicules') {
                 loadVehicules();
             } else if (page === 'clients') {
                 loadClients();
@@ -2261,6 +2263,8 @@
                 loadCharts();
             } else if (page === 'caisse') {
                 loadCaisse();
+            } else if (page === 'distributions') {
+                loadDistributions();
             }
         }
 
@@ -4035,6 +4039,110 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
                 select.innerHTML += `<option value="${p}">${p}</option>`;
             });
         }
+        // --- LOGIQUE DES DISTRIBUTIONS ---
+
+// 1. Charger les distributions depuis Supabase
+async function loadDistributions() {
+    if (!supabaseClient) return;
+    const container = document.getElementById('distributionsContainer');
+    container.innerHTML = '<div class="loading">Chargement...</div>';
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('distributions')
+            .select('*')
+            .order('date', { ascending: false });
+
+        if (error) throw error;
+        allDistributions = data || [];
+        displayDistributions();
+        updateDistribSummary();
+    } catch (error) {
+        console.error('Erreur:', error);
+        container.innerHTML = 'Erreur de chargement';
+    }
+}
+
+// 2. Afficher la liste des retraits
+function displayDistributions() {
+    const container = document.getElementById('distributionsContainer');
+    if (allDistributions.length === 0) {
+        container.innerHTML = '<div class="empty-state"><h3>Aucun retrait enregistré</h3></div>';
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="distributions-grid">
+            ${allDistributions.map(d => `
+                <div class="distribution-card">
+                    <div style="display:flex; justify-content:space-between; align-items:start;">
+                        <div>
+                            <h3 style="color:var(--warning)">${d.personne}</h3>
+                            <p style="font-size:13px; color:var(--text-secondary)">${new Date(d.date).toLocaleDateString('fr-FR')}</p>
+                        </div>
+                        <div class="amount negative">-${parseFloat(d.montant).toLocaleString('fr-FR')} €</div>
+                    </div>
+                    <p style="margin-top:10px; font-size:14px;">${d.motif || 'Retrait bénéfice'}</p>
+                    <button class="btn btn-small btn-danger" style="margin-top:15px; width:100%" onclick="deleteDistrib('${d.id}')">🗑️ Annuler ce retrait</button>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+// 3. Calculer le récapitulatif par personne (Fouad, Tarek, Walid, Riad)
+function updateDistribSummary() {
+    const summary = document.getElementById('distribSummary');
+    const noms = ['Fouad', 'Tarek', 'Walid', 'Riad'];
+    const totaux = { Fouad: 0, Tarek: 0, Walid: 0, Riad: 0 };
+
+    allDistributions.forEach(d => {
+        if (totaux[d.personne] !== undefined) totaux[d.personne] += parseFloat(d.montant);
+    });
+
+    summary.innerHTML = noms.map(nom => `
+        <div class="distrib-person-card" style="background:var(--bg-secondary); padding:20px; border-radius:12px; text-align:center; border:1px solid var(--border-color);">
+            <div style="font-size:12px; color:var(--text-secondary); text-transform:uppercase; font-weight:600;">${nom}</div>
+            <div style="font-size:20px; font-weight:700; color:var(--text-primary); margin-top:5px;">${totaux[nom].toLocaleString('fr-FR')} €</div>
+        </div>
+    `).join('');
+}
+
+// 4. Enregistrer un nouveau retrait (Caisse + Distribution)
+document.getElementById('formAddDistrib').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const dId = 'dist_' + generateId();
+    const montant = parseFloat(document.getElementById('distribMontant').value);
+    const date = document.getElementById('distribDate').value;
+    const personne = document.getElementById('distribPersonne').value;
+    const motif = document.getElementById('distribMotif').value;
+
+    try {
+        // Ajouter dans la table distributions
+        await supabaseClient.from('distributions').insert([{ id: dId, date, montant, personne, motif }]);
+        // Ajouter la sortie en caisse
+        await supabaseClient.from('caisse').insert([{
+            id: generateId(), date, type: 'sortie', montant, 
+            motif: `Distribution : ${personne}`, personne: personne, distribution_id: dId
+        }]);
+
+        closeAddDistribModal();
+        loadDistributions();
+        loadStats();
+        alert('Retrait enregistré et caisse mise à jour !');
+    } catch (error) { console.error(error); }
+});
+
+// 5. Supprimer un retrait
+async function deleteDistrib(id) {
+    if (!confirm('Annuler ce retrait et recréditer la caisse ?')) return;
+    try {
+        await supabaseClient.from('caisse').delete().eq('distribution_id', id);
+        await supabaseClient.from('distributions').delete().eq('id', id);
+        loadDistributions();
+        loadStats();
+    } catch (error) { console.error(error); }
+}
     </script>
 </body>
 </html>
