@@ -1445,8 +1445,7 @@
                             </div>
                         </div>
                     </div>
-
-                  <!-- TABLEAU HISTORIQUE -->
+<!-- TABLEAU HISTORIQUE -->
 <div class="table-container">
     <div class="caisse-table-wrapper">
         <table class="data-table">
@@ -1469,40 +1468,42 @@
         </table>
     </div>
 </div>
-      
-                <!-- PAGE VEHICULES -->
-                <div class="page-content" id="pageVehicules">
-                    <div class="page-header">
-                        <div class="page-header-left">
-                            <h1>Véhicules</h1>
-                            <p>Gestion de votre parc automobile</p>
-                        </div>
-                        <div class="page-header-right">
-                            <button class="btn btn-small" onclick="openAddVehiculeModal()">➕ Ajouter</button>
-                        </div>
-                    </div>
-
-                    <div class="filters">
-                        <div class="filters-row">
-                            <div class="filter-group">
-                                <label>Recherche</label>
-                                <input type="text" id="searchVehicule" placeholder="Marque, modèle, immatriculation..." onkeyup="filterVehicules()">
-                            </div>
-                            <div class="filter-group">
-                                <label>Statut</label>
-                                <select id="filterStatut" onchange="filterVehicules()">
-                                    <option value="">Tous</option>
-                                    <option value="en_stock">En stock</option>
-                                    <option value="vendu">Vendu</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="vehiculesContainer">
-                        <div class="loading">Chargement des véhicules...</div>
-                    </div>
                 </div>
+            </div>
+      
+<!-- PAGE VEHICULES -->
+<div class="page-content" id="pageVehicules">
+    <div class="page-header">
+        <div class="page-header-left">
+            <h1>Véhicules</h1>
+            <p>Gestion de votre parc automobile</p>
+        </div>
+        <div class="page-header-right">
+            <button class="btn btn-small" onclick="openAddVehiculeModal()">➕ Ajouter</button>
+        </div>
+    </div>
+
+    <div class="filters">
+        <div class="filters-row">
+            <div class="filter-group">
+                <label>Recherche</label>
+                <input type="text" id="searchVehicule" placeholder="Marque, modèle, immatriculation..." onkeyup="filterVehicules()">
+            </div>
+            <div class="filter-group">
+                <label>Statut</label>
+                <select id="filterStatut" onchange="filterVehicules()">
+                    <option value="">Tous</option>
+                    <option value="en_stock">En stock</option>
+                    <option value="vendu">Vendu</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div id="vehiculesContainer">
+        <div class="loading">Chargement des véhicules...</div>
+    </div>
+</div>
 
                 <!-- PAGE CLIENTS -->
                 <div class="page-content" id="pageClients">
