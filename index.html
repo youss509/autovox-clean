@@ -658,39 +658,43 @@
         }
 
         .chart-container {
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            padding: 20px;
-            min-height: 300px;
-        }
-
-        .chart-container h3 {
-            font-size: 16px;
-            margin-bottom: 16px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 600;
-        }
-
-       /* Wrapper pour éviter le débordement des graphiques */
-.chart-wrapper {
-    width: 100%;
-    overflow: hidden;
-    padding: 0 10px;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 20px;
+    min-height: 300px;
+    overflow: hidden; /* AJOUTÉ : Force le contenu à rester dedans */
+    width: 100%; /* AJOUTÉ */
 }
 
-@media (max-width: 768px) {
-    .chart-wrapper {
-        padding: 0 5px;
-    }
+.chart-container h3 {
+    font-size: 16px;
+    margin-bottom: 16px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+/* Wrapper pour éviter le débordement des graphiques */
+.chart-wrapper {
+    width: 100%;
+    max-width: 100%; /* AJOUTÉ */
+    overflow: hidden;
+    padding: 0;
+    box-sizing: border-box; /* AJOUTÉ */
 }
 
 .chart-canvas {
     position: relative;
     height: 250px;
+    width: 100%; /* AJOUTÉ */
+    max-width: 100%; /* AJOUTÉ */
+}
 
-        }
+.chart-canvas canvas {
+    max-width: 100% !important; /* FORCE le canvas à ne pas dépasser */
+    height: auto !important;
+}
 
         /* === FILTERS === */
         .filters {
