@@ -2599,6 +2599,18 @@
             try {
                 const { error } = await supabaseClient.from('vehicules').insert([vehicule]);
                 
+                // AJOUT AUTOMATIQUE EN CAISSE
+const caisseAchat = {
+    id: 'caisse_' + generateId(),
+    date: vehicule.date_achat,
+    type: 'sortie',
+    montant: vehicule.prix_achat,
+    motif: `Achat véhicule : ${vehicule.marque} ${vehicule.modele}`,
+    personne: 'Système',
+    vehicule_id: vehicule.id // Le lien pour la suppression future
+};
+await supabaseClient.from('caisse').insert([caisseAchat]);
+                
                 if (error) throw error;
                 
                 closeAddVehiculeModal();
@@ -2863,6 +2875,9 @@
                 : '⚠️ ATTENTION !\n\nVous allez supprimer ce véhicule et tous ses frais associés.\n\nCette action est irréversible.\n\nÊtes-vous sûr de continuer ?';
             
             if (!confirm(message)) return;
+            
+            // Supprime aussi la ligne d'achat en caisse
+await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
             
             try {
                 const { error } = await supabaseClient
