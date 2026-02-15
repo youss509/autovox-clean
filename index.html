@@ -2240,7 +2240,8 @@
                     
                     document.getElementById('totalVentesCount').textContent = ventesThisMonth;
                 }
-                
+                      await updateSoldeCaisse();
+       
             } catch (error) {
                 console.error('Erreur:', error);
             }
@@ -3381,27 +3382,6 @@
             document.getElementById('formAjoutCaisse').reset();
         }
         
-        // Charger les données de la caisse
-        async function loadCaisse() {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('caisse')
-                    .select('*')
-                    .order('date', { ascending: false });
-                
-                if (error) throw error;
-                
-                allCaisse = data || [];
-                displayCaisse(allCaisse);
-                updateSoldeCaisse();
-                updateFilterPersonnes();
-                
-            } catch (error) {
-                console.error('Erreur chargement caisse:', error);
-                showNotification('Erreur lors du chargement de la caisse', 'error');
-            }
-        }
-
                 // Charger les données de la caisse
         async function loadCaisse() {
             try {
