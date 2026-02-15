@@ -3643,136 +3643,70 @@
         } // ← ICI SE TERMINE loadCaisse
 
         // ========== ANALYSE DES FRAIS ==========
-        async function loadFraisAnalysis() {
-            if (!supabaseClient) return;
-            
-            try {
-                const { data: frais, error } = await supabaseClient
-                    .from('frais')
-                    .select('type, montant');
-                
-                if (error) throw error;
-                
-                if (!frais || frais.length === 0) {
-                    document.getElementById('fraisTableContainer').innerHTML = `
-                        <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
-                            💸 Aucun frais enregistré
-                        </div>
-                    `;
-                    document.getElementById('totalFraisGlobal').textContent = '0 €';
-                    return;
-                }
-                
-                // Regrouper par type
-                const fraisParType = {};
-                let totalGeneral = 0;
-                
-                frais.forEach(f => {
-                    const type = f.type || 'Autre';
-                    const montant = parseFloat(f.montant) || 0;
-                    
-                    if (!fraisParType[type]) {
-                        fraisParType[type] = 0;
-                    }
-                    fraisParType[type] += montant;
-                    totalGeneral += montant;
-                });
-                
-                // Trier par montant décroissant
-                const fraisTriés = Object.entries(fraisParType)
-                    .sort((a, b) => b[1] - a[1]);
-                
-                // Afficher le tableau
-                const tableHTML = `
-                    <table class="frais-table">
-                        ${fraisTriés.map(([type, montant]) => `
-                            <tr>
-                                <td>${type}</td>
-                                <td>${Math.round(montant).toLocaleString('fr-FR')} €</td>
-                            </tr>
-                        `).join('')}
-                    </table>
-                `;
-                
-                document.getElementById('fraisTableContainer').innerHTML = tableHTML;
-                document.getElementById('totalFraisGlobal').textContent = 
-                    Math.round(totalGeneral).toLocaleString('fr-FR') + ' €';
-                
-            } catch (error) {
-                console.error('Erreur chargement analyse frais:', error);
-                document.getElementById('fraisTableContainer').innerHTML = `
-                    <div style="text-align: center; padding: 20px; color: var(--danger);">
-                        ⚠️ Erreur de chargement
-                    </div>
-                `;
-            }
+async function loadFraisAnalysis() {
+    if (!supabaseClient) return;
+    
+    try {
+        const { data: frais, error } = await supabaseClient
+            .from('frais')
+            .select('type, montant');
+        
+        if (error) throw error;
+        
+        if (!frais || frais.length === 0) {
+            document.getElementById('fraisTableContainer').innerHTML = `
+                <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                    💸 Aucun frais enregistré
+                </div>
+            `;
+            document.getElementById('totalFraisGlobal').textContent = '0 €';
+            return;
         }
-
-        // ========== ANALYSE DES FRAIS ==========
-        async function loadFraisAnalysis() {
-            if (!supabaseClient) return;
+        
+        // Regrouper par type
+        const fraisParType = {};
+        let totalGeneral = 0;
+        
+        frais.forEach(f => {
+            const type = f.type || 'Autre';
+            const montant = parseFloat(f.montant) || 0;
             
-            try {
-                const { data: frais, error } = await supabaseClient
-                    .from('frais')
-                    .select('type, montant');
-                
-                if (error) throw error;
-                
-                if (!frais || frais.length === 0) {
-                    document.getElementById('fraisTableContainer').innerHTML = `
-                        <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
-                            💸 Aucun frais enregistré
-                        </div>
-                    `;
-                    document.getElementById('totalFraisGlobal').textContent = '0 €';
-                    return;
-                }
-                
-                // Regrouper par type
-                const fraisParType = {};
-                let totalGeneral = 0;
-                
-                frais.forEach(f => {
-                    const type = f.type || 'Autre';
-                    const montant = parseFloat(f.montant) || 0;
-                    
-                    if (!fraisParType[type]) {
-                        fraisParType[type] = 0;
-                    }
-                    fraisParType[type] += montant;
-                    totalGeneral += montant;
-                });
-                
-                // Trier par montant décroissant
-                const fraisTriés = Object.entries(fraisParType)
-                    .sort((a, b) => b[1] - a[1]);
-                
-                // Afficher le tableau
-                const tableHTML = `
-                    <table class="frais-table">
-                        ${fraisTriés.map(([type, montant]) => `
-                            <tr>
-                                <td>${type}</td>
-                                <td>${Math.round(montant).toLocaleString('fr-FR')} €</td>
-                            </tr>
-                        `).join('')}
-                    </table>
-                `;
-                
-                document.getElementById('fraisTableContainer').innerHTML = tableHTML;
-                document.getElementById('totalFraisGlobal').textContent = 
-                    Math.round(totalGeneral).toLocaleString('fr-FR') + ' €';
-                
-            } catch (error) {
-                console.error('Erreur chargement analyse frais:', error);
-                document.getElementById('fraisTableContainer').innerHTML = `
-                    <div style="text-align: center; padding: 20px; color: var(--danger);">
-                        ⚠️ Erreur de chargement
-                    </div>
-                `;
+            if (!fraisParType[type]) {
+                fraisParType[type] = 0;
             }
-        }
+            fraisParType[type] += montant;
+            totalGeneral += montant;
+        });
+        
+        // Trier par montant décroissant
+        const fraisTriés = Object.entries(fraisParType)
+            .sort((a, b) => b[1] - a[1]);
+        
+        // Afficher le tableau
+        const tableHTML = `
+            <table class="frais-table">
+                ${fraisTriés.map(([type, montant]) => `
+                    <tr>
+                        <td>${type}</td>
+                        <td style="white-space: nowrap;">${Math.round(montant).toLocaleString('fr-FR')}&nbsp;€</td>
+                    </tr>
+                `).join('')}
+            </table>
+        `;
+        
+        document.getElementById('fraisTableContainer').innerHTML = tableHTML;
+        document.getElementById('totalFraisGlobal').textContent = 
+            Math.round(totalGeneral).toLocaleString('fr-FR') + ' €';
+        
+    } catch (error) {
+        console.error('Erreur chargement analyse frais:', error);
+        document.getElementById('fraisTableContainer').innerHTML = `
+            <div style="text-align: center; padding: 20px; color: var(--danger);">
+                ⚠️ Erreur de chargement
+            </div>
+        `;
+    }
+}
 
         // ========================================
         // FONCTION POUR FORMATER LES DATES
