@@ -1233,10 +1233,7 @@
                         <span class="nav-icon">💼</span>
                         <span>Caisse</span>
                     </div>
-                    <div class="nav-link" data-page="distributions">
-                        <span class="nav-icon">💸</span>
-                        <span>Distribution</span>
-                    </div>
+
                     <div class="nav-link" data-page="ventes">
                         <span class="nav-icon">📈</span>
                         <span>Ventes</span>
@@ -1281,10 +1278,7 @@
                 <span class="nav-icon">💼</span>
                 <span>Caisse</span>
             </div>
-            <div class="mobile-menu-item" data-page="distributions">
-                <span class="nav-icon">💸</span>
-                <span>Distribution</span>
-            </div>
+
             <div class="mobile-menu-item" data-page="ventes">
                 <span class="nav-icon">📈</span>
                 <span>Ventes</span>
@@ -1356,23 +1350,6 @@
                             <div class="stat-card-value" id="totalVentesCount">0</div>
                             <div class="stat-card-subtitle">Ventes ce mois</div>
                         </div>
-                        <div class="stat-card" onclick="navigateToPage('distributions')">
-    <div class="stat-card-header">
-        <div class="stat-card-title">Distribué</div>
-        <div class="stat-card-icon">💸</div>
-    </div>
-    <div class="stat-card-value" id="totalDistribue">0 €</div>
-    <div class="stat-card-subtitle">Retraits associés</div>
-</div>
-
-<div class="stat-card">
-    <div class="stat-card-header">
-        <div class="stat-card-title">Reste à partager</div>
-        <div class="stat-card-icon">✨</div>
-    </div>
-    <div class="stat-card-value" id="resteAPartager" style="color: var(--success);">0 €</div>
-    <div class="stat-card-subtitle">Bénéfice restant</div>
-</div>
                     </div>
 
                     <!-- WELCOME CARD -->
@@ -1441,7 +1418,7 @@
                     </div>
                 </div>
 
-               <!-- PAGE CAISSE -->
+                <!-- PAGE CAISSE -->
                 <div class="page-content" id="pageCaisse">
                     <div class="page-header">
                         <div class="page-header-left">
@@ -1454,90 +1431,6 @@
                             </button>
                         </div>
                     </div>
-
-                    <!-- SOLDE ACTUEL EN GRAND -->
-                    <div class="caisse-solde-card">
-                        <div class="caisse-solde-label">Solde actuel</div>
-                        <div class="caisse-solde-value" id="soldeCaisseGrand">0 €</div>
-                        <div class="caisse-solde-subtitle">Dernière mise à jour : <span id="derniereMaj">-</span></div>
-                    </div>
-
-                    <!-- FILTRES -->
-                    <div class="filters">
-                        <div class="filters-row">
-                            <div class="filter-group">
-                                <label>Type</label>
-                                <select id="filterTypeCaisse" onchange="filterCaisse()">
-                                    <option value="">Tous</option>
-                                    <option value="entree">Entrées</option>
-                                    <option value="sortie">Sorties</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label>Personne</label>
-                                <select id="filterPersonne" onchange="filterCaisse()">
-                                    <option value="">Toutes</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label>Date début</label>
-                                <input type="date" id="filterDateDebut" onchange="filterCaisse()">
-                            </div>
-                            <div class="filter-group">
-                                <label>Date fin</label>
-                                <input type="date" id="filterDateFin" onchange="filterCaisse()">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- TABLEAU HISTORIQUE -->
-                    <div class="table-container">
-                        <div class="caisse-table-wrapper">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Type</th>
-                                        <th>Montant</th>
-                                        <th>Motif</th>
-                                        <th>Personne</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="caisseTableBody">
-                                    <tr>
-                                        <td colspan="5" style="text-align: center; padding: 40px;">
-                                            Chargement...
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div> <!-- FIN DE LA PAGE CAISSE -->
-
-                <!-- PAGE DISTRIBUTIONS -->
-                <div class="page-content" id="pageDistributions">
-                    <div class="page-header">
-                        <div class="page-header-left">
-                            <h1>💸 Distribution des bénéfices</h1>
-                            <p>Suivi des retraits des associés (Fouad, Tarek, Walid, Riad)</p>
-                        </div>
-                        <div class="page-header-right">
-                            <button class="btn btn-small btn-warning" onclick="openAddDistribModal()">
-                                ➕ Nouveau retrait
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- RÉCAPITULATIF PAR PERSONNE -->
-                    <div id="distribSummary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 30px;">
-                        <!-- Rempli par le JavaScript -->
-                    </div>
-
-                    <div id="distributionsContainer">
-                        <div class="loading">Chargement des distributions...</div>
-                    </div>
-                </div> <!-- FIN DE LA PAGE DISTRIBUTIONS -->
 
                     <!-- SOLDE ACTUEL EN GRAND -->
                     <div class="caisse-solde-card">
@@ -2137,41 +2030,6 @@
                 <button type="submit" class="btn">Enregistrer les modifications</button>
             </form>
         </div>
-        <!-- MODAL AJOUT DISTRIBUTION -->
-<div class="modal" id="modalAddDistrib">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>💰 Enregistrer un retrait</h2>
-            <button class="modal-close" onclick="closeAddDistribModal()">✕</button>
-        </div>
-        <form id="formAddDistrib">
-            <div class="input-group">
-                <label>Date du retrait *</label>
-                <input type="date" id="distribDate" required>
-            </div>
-            <div class="form-row">
-                <div class="input-group">
-                    <label>Associé *</label>
-                    <select id="distribPersonne" required>
-                        <option value="Fouad">Fouad</option>
-                        <option value="Tarek">Tarek</option>
-                        <option value="Walid">Walid</option>
-                        <option value="Riad">Riad</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Montant (€) *</label>
-                    <input type="number" id="distribMontant" step="0.01" required>
-                </div>
-            </div>
-            <div class="input-group">
-                <label>Motif / Note</label>
-                <input type="text" id="distribMotif" placeholder="Ex: Retrait partiel bénéfice mars">
-            </div>
-            <button type="submit" class="btn btn-warning">Confirmer le retrait (Déduit de la caisse)</button>
-        </form>
-    </div>
-</div>
     </div>
     <script>
         // ========== ENREGISTREMENT SERVICE WORKER (PWA) ==========
@@ -2197,7 +2055,6 @@
         let chartCA = null;
         let chartBenefice = null;
         let chartVentes = null;
-        let allDistributions = [];
         
         // Initialiser Supabase
         function initSupabase() {
@@ -2312,9 +2169,7 @@
             });
             document.getElementById('page' + page.charAt(0).toUpperCase() + page.slice(1)).classList.add('active');
 
-            if (page === 'dashboard') {
-                loadStats();
-            } else if (page === 'vehicules') {
+            if (page === 'vehicules') {
                 loadVehicules();
             } else if (page === 'clients') {
                 loadClients();
@@ -2326,8 +2181,6 @@
                 loadCharts();
             } else if (page === 'caisse') {
                 loadCaisse();
-            } else if (page === 'distributions') {
-                loadDistributions();
             }
         }
 
@@ -2746,18 +2599,6 @@
             try {
                 const { error } = await supabaseClient.from('vehicules').insert([vehicule]);
                 
-                // AJOUT AUTOMATIQUE EN CAISSE
-const caisseAchat = {
-    id: 'caisse_' + generateId(),
-    date: vehicule.date_achat,
-    type: 'sortie',
-    montant: vehicule.prix_achat,
-    motif: `Achat véhicule : ${vehicule.marque} ${vehicule.modele}`,
-    personne: 'Système',
-    vehicule_id: vehicule.id // Le lien pour la suppression future
-};
-await supabaseClient.from('caisse').insert([caisseAchat]);
-                
                 if (error) throw error;
                 
                 closeAddVehiculeModal();
@@ -3022,9 +2863,6 @@ await supabaseClient.from('caisse').insert([caisseAchat]);
                 : '⚠️ ATTENTION !\n\nVous allez supprimer ce véhicule et tous ses frais associés.\n\nCette action est irréversible.\n\nÊtes-vous sûr de continuer ?';
             
             if (!confirm(message)) return;
-            
-            // Supprime aussi la ligne d'achat en caisse
-await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
             
             try {
                 const { error } = await supabaseClient
@@ -4102,110 +3940,6 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
                 select.innerHTML += `<option value="${p}">${p}</option>`;
             });
         }
-        // --- LOGIQUE DES DISTRIBUTIONS ---
-
-// 1. Charger les distributions depuis Supabase
-async function loadDistributions() {
-    if (!supabaseClient) return;
-    const container = document.getElementById('distributionsContainer');
-    container.innerHTML = '<div class="loading">Chargement...</div>';
-
-    try {
-        const { data, error } = await supabaseClient
-            .from('distributions')
-            .select('*')
-            .order('date', { ascending: false });
-
-        if (error) throw error;
-        allDistributions = data || [];
-        displayDistributions();
-        updateDistribSummary();
-    } catch (error) {
-        console.error('Erreur:', error);
-        container.innerHTML = 'Erreur de chargement';
-    }
-}
-
-// 2. Afficher la liste des retraits
-function displayDistributions() {
-    const container = document.getElementById('distributionsContainer');
-    if (allDistributions.length === 0) {
-        container.innerHTML = '<div class="empty-state"><h3>Aucun retrait enregistré</h3></div>';
-        return;
-    }
-
-    container.innerHTML = `
-        <div class="distributions-grid">
-            ${allDistributions.map(d => `
-                <div class="distribution-card">
-                    <div style="display:flex; justify-content:space-between; align-items:start;">
-                        <div>
-                            <h3 style="color:var(--warning)">${d.personne}</h3>
-                            <p style="font-size:13px; color:var(--text-secondary)">${new Date(d.date).toLocaleDateString('fr-FR')}</p>
-                        </div>
-                        <div class="amount negative">-${parseFloat(d.montant).toLocaleString('fr-FR')} €</div>
-                    </div>
-                    <p style="margin-top:10px; font-size:14px;">${d.motif || 'Retrait bénéfice'}</p>
-                    <button class="btn btn-small btn-danger" style="margin-top:15px; width:100%" onclick="deleteDistrib('${d.id}')">🗑️ Annuler ce retrait</button>
-                </div>
-            `).join('')}
-        </div>
-    `;
-}
-
-// 3. Calculer le récapitulatif par personne (Fouad, Tarek, Walid, Riad)
-function updateDistribSummary() {
-    const summary = document.getElementById('distribSummary');
-    const noms = ['Fouad', 'Tarek', 'Walid', 'Riad'];
-    const totaux = { Fouad: 0, Tarek: 0, Walid: 0, Riad: 0 };
-
-    allDistributions.forEach(d => {
-        if (totaux[d.personne] !== undefined) totaux[d.personne] += parseFloat(d.montant);
-    });
-
-    summary.innerHTML = noms.map(nom => `
-        <div class="distrib-person-card" style="background:var(--bg-secondary); padding:20px; border-radius:12px; text-align:center; border:1px solid var(--border-color);">
-            <div style="font-size:12px; color:var(--text-secondary); text-transform:uppercase; font-weight:600;">${nom}</div>
-            <div style="font-size:20px; font-weight:700; color:var(--text-primary); margin-top:5px;">${totaux[nom].toLocaleString('fr-FR')} €</div>
-        </div>
-    `).join('');
-}
-
-// 4. Enregistrer un nouveau retrait (Caisse + Distribution)
-document.getElementById('formAddDistrib').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const dId = 'dist_' + generateId();
-    const montant = parseFloat(document.getElementById('distribMontant').value);
-    const date = document.getElementById('distribDate').value;
-    const personne = document.getElementById('distribPersonne').value;
-    const motif = document.getElementById('distribMotif').value;
-
-    try {
-        // Ajouter dans la table distributions
-        await supabaseClient.from('distributions').insert([{ id: dId, date, montant, personne, motif }]);
-        // Ajouter la sortie en caisse
-        await supabaseClient.from('caisse').insert([{
-            id: generateId(), date, type: 'sortie', montant, 
-            motif: `Distribution : ${personne}`, personne: personne, distribution_id: dId
-        }]);
-
-        closeAddDistribModal();
-        loadDistributions();
-        loadStats();
-        alert('Retrait enregistré et caisse mise à jour !');
-    } catch (error) { console.error(error); }
-});
-
-// 5. Supprimer un retrait
-async function deleteDistrib(id) {
-    if (!confirm('Annuler ce retrait et recréditer la caisse ?')) return;
-    try {
-        await supabaseClient.from('caisse').delete().eq('distribution_id', id);
-        await supabaseClient.from('distributions').delete().eq('id', id);
-        loadDistributions();
-        loadStats();
-    } catch (error) { console.error(error); }
-}
     </script>
 </body>
 </html>
