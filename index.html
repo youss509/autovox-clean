@@ -673,9 +673,23 @@
             font-weight: 600;
         }
 
-        .chart-canvas {
-            position: relative;
-            height: 250px;
+       /* Wrapper pour éviter le débordement des graphiques */
+.chart-wrapper {
+    width: 100%;
+    overflow: hidden;
+    padding: 0 10px;
+}
+
+@media (max-width: 768px) {
+    .chart-wrapper {
+        padding: 0 5px;
+    }
+}
+
+.chart-canvas {
+    position: relative;
+    height: 250px;
+
         }
 
         /* === FILTERS === */
