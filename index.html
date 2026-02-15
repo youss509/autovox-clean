@@ -591,10 +591,69 @@
             gap: 12px;
         }
 
-        .charts-grid {
+               .charts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 24px;
+        }
+        
+        .charts-grid-2x2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+        
+        .frais-analysis {
+            padding: 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .frais-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .frais-table tr {
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .frais-table tr:last-child {
+            border-bottom: none;
+        }
+        
+        .frais-table td {
+            padding: 12px 8px;
+            font-size: 14px;
+        }
+        
+        .frais-table td:first-child {
+            color: var(--text-secondary);
+        }
+        
+        .frais-table td:last-child {
+            text-align: right;
+            font-weight: 600;
+            color: var(--danger);
+            font-size: 16px;
+        }
+        
+        .frais-total {
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 2px solid rgba(255,255,255,0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 1200px) {
+            .charts-grid-2x2 {
+                grid-template-columns: 1fr;
+            }
         }
 
         .chart-container {
