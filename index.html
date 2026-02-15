@@ -1453,7 +1453,28 @@
                                 ➕ Ajouter de l'argent
                             </button>
                         </div>
-                        <div class="page-content" id="pageDistributions">
+                       <!-- 1. ON FINIT LA PAGE CAISSE PROPREMENT -->
+<div class="page-content" id="pageCaisse">
+    <div class="page-header">
+        <div class="page-header-left">
+            <h1>💼 Gestion de la Caisse</h1>
+            <p>Suivi des entrées et sorties d'argent</p>
+        </div>
+        <div class="page-header-right">
+            <button class="btn btn-primary" onclick="openModalAjoutCaisse()">
+                ➕ Ajouter de l'argent
+            </button>
+        </div>
+    </div> <!-- Fin du header -->
+
+    <!-- ICI VOTRE CODE DE LA CAISSE (SOLDE, TABLEAU, ETC.) -->
+    <div class="caisse-solde-card">...</div>
+    <div class="table-container">...</div>
+
+</div> <!-- CETTE BALISE EST VITALE : ELLE FERME LA PAGE CAISSE -->
+
+<!-- 2. ON COMMENCE LA PAGE DISTRIBUTION APRÈS -->
+<div class="page-content" id="pageDistributions">
     <div class="page-header">
         <div class="page-header-left">
             <h1>💸 Distribution des bénéfices</h1>
@@ -1468,14 +1489,13 @@
 
     <!-- RÉCAP PAR PERSONNE -->
     <div id="distribSummary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 30px;">
-        <!-- Sera rempli par le JavaScript -->
+        <!-- JS remplira ici -->
     </div>
 
     <div id="distributionsContainer">
         <div class="loading">Chargement des distributions...</div>
     </div>
-</div>
-                    </div>
+</div> <!-- Ferme la page Distribution -->
 
                     <!-- SOLDE ACTUEL EN GRAND -->
                     <div class="caisse-solde-card">
