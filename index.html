@@ -1028,6 +1028,115 @@
                 padding: 16px;
             }
         }
+                .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+        }
+        
+        /* === TABLE CAISSE === */
+        .table-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-top: 24px;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table thead {
+            background: var(--bg-secondary);
+        }
+        
+        .data-table th {
+            padding: 16px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .data-table td {
+            padding: 16px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+        
+        .data-table tbody tr:hover {
+            background: var(--bg-secondary);
+        }
+        
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .caisse-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        .caisse-type-entree {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+        
+        .caisse-type-sortie {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+        
+        .caisse-montant {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
+        .caisse-solde-card {
+            background: linear-gradient(135deg, var(--primary), #1e40af);
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+            color: white;
+            margin-bottom: 32px;
+        }
+        
+        .caisse-solde-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .caisse-solde-value {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .caisse-solde-subtitle {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
     </style>
 </head>
 <body>
@@ -3654,7 +3763,7 @@
             }, 3000);
         }
 
-        // Afficher l'historique de la caisse
+       // Afficher l'historique de la caisse
 function displayCaisse(caisse) {
     const tbody = document.getElementById('caisseTableBody');
     
@@ -3671,15 +3780,20 @@ function displayCaisse(caisse) {
     
     tbody.innerHTML = caisse.map(c => {
         const isEntree = c.type === 'entree';
-        const typeIcon = isEntree ? '➕' : '➖';
-        const typeClass = isEntree ? 'badge-success' : 'badge-danger';
-        const montantSign = isEntree ? '+' : '';
+        const typeIcon = isEntree ? '↗' : '↘';
+        const typeClass = isEntree ? 'caisse-type-entree' : 'caisse-type-sortie';
+        const montantSign = isEntree ? '+' : '-';
+        const montantColor = isEntree ? 'var(--success)' : 'var(--danger)';
         
         return `
             <tr>
                 <td>${formatDate(c.date)}</td>
-                <td><span class="badge ${typeClass}">${typeIcon} ${isEntree ? 'Entrée' : 'Sortie'}</span></td>
-                <td style="font-weight: 600; ${isEntree ? 'color: #4ade80 !important;' : ''}">
+                <td>
+                    <span class="caisse-type-badge ${typeClass}">
+                        ${typeIcon} ${isEntree ? 'Entrée' : 'Sortie'}
+                    </span>
+                </td>
+                <td class="caisse-montant" style="color: ${montantColor};">
                     ${montantSign}${c.montant.toFixed(2)} €
                 </td>
                 <td>${c.personne || '-'}</td>
@@ -3688,7 +3802,7 @@ function displayCaisse(caisse) {
         `;
     }).join('');
 }
-        
+
         // Mettre à jour le solde de la caisse
         async function updateSoldeCaisse() {
             try {
