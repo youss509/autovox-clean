@@ -16,7 +16,7 @@
     <title>Autovox - Gestion de flotte automobile</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <!-- BIBLIOTHÈQUE EXCEL -->
+    <!-- AJOUT BIBLIOTHÈQUE EXCEL POUR EXPORT -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     
     <style>
@@ -180,14 +180,37 @@
             transform: translateY(-2px);
         }
 
-        .btn-success { background: var(--success); }
-        .btn-success:hover { background: var(--success-hover); }
-        .btn-warning { background: var(--warning); }
-        .btn-warning:hover { background: #d97706; }
-        .btn-danger { background: var(--danger); }
-        .btn-danger:hover { background: var(--danger-hover); }
-        .btn-secondary { background: var(--text-secondary); }
-        .btn-secondary:hover { background: var(--text-primary); }
+        .btn-success {
+            background: var(--success);
+        }
+
+        .btn-success:hover {
+            background: var(--success-hover);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: var(--danger-hover);
+        }
+
+        .btn-secondary {
+            background: var(--text-secondary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--text-primary);
+        }
 
         .btn-small {
             padding: 8px 16px;
@@ -211,14 +234,6 @@
             background: var(--danger);
             color: white;
             border-color: var(--danger);
-        }
-
-        /* BOUTON EXCEL VERT */
-        .btn-excel {
-            background: #10b981 !important;
-            color: white !important;
-            border-color: #10b981 !important;
-            margin-right: 8px;
         }
 
         .alert {
@@ -312,6 +327,10 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
+        }
+
+        .header-logo-text {
+            display: none;
         }
 
         .header-nav {
@@ -451,7 +470,7 @@
 
 .page-content {
     display: none;
-    padding: 0 24px;
+    padding: 0 24px; /* AJOUTÉ : Espacement gauche/droite */
 }
 
 .page-content.active {
@@ -484,7 +503,7 @@
     font-size: 15px;
 }
 
-        /* === STATS CARDS === */
+        /* === STATS CARDS (4 CARTES COMPACTES) === */
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -632,13 +651,13 @@
     justify-content: space-between;
     align-items: center;
     font-weight: 600;
-    flex-wrap: nowrap;
-    gap: 10px;
+    flex-wrap: nowrap; /* AJOUTÉ : Empêche le retour à la ligne */
+    gap: 10px; /* AJOUTÉ : Espacement entre les éléments */
 }
 
 .frais-total span:last-child {
-    white-space: nowrap;
-    flex-shrink: 0;
+    white-space: nowrap; /* AJOUTÉ : Le montant ne coupe jamais */
+    flex-shrink: 0; /* AJOUTÉ : Le montant garde sa taille */
 }
 
         
@@ -653,8 +672,8 @@
     border-radius: 12px;
     padding: 20px;
     min-height: 300px;
-    overflow: hidden;
-    width: 100%;
+    overflow: hidden; /* AJOUTÉ : Force le contenu à rester dedans */
+    width: 100%; /* AJOUTÉ */
 }
 
 .chart-container h3 {
@@ -666,24 +685,25 @@
     font-weight: 600;
 }
 
+/* Wrapper pour éviter le débordement des graphiques */
 .chart-wrapper {
     width: 100%;
     max-width: 100%;
     overflow: hidden;
-    padding: 0;
+    padding: 0; /* DÉJÀ BON */
     box-sizing: border-box;
-    margin: 0 -5px;
+    margin: 0 -5px; /* AJOUTÉ : Compense la marge du canvas */
 }
 
 .chart-canvas {
     position: relative;
     height: 250px;
-    width: 100%;
-    max-width: 100%;
+    width: 100%; /* AJOUTÉ */
+    max-width: 100%; /* AJOUTÉ */
 }
 
 .chart-canvas canvas {
-    max-width: 100% !important;
+    max-width: 100% !important; /* FORCE le canvas à ne pas dépasser */
     height: auto !important;
 }
 
@@ -700,6 +720,16 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 16px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         /* === GRIDS === */
@@ -725,6 +755,7 @@
             border-color: var(--primary);
         }
 
+        /* NOUVEAU : Couleurs par bénéfice */
         .vente-card.profit {
             border-color: var(--success);
             background: linear-gradient(to bottom right, var(--bg-card) 0%, rgba(16, 185, 129, 0.05) 100%);
@@ -745,8 +776,38 @@
             font-weight: 600;
         }
 
-        .badge-stock { background: rgba(16, 185, 129, 0.1); color: var(--success); }
-        .badge-vendu { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .badge-stock {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .badge-vendu {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .vehicule-card h3, .client-card h3, .frais-card h3, .vente-card h3 {
+            font-size: 20px;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .vehicule-info, .client-info, .frais-info, .vente-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .vehicule-info-row, .info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+
+        .vehicule-info-label, .info-label {
+            color: var(--text-secondary);
+        }
 
         .vehicule-price, .amount {
             font-size: 24px;
@@ -755,9 +816,257 @@
             margin-top: 8px;
         }
 
-        .amount.positive { color: var(--success); }
-        .amount.negative { color: var(--danger); }
+        .amount.positive {
+            color: var(--success);
+        }
 
+        .amount.negative {
+            color: var(--danger);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .card-actions button {
+            flex: 1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--bg-card);
+            border: 2px dashed var(--border-color);
+            border-radius: 16px;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        /* === MODALS === */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px var(--shadow-hover);
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h2 {
+            font-size: 24px;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: none;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .modal-content form {
+            padding: 24px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            padding: 24px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* === DETAILS === */
+        .detail-section {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .detail-section:last-child {
+            border-bottom: none;
+        }
+
+        .detail-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .detail-item {
+            padding: 12px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .detail-value.large {
+            font-size: 32px;
+        }
+
+        .detail-value.positive {
+            color: var(--success);
+        }
+
+        .detail-value.negative {
+            color: var(--danger);
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 768px) {
+            .header-logo-icon {
+                width: 80px;
+                height: 80px;
+                flex-shrink: 0;
+            }
+
+            .header-nav {
+                display: none;
+            }
+
+            .header {
+                padding: 8px 16px;
+                overflow-x: hidden;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .btn-logout {
+                display: none;
+            }
+
+            .page-header h1 {
+                font-size: 24px;
+            }
+
+            .stat-card-value {
+                font-size: 28px;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .vehicules-grid, .clients-grid, .frais-grid, .ventes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+        }
+                .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+        }
+        
         /* === TABLE CAISSE === */
         .table-container {
             background: var(--bg-card);
@@ -772,16 +1081,77 @@
             border-collapse: collapse;
         }
         
-        .data-table th, .data-table td {
+        .data-table thead {
+            background: var(--bg-secondary);
+        }
+        
+        .data-table th {
+            padding: 16px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .data-table td {
             padding: 16px;
             text-align: center;
             border-bottom: 1px solid var(--border-color);
             font-size: 14px;
         }
         
-        .caisse-table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 20px 0; }
-        .caisse-table-wrapper table { min-width: 600px; }
+        .data-table tbody tr:hover {
+            background: var(--bg-secondary);
+        }
+        
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .caisse-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        /* Scroll horizontal pour le tableau caisse sur mobile */
+.caisse-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 20px 0;
+}
 
+.caisse-table-wrapper table {
+    min-width: 600px;
+}
+
+@media (max-width: 768px) {
+    .caisse-table-wrapper {
+        margin: 20px -20px;
+    }
+}
+
+        .caisse-type-entree {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+        
+        .caisse-type-sortie {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+        
+        .caisse-montant {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
         .caisse-solde-card {
             background: linear-gradient(135deg, var(--primary), #1e40af);
             border-radius: 16px;
@@ -791,16 +1161,23 @@
             margin-bottom: 32px;
         }
         
-        .caisse-solde-value { font-size: 48px; font-weight: 700; margin-bottom: 8px; }
-
-        /* === RESPONSIVE === */
-        @media (max-width: 768px) {
-            .header-nav { display: none; }
-            .hamburger { display: flex; }
-            .header-right .btn-logout, .header-right .btn-excel { display: none; }
-            .stats { grid-template-columns: repeat(2, 1fr); }
-            .charts-grid-2x2 { grid-template-columns: 1fr; }
-            .main-content { padding: 16px; }
+        .caisse-solde-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .caisse-solde-value {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .caisse-solde-subtitle {
+            font-size: 13px;
+            opacity: 0.8;
         }
     </style>
 </head>
@@ -808,339 +1185,1721 @@
     <!-- PAGE DE CONNEXION -->
     <div class="login-container" id="loginPage">
         <div class="card">
-            <div class="logo-container"><div class="logo-badge"><img src="logo sans fond.jpg" alt="Autovox"></div></div>
+            <div class="logo-container">
+                <div class="logo-badge">
+                    <img src="logo sans fond.jpg" alt="Autovox">
+                </div>
+            </div>
             <p class="subtitle">Gestion flotte automobile</p>
-            <div class="alert" id="errorAlert">Identifiant ou mot de passe incorrect</div>
+            
+            <div class="alert" id="errorAlert">
+                Identifiant ou mot de passe incorrect
+            </div>
+            
             <form id="loginForm">
-                <div class="input-group"><label>Identifiant</label><input type="text" id="username" required></div>
-                <div class="input-group"><label>Mot de passe</label><input type="password" id="password" required></div>
+                <div class="input-group">
+                    <label>Identifiant</label>
+                    <input type="text" id="username" placeholder="Votre identifiant" required autocomplete="username">
+                </div>
+                <div class="input-group">
+                    <label>Mot de passe</label>
+                    <input type="password" id="password" placeholder="Votre mot de passe" required autocomplete="current-password">
+                </div>
                 <button type="submit" class="btn">Se connecter</button>
             </form>
         </div>
+        <div class="footer">© 2026 Autovox • Design Premium</div>
     </div>
 
     <!-- DASHBOARD -->
     <div class="dashboard" id="dashboardPage">
+        <!-- HEADER HORIZONTAL -->
         <header class="header">
             <div class="header-left">
                 <a href="#" class="header-logo" onclick="navigateToPage('dashboard'); return false;">
-                    <div class="header-logo-icon"><img src="logo sans fond.jpg" alt="Autovox"></div>
+                    <div class="header-logo-icon">
+                        <img src="logo sans fond.jpg" alt="Autovox">
+                    </div>
+                    <div class="header-logo-text">Autovox</div>
                 </a>
+                
                 <nav class="header-nav" id="desktopNav">
-                    <div class="nav-link active" data-page="dashboard">📊 Dashboard</div>
-                    <div class="nav-link" data-page="vehicules">🚗 Véhicules</div>
-                    <div class="nav-link" data-page="clients">👥 Clients</div>
-                    <div class="nav-link" data-page="frais">💰 Frais</div>
-                    <div class="nav-link" data-page="caisse">💼 Caisse</div>
-                    <div class="nav-link" data-page="ventes">📈 Ventes</div>
-                    <div class="nav-link" data-page="statistiques">📊 Stats</div>
+                    <div class="nav-link active" data-page="dashboard">
+                        <span class="nav-icon">📊</span>
+                        <span>Dashboard</span>
+                    </div>
+                    <div class="nav-link" data-page="vehicules">
+                        <span class="nav-icon">🚗</span>
+                        <span>Véhicules</span>
+                    </div>
+                    <div class="nav-link" data-page="clients">
+                        <span class="nav-icon">👥</span>
+                        <span>Clients</span>
+                    </div>
+                    <div class="nav-link" data-page="frais">
+                        <span class="nav-icon">💰</span>
+                        <span>Frais</span>
+                    </div>
+                    <div class="nav-link" data-page="caisse">
+                        <span class="nav-icon">💼</span>
+                        <span>Caisse</span>
+                    </div>
+
+                    <div class="nav-link" data-page="ventes">
+                        <span class="nav-icon">📈</span>
+                        <span>Ventes</span>
+                    </div>
+                    <div class="nav-link" data-page="statistiques">
+                        <span class="nav-icon">📊</span>
+                        <span>Statistiques</span>
+                    </div>
                 </nav>
             </div>
             
             <div class="header-right">
-                <button class="btn-logout btn-excel" onclick="exportGlobalExcel()">📥 Excel Premium</button>
-                <button class="theme-toggle-btn" onclick="toggleTheme()"><span id="themeIcon">🌙</span></button>
+                <!-- BOUTON EXCEL HEADER -->
+                <button class="btn-logout btn-excel" onclick="exportGlobalExcel()">📥 Excel</button>
+                <button class="theme-toggle-btn" onclick="toggleTheme()">
+                    <span id="themeIcon">🌙</span>
+                </button>
                 <button class="btn-logout" onclick="logout()">Déconnexion</button>
-                <button class="hamburger" onclick="toggleMobileMenu()">☰</button>
+                <button class="hamburger" onclick="toggleMobileMenu()">
+                    <span id="hamburgerIcon">☰</span>
+                </button>
             </div>
         </header>
 
-        <!-- MENU MOBILE -->
+        <!-- MOBILE MENU -->
         <div class="mobile-menu" id="mobileMenu">
-            <div class="mobile-menu-item active" data-page="dashboard">📊 Dashboard</div>
-            <div class="mobile-menu-item" data-page="vehicules">🚗 Véhicules</div>
-            <div class="mobile-menu-item" data-page="caisse">💼 Caisse</div>
-            <div class="mobile-menu-item" data-page="statistiques">📊 Statistiques</div>
-            <div class="mobile-menu-item" onclick="exportGlobalExcel()" style="color: var(--success);">📥 Exporter Excel</div>
-            <div style="border-top: 1px solid var(--border-color); padding-top: 20px;"><button class="btn btn-secondary" onclick="logout()">Déconnexion</button></div>
+            <div class="mobile-menu-item active" data-page="dashboard">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </div>
+            <div class="mobile-menu-item" data-page="vehicules">
+                <span class="nav-icon">🚗</span>
+                <span>Véhicules</span>
+            </div>
+            <div class="mobile-menu-item" data-page="clients">
+                <span class="nav-icon">👥</span>
+                <span>Clients</span>
+            </div>
+            <div class="mobile-menu-item" data-page="frais">
+                <span class="nav-icon">💰</span>
+                <span>Frais</span>
+            </div>
+            <div class="mobile-menu-item" data-page="caisse">
+                <span class="nav-icon">💼</span>
+                <span>Caisse</span>
+            </div>
+
+            <div class="mobile-menu-item" data-page="ventes">
+                <span class="nav-icon">📈</span>
+                <span>Ventes</span>
+            </div>
+            <div class="mobile-menu-item" data-page="statistiques">
+                <span class="nav-icon">📊</span>
+                <span>Statistiques</span>
+            </div>
+            <!-- BOUTON EXCEL MOBILE -->
+            <div class="mobile-menu-item" onclick="exportGlobalExcel()" style="color: var(--success); font-weight: 600;">
+                <span class="nav-icon">📥</span>
+                <span>Exporter Excel Premium</span>
+            </div>
+            <div style="border-top: 1px solid var(--border-color); margin: 20px 0; padding-top: 20px;">
+                <button class="btn btn-secondary" onclick="logout()" style="width: 100%;">Déconnexion</button>
+            </div>
         </div>
         
+        <!-- MAIN CONTENT -->
         <div class="main-wrapper">
             <div class="main-content">
-                <!-- DASHBOARD -->
+                <!-- PAGE DASHBOARD -->
                 <div class="page-content active" id="pageDashboard">
-                    <h1>Tableau de bord</h1>
-                    <div class="stats">
-                        <div class="stat-card" onclick="showVehiculesStock()">
-                            <div class="stat-card-title">En stock</div>
-                            <div class="stat-card-value" id="vehiculesStock">0</div>
-                        </div>
-                        <div class="stat-card" onclick="showVehiculesVendus()">
-                            <div class="stat-card-title">Vendus</div>
-                            <div class="stat-card-value" id="vehiculesVendus">0</div>
-                        </div>
-                        <div class="stat-card" onclick="showVentesDetails()">
-                            <div class="stat-card-title">Bénéfice net</div>
-                            <div class="stat-card-value" id="beneficeTotal">0 €</div>
-                        </div>
-                        <div class="stat-card" onclick="navigateToPage('caisse')">
-                            <div class="stat-card-title">Caisse</div>
-                            <div class="stat-card-value" id="soldeCaisse">0 €</div>
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h1>Tableau de bord</h1>
+                            <p>Vue d'ensemble de votre activité</p>
                         </div>
                     </div>
-                    <div class="welcome-card"><h2>Bienvenue sur Autovox ✨</h2></div>
+                    
+                    <!-- 4 CARTES COMPACTES -->
+                    <div class="stats">
+                        <div class="stat-card" onclick="showVehiculesStock()">
+                            <div class="stat-card-header">
+                                <div class="stat-card-title">En stock</div>
+                                <div class="stat-card-icon">🚗</div>
+                            </div>
+                            <div class="stat-card-value" id="vehiculesStock">0</div>
+                            <div class="stat-card-subtitle">Véhicules disponibles</div>
+                        </div>
+                        
+                        <div class="stat-card" onclick="showVehiculesVendus()">
+                            <div class="stat-card-header">
+                                <div class="stat-card-title">Vendus</div>
+                                <div class="stat-card-icon">✅</div>
+                            </div>
+                            <div class="stat-card-value" id="vehiculesVendus">0</div>
+                            <div class="stat-card-subtitle">Véhicules vendus</div>
+                        </div>
+                        
+                        <div class="stat-card" onclick="showVentesDetails()">
+                            <div class="stat-card-header">
+                                <div class="stat-card-title">Bénéfice net</div>
+                                <div class="stat-card-icon">💰</div>
+                            </div>
+                            <div class="stat-card-value" id="beneficeTotal">0 €</div>
+                            <div class="stat-card-subtitle">Avec frais déduits</div>
+                        </div>
+                        
+                        <div class="stat-card" onclick="navigateToPage('caisse')">
+                            <div class="stat-card-header">
+                                <div class="stat-card-title">Caisse</div>
+                                <div class="stat-card-icon">💰</div>
+                            </div>
+                            <div class="stat-card-value" id="soldeCaisse">0 €</div>
+                            <div class="stat-card-subtitle">Solde disponible</div>
+                        </div>
+                        
+                        <div class="stat-card" onclick="navigateToPage('statistiques')">
+                            <div class="stat-card-header">
+                                <div class="stat-card-title">Statistiques</div>
+                                <div class="stat-card-icon">📊</div>
+                            </div>
+                            <div class="stat-card-value" id="totalVentesCount">0</div>
+                            <div class="stat-card-subtitle">Ventes ce mois</div>
+                        </div>
+                    </div>
+
+                    <!-- WELCOME CARD -->
+                    <div class="welcome-card">
+                        <h2>Bienvenue sur Autovox ✨</h2>
+                        <p>Gérez efficacement votre parc automobile</p>
+                    </div>
                 </div>
 
-                <!-- STATISTIQUES -->
-                <div class="page-content" id="pageStatistiques">
-                    <h1>Statistiques</h1>
-                    <div class="charts-section">
-                        <div class="charts-grid-2x2">
-                            <div class="chart-container"><h3>🚗 Ventes par mois</h3><canvas id="chartVentes"></canvas></div>
-                            <div class="chart-container"><h3>📈 Chiffre d'affaires</h3><canvas id="chartCA"></canvas></div>
-                            <div class="chart-container"><h3>💰 Bénéfice mensuel</h3><canvas id="chartBenefice"></canvas></div>
-                            <div class="chart-container"><h3>💸 Analyse des frais</h3>
-                                <div id="fraisTableContainer"></div>
-                                <div class="frais-total">TOTAL: <span id="totalFraisGlobal">0 €</span></div>
+                               <!-- PAGE STATISTIQUES (NOUVELLE) -->
+<div class="page-content" id="pageStatistiques">
+    <div class="page-header">
+        <div class="page-header-left">
+            <h1>Statistiques</h1>
+            <p>Analyse de vos performances</p>
+        </div>
+    </div>
+
+    <!-- SECTION GRAPHIQUES -->
+    <div class="charts-section">
+        <h2>📊 Vue d'ensemble</h2>
+        
+        <!-- LIGNE 1 : ACTIVITÉ & VENTES -->
+        <div class="charts-grid-2x2">
+            <div class="chart-container">
+                <h3>🚗 Véhicules vendus par mois</h3>
+                <div class="chart-wrapper">
+                    <div class="chart-canvas">
+                        <canvas id="chartVentes"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>📈 Chiffre d'affaires mensuel</h3>
+                <div class="chart-wrapper">
+                    <div class="chart-canvas">
+                        <canvas id="chartCA"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- LIGNE 2 : RENTABILITÉ -->
+        <div class="charts-grid-2x2" style="margin-top: 20px;">
+            <div class="chart-container">
+                <h3>💰 Bénéfice net mensuel</h3>
+                <div class="chart-wrapper">
+                    <div class="chart-canvas">
+                        <canvas id="chartBenefice"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>💸 Analyse des frais</h3>
+                <div class="frais-analysis">
+                    <div id="fraisTableContainer"></div>
+                    <div class="frais-total">
+                        <span>TOTAL DES FRAIS</span>
+                        <span id="totalFraisGlobal" style="font-size: 24px; font-weight: 700; color: var(--danger);">0 €</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+                                <!-- PAGE CAISSE -->
+                <div class="page-content" id="pageCaisse">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h1>💼 Gestion de la Caisse</h1>
+                            <p>Suivi des entrées et sorties d'argent</p>
+                        </div>
+                        <div class="page-header-right">
+                            <button class="btn btn-primary" onclick="openModalAjoutCaisse()">
+                                ➕ Ajouter de l'argent
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SOLDE ACTUEL EN GRAND -->
+                    <div class="caisse-solde-card">
+                        <div class="caisse-solde-label">Solde actuel</div>
+                        <div class="caisse-solde-value" id="soldeCaisseGrand">0 €</div>
+                        <div class="caisse-solde-subtitle">Dernière mise à jour : <span id="derniereMaj">-</span></div>
+                    </div>
+
+                    <!-- FILTRES -->
+                    <div class="filters">
+                        <div class="filters-row">
+                            <div class="filter-group">
+                                <label>Type</label>
+                                <select id="filterTypeCaisse" onchange="filterCaisse()">
+                                    <option value="">Tous</option>
+                                    <option value="entree">Entrées</option>
+                                    <option value="sortie">Sorties</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>Personne</label>
+                                <select id="filterPersonne" onchange="filterCaisse()">
+                                    <option value="">Toutes</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>Date début</label>
+                                <input type="date" id="filterDateDebut" onchange="filterCaisse()">
+                            </div>
+                            <div class="filter-group">
+                                <label>Date fin</label>
+                                <input type="date" id="filterDateFin" onchange="filterCaisse()">
                             </div>
                         </div>
                     </div>
+<!-- TABLEAU HISTORIQUE -->
+<div class="table-container">
+    <div class="caisse-table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Montant</th>
+                    <th>Motif</th>
+                    <th>Personne</th>
+                </tr>
+            </thead>
+            <tbody id="caisseTableBody">
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 40px;">
+                        Chargement...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
                 </div>
+            </div>
+      
+<!-- PAGE VEHICULES -->
+<div class="page-content" id="pageVehicules">
+    <div class="page-header">
+        <div class="page-header-left">
+            <h1>Véhicules</h1>
+            <p>Gestion de votre parc automobile</p>
+        </div>
+        <div class="page-header-right">
+            <button class="btn btn-small" onclick="openAddVehiculeModal()">➕ Ajouter</button>
+        </div>
+    </div>
 
-                <!-- CAISSE -->
-                <div class="page-content" id="pageCaisse">
-                    <div class="page-header"><h1>💼 Caisse</h1><button class="btn btn-small" onclick="openModalAjoutCaisse()">➕ Ajouter argent</button></div>
-                    <div class="caisse-solde-card">
-                        <div class="caisse-solde-value" id="soldeCaisseGrand">0 €</div>
-                        <p>Dernière MAJ: <span id="derniereMaj">-</span></p>
-                    </div>
-                    <div class="table-container">
-                        <div class="caisse-table-wrapper">
-                            <table class="data-table">
-                                <thead><tr><th>Date</th><th>Type</th><th>Montant</th><th>Motif</th><th>Personne</th></tr></thead>
-                                <tbody id="caisseTableBody"></tbody>
-                            </table>
+    <div class="filters">
+        <div class="filters-row">
+            <div class="filter-group">
+                <label>Recherche</label>
+                <input type="text" id="searchVehicule" placeholder="Marque, modèle, immatriculation..." onkeyup="filterVehicules()">
+            </div>
+            <div class="filter-group">
+                <label>Statut</label>
+                <select id="filterStatut" onchange="filterVehicules()">
+                    <option value="">Tous</option>
+                    <option value="en_stock">En stock</option>
+                    <option value="vendu">Vendu</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div id="vehiculesContainer">
+        <div class="loading">Chargement des véhicules...</div>
+    </div>
+</div>
+
+                <!-- PAGE CLIENTS -->
+                <div class="page-content" id="pageClients">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h1>Clients</h1>
+                            <p>Gestion de vos clients</p>
+                        </div>
+                        <div class="page-header-right">
+                            <button class="btn btn-small" onclick="openAddClientModal()">➕ Ajouter un client</button>
                         </div>
                     </div>
+
+                    <div class="filters">
+                        <div class="filters-row">
+                            <div class="filter-group">
+                                <label>Recherche</label>
+                                <input type="text" id="searchClient" placeholder="Nom, prénom, email..." onkeyup="filterClients()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="clientsContainer">
+                        <div class="loading">Chargement des clients...</div>
+                    </div>
                 </div>
 
-                <!-- VEHICULES -->
-                <div class="page-content" id="pageVehicules">
-                    <div class="page-header"><h1>🚗 Véhicules</h1><button class="btn btn-small" onclick="openAddVehiculeModal()">➕ Ajouter</button></div>
-                    <div id="vehiculesContainer"></div>
-                </div>
-
-                <!-- CLIENTS -->
-                <div class="page-content" id="pageClients">
-                    <div class="page-header"><h1>👥 Clients</h1><button class="btn btn-small" onclick="openAddClientModal()">➕ Ajouter</button></div>
-                    <div id="clientsContainer"></div>
-                </div>
-
-                <!-- FRAIS -->
+                <!-- PAGE FRAIS -->
                 <div class="page-content" id="pageFrais">
-                    <div class="page-header"><h1>💰 Frais</h1><button class="btn btn-small" onclick="openAddFraisModal()">➕ Ajouter</button></div>
-                    <div id="fraisContainer"></div>
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h1>Frais</h1>
+                            <p>Gestion de vos frais véhicules</p>
+                        </div>
+                        <div class="page-header-right">
+                            <button class="btn btn-small" onclick="openAddFraisModal()">➕ Ajouter des frais</button>
+                        </div>
+                    </div>
+
+                    <div class="filters">
+                        <div class="filters-row">
+                            <div class="filter-group">
+                                <label>Type de frais</label>
+                                <select id="filterTypeFrais" onchange="filterFrais()">
+                                   <option value="">Sélectionnez</option>
+                                    <option value="Pièces et main d'oeuvre">Pièces et main d'oeuvre</option>
+                                    <option value="Carrosserie/Peinture">Carrosserie/Peinture</option>
+                                    <option value="Dépanneuse">Dépanneuse</option>
+                                    <option value="Déclaration d'achat">Déclaration d'achat</option>
+                                    <option value="Contrôle technique">Contrôle technique</option>
+                                    <option value="Annonce LeBonCoin">Annonce LeBonCoin</option>
+                                    <option value="Clés">Clés</option>
+                                    <option value="Pneus">Pneus</option>
+                                    <option value="Lavage">Lavage</option>
+                                    <option value="Essence">Essence</option>
+                                    <option value="Entretien">Entretien</option>
+                                    <option value="Autre">Autre</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="fraisContainer">
+                        <div class="loading">Chargement des frais...</div>
+                    </div>
                 </div>
 
-                <!-- VENTES -->
+                <!-- PAGE VENTES -->
                 <div class="page-content" id="pageVentes">
-                    <h1>📈 Ventes</h1>
-                    <div id="ventesContainer"></div>
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h1>Ventes</h1>
+                            <p>Historique de vos ventes avec bénéfice net</p>
+                        </div>
+                    </div>
+
+                    <div id="ventesContainer">
+                        <div class="loading">Chargement des ventes...</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODALS (LOGIQUE ORIGINALE) -->
+    <!-- MODAL AJOUT VEHICULE -->
+    <div class="modal" id="modalAddVehicule">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Ajouter un véhicule</h2>
+                <button class="modal-close" onclick="closeAddVehiculeModal()">✕</button>
+            </div>
+            <form id="formAddVehicule">
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Marque *</label>
+                        <input type="text" name="marque" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Modèle *</label>
+                        <input type="text" name="modele" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Année *</label>
+                        <input type="number" name="annee" min="1900" max="2099" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Immatriculation *</label>
+                        <input type="text" name="immatriculation" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Prix d'achat (€) *</label>
+                        <input type="number" name="prix_achat" step="0.01" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Kilométrage (km) *</label>
+                        <input type="number" name="kilometrage" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Date d'achat *</label>
+                        <input type="date" name="date_achat" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Couleur</label>
+                        <input type="text" name="couleur">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Type de carburant</label>
+                        <select name="carburant">
+                            <option value="">Non renseigné</option>
+                            <option value="Essence">Essence</option>
+                            <option value="Diesel">Diesel</option>
+                            <option value="Électrique">Électrique</option>
+                            <option value="Hybride">Hybride</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Fournisseur</label>
+                        <input type="text" name="fournisseur">
+                    </div>
+                </div>
+                <button type="submit" class="btn">Ajouter le véhicule</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- MODAL AJOUT ARGENT CAISSE -->
     <div class="modal" id="modalAjoutCaisse">
         <div class="modal-content">
-            <h2>💰 Ajouter de l'argent</h2>
+            <div class="modal-header">
+                <h2>💰 Ajouter de l'argent</h2>
+                <button class="modal-close" onclick="closeModalAjoutCaisse()">✕</button>
+            </div>
             <form id="formAjoutCaisse" onsubmit="ajouterArgentCaisse(event)">
-                <div class="form-row"><div class="input-group"><label>Date</label><input type="date" name="date" required></div><div class="input-group"><label>Montant (€)</label><input type="number" name="montant" required></div></div>
-                <div class="form-row"><div class="input-group"><label>Personne</label><select name="personne" required><option>Fouad</option><option>Tarek</option><option>Walid</option><option>Riad</option></select></div><div class="input-group"><label>Motif</label><input type="text" name="motif" required></div></div>
-                <button type="submit" class="btn">Confirmer</button>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Date *</label>
+                        <input type="date" name="date" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Montant (€) *</label>
+                        <input type="number" name="montant" step="0.01" min="0.01" required placeholder="Ex: 3000">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Personne *</label>
+                        <select name="personne" required>
+                            <option value="">Sélectionnez</option>
+                            <option value="Fouad">Fouad</option>
+                            <option value="Tarek">Tarek</option>
+                            <option value="Walid">Walid</option>
+                            <option value="Riad">Riad</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Motif *</label>
+                        <input type="text" name="motif" required placeholder="Ex: Apport initial, Complément caisse...">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">💰 Ajouter l'argent</button>
             </form>
         </div>
     </div>
 
-    <!-- FORMULAIRES AJOUT SIMPLIFIÉS MAIS FONCTIONNELS -->
-    <div class="modal" id="modalAddVehicule"><div class="modal-content"><form id="formAddVehicule"><div class="form-row"><div class="input-group"><label>Marque</label><input type="text" name="marque" required></div><div class="input-group"><label>Modèle</label><input type="text" name="modele" required></div></div><div class="form-row"><div class="input-group"><label>KM</label><input type="number" name="kilometrage" required></div><div class="input-group"><label>Immat</label><input type="text" name="immatriculation" required></div></div><div class="form-row"><div class="input-group"><label>Prix Achat</label><input type="number" name="prix_achat" required></div><div class="input-group"><label>Année</label><input type="number" name="annee" required></div></div><div class="input-group"><label>Date</label><input type="date" name="date_achat" required></div><button type="submit" class="btn">Ajouter</button><button type="button" onclick="closeAddVehiculeModal()">Annuler</button></form></div></div>
+    <!-- MODAL DÉTAILS VEHICULE -->
+    <div class="modal" id="modalDetailsVehicule">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="detailsTitle">Détails du véhicule</h2>
+                <button class="modal-close" onclick="closeDetailsModal()">✕</button>
+            </div>
+            
+            <div id="detailsContent"></div>
+            
+            <div class="modal-actions" id="detailsActions"></div>
+        </div>
+    </div>
 
-    <div class="modal" id="modalAddFrais"><div class="modal-content"><form id="formAddFrais"><div class="input-group"><label>Véhicule</label><select name="vehicule_id" id="selectVehicule" required></select></div><div class="input-group"><label>Type</label><select name="type"><option>Pièces et main d'oeuvre</option><option>Carrosserie/Peinture</option><option>Dépanneuse</option><option>Déclaration d'achat</option><option>Contrôle technique</option><option>Annonce LeBonCoin</option><option>Clés</option><option>Lavage</option><option>Essence</option><option>Autre</option></select></div><div class="input-group"><label>Montant</label><input type="number" name="montant" required></div><div class="input-group"><label>Date</label><input type="date" name="date" required></div><button type="submit" class="btn">Enregistrer</button><button type="button" onclick="closeAddFraisModal()">Fermer</button></form></div></div>
+    <!-- MODAL MODIFIER VEHICULE -->
+    <div class="modal" id="modalEditVehicule">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Modifier le véhicule</h2>
+                <button class="modal-close" onclick="closeEditModal()">✕</button>
+            </div>
+            <form id="formEditVehicule">
+                <input type="hidden" id="editVehiculeId">
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Marque *</label>
+                        <input type="text" id="editMarque" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Modèle *</label>
+                        <input type="text" id="editModele" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Année *</label>
+                        <input type="number" id="editAnnee" min="1900" max="2099" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Immatriculation *</label>
+                        <input type="text" id="editImmatriculation" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Prix d'achat (€) *</label>
+                        <input type="number" id="editPrixAchat" step="0.01" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Kilométrage (km) *</label>
+                        <input type="number" id="editKilometrage" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Date d'achat *</label>
+                        <input type="date" id="editDateAchat" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Couleur</label>
+                        <input type="text" id="editCouleur">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Type de carburant</label>
+                        <select id="editCarburant">
+                            <option value="">Non renseigné</option>
+                            <option value="Essence">Essence</option>
+                            <option value="Diesel">Diesel</option>
+                            <option value="Électrique">Électrique</option>
+                            <option value="Hybride">Hybride</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Fournisseur</label>
+                        <input type="text" id="editFournisseur">
+                    </div>
+                </div>
+                <button type="submit" class="btn">Enregistrer les modifications</button>
+            </form>
+        </div>
+    </div>
 
+    <!-- MODAL VENDRE VEHICULE -->
+    <div class="modal" id="modalVendreVehicule">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Vendre le véhicule</h2>
+                <button class="modal-close" onclick="closeVendreModal()">✕</button>
+            </div>
+            <form id="formVendreVehicule">
+                <input type="hidden" id="vehiculeIdVente">
+                <div class="input-group">
+                    <label>Prix de vente (€) *</label>
+                    <input type="number" id="prixVente" step="0.01" required>
+                </div>
+                <div class="input-group">
+                    <label>Date de vente *</label>
+                    <input type="date" id="dateVente" required>
+                </div>
+                <div class="input-group">
+                    <label>Client (optionnel)</label>
+                    <select id="clientVente">
+                        <option value="">Aucun client</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success">Confirmer la vente</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL AJOUT CLIENT -->
+    <div class="modal" id="modalAddClient">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Ajouter un client</h2>
+                <button class="modal-close" onclick="closeAddClientModal()">✕</button>
+            </div>
+            <form id="formAddClient">
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Nom *</label>
+                        <input type="text" name="nom" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Prénom *</label>
+                        <input type="text" name="prenom" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Téléphone</label>
+                        <input type="tel" name="telephone">
+                    </div>
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="email" name="email">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Adresse</label>
+                    <textarea name="adresse" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn">Ajouter le client</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL MODIFIER CLIENT -->
+    <div class="modal" id="modalEditClient">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Modifier le client</h2>
+                <button class="modal-close" onclick="closeEditClientModal()">✕</button>
+            </div>
+            <form id="formEditClient">
+                <input type="hidden" id="editClientId">
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Nom *</label>
+                        <input type="text" id="editClientNom" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Prénom *</label>
+                        <input type="text" id="editClientPrenom" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Téléphone</label>
+                        <input type="tel" id="editClientTelephone">
+                    </div>
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="email" id="editClientEmail">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Adresse</label>
+                    <textarea id="editClientAdresse" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn">Enregistrer les modifications</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DÉTAILS CLIENT -->
+    <div class="modal" id="modalDetailsClient">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="detailsClientTitle">Détails du client</h2>
+                <button class="modal-close" onclick="closeDetailsClientModal()">✕</button>
+            </div>
+            
+            <div id="detailsClientContent"></div>
+            
+            <div class="modal-actions" id="detailsClientActions"></div>
+        </div>
+    </div>
+
+    <!-- MODAL AJOUT FRAIS -->
+    <div class="modal" id="modalAddFrais">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Ajouter des frais</h2>
+                <button class="modal-close" onclick="closeAddFraisModal()">✕</button>
+            </div>
+            <form id="formAddFrais">
+                <div class="input-group">
+                    <label>Véhicule concerné *</label>
+                    <select name="vehicule_id" id="selectVehicule" required>
+                        <option value="">Sélectionnez un véhicule</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Type de frais *</label>
+                        <select name="type" id="addFraisType" required>
+                            <option value="">Sélectionnez</option>
+                            <option value="Pièces et main d'oeuvre">Pièces et main d'oeuvre</option>
+                            <option value="Carrosserie/Peinture">Carrosserie/Peinture</option>
+                            <option value="Dépanneuse">Dépanneuse</option>
+                            <option value="Déclaration d'achat">Déclaration d'achat</option>
+                            <option value="Contrôle technique">Contrôle technique</option>
+                            <option value="Annonce LeBonCoin">Annonce LeBonCoin</option>
+                            <option value="Clés">Clés</option>
+                            <option value="Pneus">Pneus</option>
+                            <option value="Lavage">Lavage</option>
+                            <option value="Essence">Essence</option>
+                            <option value="Entretien">Entretien</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Montant (€) *</label>
+                        <input type="number" name="montant" step="0.01" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Date *</label>
+                        <input type="date" name="date" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Prestataire</label>
+                        <input type="text" name="prestataire">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Description</label>
+                    <textarea name="description" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn">Ajouter les frais</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL MODIFIER FRAIS -->
+    <div class="modal" id="modalEditFrais">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Modifier les frais</h2>
+                <button class="modal-close" onclick="closeEditFraisModal()">✕</button>
+            </div>
+            <form id="formEditFrais">
+                <input type="hidden" id="editFraisId">
+                <div class="input-group">
+                    <label>Véhicule concerné *</label>
+                    <select id="editFraisVehicule" required>
+                        <option value="">Sélectionnez un véhicule</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Type de frais *</label>
+                        <select id="editFraisType" required>
+                            <option value="">Sélectionnez</option>
+                            <option value="Pièces et main d'oeuvre">Pièces et main d'oeuvre</option>
+                            <option value="Carrosserie/Peinture">Carrosserie/Peinture</option>
+                            <option value="Dépanneuse">Dépanneuse</option>
+                            <option value="Déclaration d'achat">Déclaration d'achat</option>
+                            <option value="Contrôle technique">Contrôle technique</option>
+                            <option value="Annonce LeBonCoin">Annonce LeBonCoin</option>
+                            <option value="Clés">Clés</option>
+                            <option value="Pneus">Pneus</option>
+                            <option value="Lavage">Lavage</option>
+                            <option value="Essence">Essence</option>
+                            <option value="Entretien">Entretien</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Montant (€) *</label>
+                        <input type="number" id="editFraisMontant" step="0.01" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Date *</label>
+                        <input type="date" id="editFraisDate" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Prestataire</label>
+                        <input type="text" id="editFraisPrestataire">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Description</label>
+                    <textarea id="editFraisDescription" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn">Enregistrer les modifications</button>
+            </form>
+        </div>
+    </div>
     <script>
-        const SUPABASE_URL = 'https://htmpyspelscwftpdrzov.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0bXB5c3BlbHNjd2Z0cGRyem92Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NDQ5NTAsImV4cCI6MjA4NjQyMDk1MH0.FKv8RO32kNEI8KQACWlTgvKTn9X8N39HyKza03Rq0lY';
-        let supabaseClient = null, allVehicules = [], allFrais = [], allVentes = [], allCaisse = [];
-        let chartCA, chartBenefice, chartVentes;
+        // ========== ENREGISTREMENT SERVICE WORKER (PWA) ==========
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(function(registration) {
+                        console.log('✅ PWA activée ! Service Worker enregistré');
+                    })
+                    .catch(function(error) {
+                        console.log('⚠️ Service Worker non enregistré:', error);
+                    });
+            });
+        }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            if (localStorage.getItem('autovox_session') === 'active') { showDashboard(); }
+        // Variables globales
+        let supabaseClient = null;
+        let allVehicules = [];
+        let allClients = [];
+        let allFrais = [];
+        let allVentes = [];
+        let allCaisse = [];
+        let chartCA = null;
+        let chartBenefice = null;
+        let chartVentes = null;
+        
+        // Initialiser Supabase
+        function initSupabase() {
+            const SUPABASE_URL = 'https://htmpyspelscwftpdrzov.supabase.co';
+            const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0bXB5c3BlbHNjd2Z0cGRyem92Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NDQ5NTAsImV4cCI6MjA4NjQyMDk1MH0.FKv8RO32kNEI8KQACWlTgvKTn9X8N39HyKza03Rq0lY';
+            
+            if (window.supabase && !supabaseClient) {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            }
+        }
+
+        function generateId() {
+            return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const isDark = body.classList.toggle('dark-mode');
+            
+            localStorage.setItem('autovox_theme', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').textContent = isDark ? '☀️' : '🌙';
+            
+            const currentPage = document.querySelector('.page-content.active');
+            if (currentPage && currentPage.id === 'pageStatistiques') {
+                loadCharts();
+            }
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('autovox_theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('themeIcon').textContent = '☀️';
+            }
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const isActive = menu.classList.toggle('active');
+            document.getElementById('hamburgerIcon').textContent = isActive ? '✕' : '☰';
+        }
+
+        function closeMobileMenu() {
+            document.getElementById('mobileMenu').classList.remove('active');
+            document.getElementById('hamburgerIcon').textContent = '☰';
+        }
+
+        window.addEventListener('DOMContentLoaded', function() {
             loadTheme();
+            if (localStorage.getItem('autovox_session') === 'active') {
+                showDashboard();
+            }
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === 'admin' && password === 'autovox2026') {
+                localStorage.setItem('autovox_session', 'active');
+                showDashboard();
+            } else {
+                const alert = document.getElementById('errorAlert');
+                alert.classList.add('show');
+                setTimeout(() => alert.classList.remove('show'), 3000);
+            }
         });
 
         function showDashboard() {
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('dashboardPage').classList.add('active');
-            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            initSupabase();
             loadStats();
             setupNavigation();
         }
 
         function setupNavigation() {
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', function() { navigateToPage(this.getAttribute('data-page')); });
+            document.querySelectorAll('#desktopNav .nav-link').forEach(item => {
+                item.addEventListener('click', function() {
+                    const page = this.getAttribute('data-page');
+                    navigateToPage(page);
+                });
+            });
+
+            document.querySelectorAll('.mobile-menu-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const page = this.getAttribute('data-page');
+                    navigateToPage(page);
+                    closeMobileMenu();
+                });
             });
         }
 
         function navigateToPage(page) {
-            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.querySelectorAll('#desktopNav .nav-link').forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-page') === page) {
+                    item.classList.add('active');
+                }
+            });
+
+            document.querySelectorAll('.mobile-menu-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-page') === page) {
+                    item.classList.add('active');
+                }
+            });
+
+            document.querySelectorAll('.page-content').forEach(content => {
+                content.classList.remove('active');
+            });
             document.getElementById('page' + page.charAt(0).toUpperCase() + page.slice(1)).classList.add('active');
-            const n = document.querySelector(`[data-page="${page}"]`); if(n) n.classList.add('active');
 
-            if(page === 'caisse') loadCaisse();
-            if(page === 'vehicules') loadVehicules();
-            if(page === 'ventes') loadVentes();
-            if(page === 'statistiques') { loadFraisAnalysis(); loadCharts(); }
-            if(page === 'frais') loadFrais();
+            if (page === 'vehicules') {
+                loadVehicules();
+            } else if (page === 'clients') {
+                loadClients();
+            } else if (page === 'frais') {
+                loadFrais();
+            } else if (page === 'ventes') {
+                loadVentes();
+            } else if (page === 'statistiques') {
+                loadCharts();
+            } else if (page === 'caisse') {
+                loadCaisse();
+            }
         }
 
-        // --- CALCUL BÉNÉFICE NET (LOGIQUE COMPLÈTE) ---
         async function calculateBeneficeNet(vehiculeId, prixVente, prixAchat) {
-            const { data: frais } = await supabaseClient.from('frais').select('montant').eq('vehicule_id', vehiculeId);
-            const totalFrais = frais ? frais.reduce((sum, f) => sum + parseFloat(f.montant), 0) : 0;
-            return { totalFrais, beneficeNet: (parseFloat(prixVente) - parseFloat(prixAchat)) - totalFrais };
+            try {
+                const { data: frais } = await supabaseClient
+                    .from('frais')
+                    .select('montant')
+                    .eq('vehicule_id', vehiculeId);
+                
+                const totalFrais = frais ? frais.reduce((sum, f) => sum + parseFloat(f.montant), 0) : 0;
+                const beneficeBrut = parseFloat(prixVente) - parseFloat(prixAchat);
+                const beneficeNet = beneficeBrut - totalFrais;
+                
+                return {
+                    beneficeBrut: beneficeBrut,
+                    totalFrais: totalFrais,
+                    beneficeNet: beneficeNet
+                };
+            } catch (error) {
+                console.error('Erreur calcul bénéfice:', error);
+                return {
+                    beneficeBrut: 0,
+                    totalFrais: 0,
+                    beneficeNet: 0
+                };
+            }
         }
 
-        // --- LOGIQUE METIER ---
-        async function loadVehicules() {
-            const { data } = await supabaseClient.from('vehicules').select('*').order('date_achat', {ascending:false});
-            allVehicules = data || [];
-            document.getElementById('vehiculesContainer').innerHTML = allVehicules.map(v => `
-                <div class="vehicule-card">
-                    <div class="vehicule-badge ${v.statut === 'en_stock' ? 'badge-stock' : 'badge-vendu'}">${v.statut}</div>
-                    <h3>${v.marque} ${v.modele}</h3>
-                    <p>${v.immatriculation} | ${v.kilometrage} km</p>
-                    <div class="vehicule-price">${v.prix_achat} €</div>
-                </div>
-            `).join('');
+        async function loadCharts() {
+            if (!supabaseClient) return;
+            
+            try {
+                const { data: ventes } = await supabaseClient
+                    .from('ventes')
+                    .select('*, vehicules(id, prix_achat)')
+                    .order('date_vente', { ascending: true });
+                
+                if (!ventes || ventes.length === 0) {
+                    createEmptyCharts();
+                    return;
+                }
+                
+                const now = new Date();
+                const months = [];
+                const labels = [];
+                
+                for (let i = 5; i >= 0; i--) {
+                    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                    months.push({
+                        year: date.getFullYear(),
+                        month: date.getMonth(),
+                        label: date.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' }),
+                        ca: 0,
+                        benefice: 0,
+                        count: 0
+                    });
+                    labels.push(date.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' }));
+                }
+                
+                for (const vente of ventes) {
+                    const venteDate = new Date(vente.date_vente);
+                    const venteMonth = venteDate.getMonth();
+                    const venteYear = venteDate.getFullYear();
+                    
+                    const monthData = months.find(m => m.month === venteMonth && m.year === venteYear);
+                    
+                    if (monthData) {
+                        monthData.ca += parseFloat(vente.prix_vente);
+                        monthData.count += 1;
+                        
+                        const calcul = await calculateBeneficeNet(
+                            vente.vehicule_id,
+                            vente.prix_vente,
+                            vente.vehicules?.prix_achat || 0
+                        );
+                        monthData.benefice += calcul.beneficeNet;
+                    }
+                }
+                
+                const dataCA = months.map(m => Math.round(m.ca));
+                const dataBenefice = months.map(m => Math.round(m.benefice));
+                const dataCount = months.map(m => m.count);
+                
+                createCharts(labels, dataCA, dataBenefice, dataCount);
+                                
+                // Charger l'analyse des frais
+                await loadFraisAnalysis();
+
+            } catch (error) {
+                console.error('Erreur chargement graphiques:', error);
+                createEmptyCharts();
+            }
+        }
+
+        function createCharts(labels, dataCA, dataBenefice, dataCount) {
+            const isDark = document.body.classList.contains('dark-mode');
+            const textColor = isDark ? '#94a3b8' : '#64748b';
+            const gridColor = isDark ? '#334155' : '#e2e8f0';
+            
+            if (chartCA) chartCA.destroy();
+            if (chartBenefice) chartBenefice.destroy();
+            if (chartVentes) chartVentes.destroy();
+            
+            const ctxCA = document.getElementById('chartCA').getContext('2d');
+            chartCA = new Chart(ctxCA, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Chiffre d\'affaires (€)',
+                        data: dataCA,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y.toLocaleString('fr-FR') + ' €';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: textColor },
+                            grid: { color: gridColor }
+                        },
+                        x: {
+                            ticks: { color: textColor },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+            
+            const ctxBenefice = document.getElementById('chartBenefice').getContext('2d');
+            chartBenefice = new Chart(ctxBenefice, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Bénéfice net (€)',
+                        data: dataBenefice,
+                        backgroundColor: dataBenefice.map(v => v >= 0 ? 'rgba(16, 185, 129, 0.6)' : 'rgba(239, 68, 68, 0.6)'),
+                        borderColor: dataBenefice.map(v => v >= 0 ? '#10b981' : '#ef4444'),
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y.toLocaleString('fr-FR') + ' €';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: textColor },
+                            grid: { color: gridColor }
+                        },
+                        x: {
+                            ticks: { color: textColor },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+            
+            const ctxVentes = document.getElementById('chartVentes').getContext('2d');
+            chartVentes = new Chart(ctxVentes, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Véhicules vendus',
+                        data: dataCount,
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y + ' véhicule(s)';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { 
+                                color: textColor,
+                                stepSize: 1
+                            },
+                            grid: { color: gridColor }
+                        },
+                        x: {
+                            ticks: { color: textColor },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createEmptyCharts() {
+            const labels = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'];
+            const emptyData = [0, 0, 0, 0, 0, 0];
+            createCharts(labels, emptyData, emptyData, emptyData);
         }
 
         async function loadStats() {
-            const { data: vehs } = await supabaseClient.from('vehicules').select('*');
-            const { data: vnts } = await supabaseClient.from('ventes').select('*, vehicules(prix_achat)');
+            if (!supabaseClient) return;
             
-            document.getElementById('vehiculesStock').textContent = vehs.filter(v=>v.statut==='en_stock').length;
-            document.getElementById('vehiculesVendus').textContent = vehs.filter(v=>v.statut==='vendu').length;
+            try {
+                const { data: vehicules } = await supabaseClient.from('vehicules').select('*');
+                const { data: ventes } = await supabaseClient.from('ventes').select('*, vehicules(id, prix_achat)');
+                
+                if (vehicules) {
+                    const stock = vehicules.filter(v => v.statut === 'en_stock').length;
+                    const vendus = vehicules.filter(v => v.statut === 'vendu').length;
+                    
+                    document.getElementById('vehiculesStock').textContent = stock;
+                    document.getElementById('vehiculesVendus').textContent = vendus;
+                }
 
-            let totalNet = 0;
-            if (vnts) {
-                for(let v of vnts) {
-                    const c = await calculateBeneficeNet(v.vehicule_id, v.prix_vente, v.vehicules.prix_achat);
-                    totalNet += c.beneficeNet;
+                if (ventes && ventes.length > 0) {
+                    let beneficeNetTotal = 0;
+                    const now = new Date();
+                    const currentMonth = now.getMonth();
+                    const currentYear = now.getFullYear();
+                    let ventesThisMonth = 0;
+                    
+                    for (const vente of ventes) {
+                        const calcul = await calculateBeneficeNet(
+                            vente.vehicule_id,
+                            vente.prix_vente,
+                            vente.vehicules?.prix_achat || 0
+                        );
+                        beneficeNetTotal += calcul.beneficeNet;
+                        
+                        const venteDate = new Date(vente.date_vente);
+                        if (venteDate.getMonth() === currentMonth && venteDate.getFullYear() === currentYear) {
+                            ventesThisMonth++;
+                        }
+                    }
+                    
+                    document.getElementById('beneficeTotal').textContent = 
+                        Math.round(beneficeNetTotal).toLocaleString('fr-FR') + ' €';
+                    document.getElementById('totalVentesCount').textContent = ventesThisMonth;
+                }
+                
+                await updateSoldeCaisse();
+       
+            } catch (error) {
+                console.error('Erreur stats dashboard:', error);
+            }
+        }
+
+        async function loadVehicules() {
+            if (!supabaseClient) return;
+            const container = document.getElementById('vehiculesContainer');
+            container.innerHTML = '<div class="loading">Chargement...</div>';
+            try {
+                const { data: vehicules, error } = await supabaseClient
+                    .from('vehicules').select('*').order('date_achat', { ascending: false });
+                if (error) throw error;
+                allVehicules = vehicules || [];
+                displayVehicules(allVehicules);
+            } catch (error) { console.error(error); }
+        }
+
+        function displayVehicules(vehicules) {
+            const container = document.getElementById('vehiculesContainer');
+            if (vehicules.length === 0) {
+                container.innerHTML = `<div class="empty-state"><h3>Aucun véhicule</h3><button class="btn btn-small" onclick="openAddVehiculeModal()">➕ Ajouter</button></div>`;
+                return;
+            }
+            const html = `<div class="vehicules-grid">${vehicules.map(v => `
+                <div class="vehicule-card" onclick="openVehiculeDetails('${v.id}')">
+                    <div class="vehicule-badge ${v.statut === 'en_stock' ? 'badge-stock' : 'badge-vendu'}">${v.statut === 'en_stock' ? '🟢 Stock' : '🔴 Vendu'}</div>
+                    <h3>${v.marque} ${v.modele}</h3>
+                    <div class="vehicule-info">
+                        <div class="vehicule-info-row"><span>Immat:</span><span>${v.immatriculation}</span></div>
+                        <div class="vehicule-info-row"><span>Kilométrage:</span><span>${parseInt(v.kilometrage).toLocaleString()} km</span></div>
+                    </div>
+                    <div class="vehicule-price">${parseFloat(v.prix_achat).toLocaleString()} €</div>
+                </div>`).join('')}</div>`;
+            container.innerHTML = html;
+        }
+
+        function filterVehicules() {
+            const search = document.getElementById('searchVehicule').value.toLowerCase();
+            const statut = document.getElementById('filterStatut').value;
+            let filtered = allVehicules;
+            if (search) filtered = filtered.filter(v => v.marque.toLowerCase().includes(search) || v.modele.toLowerCase().includes(search) || v.immatriculation.toLowerCase().includes(search));
+            if (statut) filtered = filtered.filter(v => v.statut === statut);
+            displayVehicules(filtered);
+        }
+
+        function openAddVehiculeModal() {
+            document.getElementById('modalAddVehicule').classList.add('active');
+            document.getElementById('formAddVehicule').reset();
+        }
+
+        function closeAddVehiculeModal() { document.getElementById('modalAddVehicule').classList.remove('active'); }
+
+        document.getElementById('formAddVehicule').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const vehicule = {
+                id: generateId(),
+                marque: formData.get('marque'), modele: formData.get('modele'),
+                annee: parseInt(formData.get('annee')), immatriculation: formData.get('immatriculation'),
+                prix_achat: parseFloat(formData.get('prix_achat')), kilometrage: parseInt(formData.get('kilometrage')),
+                date_achat: formData.get('date_achat'), couleur: formData.get('couleur') || null,
+                carburant: formData.get('carburant') || null, fournisseur: formData.get('fournisseur') || null,
+                statut: 'en_stock'
+            };
+            try {
+                await supabaseClient.from('vehicules').insert([vehicule]);
+                closeAddVehiculeModal(); loadVehicules(); loadStats();
+                alert('✅ Ajouté !');
+            } catch (error) { console.error(error); }
+        });
+
+        async function openVehiculeDetails(id) {
+            const vehicule = allVehicules.find(v => v.id === id);
+            if (!vehicule) return;
+            const modal = document.getElementById('modalDetailsVehicule');
+            document.getElementById('detailsTitle').textContent = `${vehicule.marque} ${vehicule.modele}`;
+            const { data: frais } = await supabaseClient.from('frais').select('*').eq('vehicule_id', id);
+            const totalFrais = frais ? frais.reduce((sum, f) => sum + parseFloat(f.montant), 0) : 0;
+            
+            let html = `<div class="detail-section"><h3>Infos</h3><div class="detail-grid">
+                <div class="detail-item"><div class="detail-label">Achat</div><div class="detail-value">${parseFloat(vehicule.prix_achat).toLocaleString()} €</div></div>
+                <div class="detail-item"><div class="detail-label">Frais</div><div class="detail-value negative">${totalFrais.toLocaleString()} €</div></div>
+            </div></div>`;
+            
+            if (vehicule.statut === 'vendu') {
+                const { data: vnt } = await supabaseClient.from('ventes').select('*').eq('vehicule_id', id).single();
+                if (vnt) {
+                    const calc = await calculateBeneficeNet(id, vnt.prix_vente, vehicule.prix_achat);
+                    html += `<div class="detail-section"><h3>Vente</h3><div class="detail-grid">
+                        <div class="detail-item"><div class="detail-label">Vendu</div><div class="detail-value">${parseFloat(vnt.prix_vente).toLocaleString()} €</div></div>
+                        <div class="detail-item"><div class="detail-label">Bénéfice Net</div><div class="detail-value large positive">${Math.round(calc.beneficeNet).toLocaleString()} €</div></div>
+                    </div></div>`;
                 }
             }
-            document.getElementById('beneficeTotal').textContent = Math.round(totalNet).toLocaleString() + ' €';
-            updateSoldeCaisse();
+
+            document.getElementById('detailsContent').innerHTML = html;
+            document.getElementById('detailsActions').innerHTML = `
+                ${vehicule.statut === 'en_stock' ? `<button class="btn btn-success" onclick="closeDetailsModal(); openVendreModal('${vehicule.id}')">💰 Vendre</button>` : ''}
+                <button class="btn btn-secondary" onclick="closeDetailsModal(); openEditModal('${vehicule.id}')">✏️ Modifier</button>
+                <button class="btn btn-danger" onclick="closeDetailsModal(); deleteVehicule('${vehicule.id}')">🗑️ Supprimer</button>`;
+            modal.classList.add('active');
         }
 
-        async function loadVentes() {
-            const { data } = await supabaseClient.from('ventes').select('*, vehicules(*)').order('date_vente', {ascending:false});
-            allVentes = data || [];
-            const container = document.getElementById('ventesContainer');
-            let html = '<div class="ventes-grid">';
-            for(let v of allVentes) {
-                const c = await calculateBeneficeNet(v.vehicule_id, v.prix_vente, v.vehicules.prix_achat);
-                html += `<div class="vente-card ${c.beneficeNet >= 0 ? 'profit' : 'loss'}">
-                    <h3>${v.vehicules.marque} ${v.vehicules.modele}</h3>
-                    <p>Vendu le ${new Date(v.date_vente).toLocaleDateString()}</p>
-                    <div class="amount ${c.beneficeNet >= 0 ? 'positive' : 'negative'}">${Math.round(c.beneficeNet)} €</div>
-                </div>`;
-            }
-            container.innerHTML = html + '</div>';
+        function closeDetailsModal() { document.getElementById('modalDetailsVehicule').classList.remove('active'); }
+
+        function openEditModal(id) {
+            const v = allVehicules.find(x => x.id === id);
+            document.getElementById('editVehiculeId').value = v.id;
+            document.getElementById('editMarque').value = v.marque;
+            document.getElementById('editModele').value = v.modele;
+            document.getElementById('editPrixAchat').value = v.prix_achat;
+            document.getElementById('editImmatriculation').value = v.immatriculation;
+            document.getElementById('editDateAchat').value = v.date_achat;
+            document.getElementById('editAnnee').value = v.annee;
+            document.getElementById('editKilometrage').value = v.kilometrage;
+            document.getElementById('modalEditVehicule').classList.add('active');
         }
 
-        // --- SYNCHRO FRAIS -> CAISSE ---
+        function closeEditModal() { document.getElementById('modalEditVehicule').classList.remove('active'); }
+
+        document.getElementById('formEditVehicule').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('editVehiculeId').value;
+            const data = {
+                marque: document.getElementById('editMarque').value, modele: document.getElementById('editModele').value,
+                prix_achat: parseFloat(document.getElementById('editPrixAchat').value), immatriculation: document.getElementById('editImmatriculation').value,
+                date_achat: document.getElementById('editDateAchat').value, annee: parseInt(document.getElementById('editAnnee').value),
+                kilometrage: parseInt(document.getElementById('editKilometrage').value)
+            };
+            await supabaseClient.from('vehicules').update(data).eq('id', id);
+            closeEditModal(); loadVehicules(); loadStats();
+        });
+
+        async function deleteVehicule(id) {
+            if (!confirm('Tout supprimer (véhicule, frais, ventes) ?')) return;
+            await supabaseClient.from('vehicules').delete().eq('id', id);
+            loadVehicules(); loadStats();
+        }
+
+        async function openVendreModal(id) {
+            document.getElementById('vehiculeIdVente').value = id;
+            const { data: cls } = await supabaseClient.from('clients').select('*').order('nom');
+            const select = document.getElementById('clientVente');
+            select.innerHTML = '<option value="">Aucun client</option>' + cls.map(c => `<option value="${c.id}">${c.nom} ${c.prenom}</option>`).join('');
+            document.getElementById('modalVendreVehicule').classList.add('active');
+        }
+
+        function closeVendreModal() { document.getElementById('modalVendreVehicule').classList.remove('active'); }
+
+        document.getElementById('formVendreVehicule').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const vid = document.getElementById('vehiculeIdVente').value;
+            const prix = parseFloat(document.getElementById('prixVente').value);
+            const date = document.getElementById('dateVente').value;
+            const cid = document.getElementById('clientVente').value || null;
+            
+            await supabaseClient.from('vehicules').update({ statut: 'vendu' }).eq('id', vid);
+            await supabaseClient.from('ventes').insert([{ id: generateId(), vehicule_id: vid, client_id: cid, prix_vente: prix, date_vente: date }]);
+            closeVendreModal(); loadVehicules(); loadStats();
+        });
+
+        async function loadClients() {
+            if (!supabaseClient) return;
+            const { data } = await supabaseClient.from('clients').select('*').order('nom');
+            allClients = data || [];
+            document.getElementById('clientsContainer').innerHTML = `<div class="clients-grid">${allClients.map(c => `
+                <div class="client-card" onclick="openClientDetails('${c.id}')">
+                    <h3>${c.nom} ${c.prenom}</h3>
+                    <p>${c.telephone || 'Pas de tel'}</p>
+                    <div class="card-actions">
+                        <button class="btn btn-small btn-secondary" onclick="event.stopPropagation(); openEditClientModal('${c.id}')">✏️</button>
+                        <button class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteClient('${c.id}')">🗑️</button>
+                    </div>
+                </div>`).join('')}</div>`;
+        }
+
+        function openAddClientModal() { document.getElementById('modalAddClient').classList.add('active'); }
+        function closeAddClientModal() { document.getElementById('modalAddClient').classList.remove('active'); }
+
+        document.getElementById('formAddClient').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const fd = new FormData(e.target);
+            const client = { id: generateId(), nom: fd.get('nom'), prenom: fd.get('prenom'), telephone: fd.get('telephone'), email: fd.get('email'), adresse: fd.get('adresse') };
+            await supabaseClient.from('clients').insert([client]);
+            closeAddClientModal(); loadClients();
+        });
+
+        async function loadFrais() {
+            if (!supabaseClient) return;
+            const { data } = await supabaseClient.from('frais').select('*, vehicules(marque, modele)').order('date', { ascending: false });
+            allFrais = data || [];
+            document.getElementById('fraisContainer').innerHTML = `<div class="frais-grid">${allFrais.map(f => `
+                <div class="frais-card">
+                    <h3>${f.type}</h3>
+                    <p>${f.vehicules?.marque} - ${new Date(f.date).toLocaleDateString()}</p>
+                    <div class="amount negative">${parseFloat(f.montant).toLocaleString()} €</div>
+                    <div class="card-actions">
+                        <button class="btn btn-small btn-secondary" onclick="openEditFraisModal('${f.id}')">✏️</button>
+                        <button class="btn btn-small btn-danger" onclick="deleteFrais('${f.id}')">🗑️</button>
+                    </div>
+                </div>`).join('')}</div>`;
+            await loadVehiculesForSelect();
+        }
+
+        async function loadVehiculesForSelect() {
+            const { data: vs } = await supabaseClient.from('vehicules').select('*').order('marque');
+            const select = document.getElementById('selectVehicule');
+            const editSelect = document.getElementById('editFraisVehicule');
+            const html = '<option value="">Sélectionnez un véhicule</option>' + vs.map(v => `<option value="${v.id}">${v.marque} ${v.modele} - ${v.immatriculation}</option>`).join('');
+            if (select) select.innerHTML = html;
+            if (editSelect) editSelect.innerHTML = html;
+        }
+
+        function openAddFraisModal() { document.getElementById('modalAddFrais').classList.add('active'); }
+        function closeAddFraisModal() { document.getElementById('modalAddFrais').classList.remove('active'); }
+
+        // SYNCHRONISATION FRAIS -> CAISSE REPARÉE
         document.getElementById('formAddFrais').addEventListener('submit', async function(e) {
             e.preventDefault();
             const fd = new FormData(e.target);
-            const fid = 'id_' + Date.now();
-            const frais = { id: fid, vehicule_id: fd.get('vehicule_id'), type: fd.get('type'), montant: parseFloat(fd.get('montant')), date: fd.get('date') };
-            await supabaseClient.from('frais').insert([frais]);
-            await supabaseClient.from('caisse').insert([{ id: 'c_'+fid, date: frais.date, type: 'sortie', montant: frais.montant, motif: `Frais: ${frais.type}`, personne: 'Auto', frais_id: fid }]);
-            closeAddFraisModal(); loadFrais(); loadStats();
+            const fid = generateId();
+            const frais = {
+                id: fid, vehicule_id: fd.get('vehicule_id'), type: fd.get('type'),
+                montant: parseFloat(fd.get('montant')), date: fd.get('date'),
+                description: fd.get('description')
+            };
+            try {
+                await supabaseClient.from('frais').insert([frais]);
+                // Synchro Caisse
+                await supabaseClient.from('caisse').insert([{
+                    id: generateId(), date: frais.date, type: 'sortie', montant: frais.montant,
+                    motif: `Frais: ${frais.type}`, personne: 'Automatique', frais_id: fid
+                }]);
+                closeAddFraisModal(); loadFrais(); loadStats();
+            } catch (err) { console.error(err); }
         });
 
-        // --- EXPORT EXCEL PREMIUM (COPIE CONFORME PHOTO) ---
+        function openEditFraisModal(id) {
+            const f = allFrais.find(x => x.id === id);
+            document.getElementById('editFraisId').value = f.id;
+            document.getElementById('editFraisVehicule').value = f.vehicule_id;
+            document.getElementById('editFraisType').value = f.type;
+            document.getElementById('editFraisMontant').value = f.montant;
+            document.getElementById('editFraisDate').value = f.date;
+            document.getElementById('modalEditFrais').classList.add('active');
+        }
+
+        function closeEditFraisModal() { document.getElementById('modalEditFrais').classList.remove('active'); }
+
+        document.getElementById('formEditFrais').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('editFraisId').value;
+            const type = document.getElementById('editFraisType').value;
+            const mnt = parseFloat(document.getElementById('editFraisMontant').value);
+            const dt = document.getElementById('editFraisDate').value;
+            
+            await supabaseClient.from('frais').update({ type, montant: mnt, date: dt, vehicule_id: document.getElementById('editFraisVehicule').value }).eq('id', id);
+            // Synchro Caisse via frais_id
+            await supabaseClient.from('caisse').update({ montant: mnt, date: dt, motif: `Frais: ${type} (Modifié)` }).eq('frais_id', id);
+            closeEditFraisModal(); loadFrais(); loadStats();
+        });
+
+        async function deleteFrais(id) {
+            if (!confirm('Supprimer ce frais et recréditer la caisse ?')) return;
+            await supabaseClient.from('caisse').delete().eq('frais_id', id);
+            await supabaseClient.from('frais').delete().eq('id', id);
+            loadFrais(); loadStats();
+        }
+
+        async function loadVentes() {
+            if (!supabaseClient) return;
+            const { data: vnts } = await supabaseClient.from('ventes').select('*, vehicules(*), clients(*)').order('date_vente', { ascending: false });
+            allVentes = vnts || [];
+            let html = '<div class="ventes-grid">';
+            for (let v of allVentes) {
+                const calc = await calculateBeneficeNet(v.vehicule_id, v.prix_vente, v.vehicules?.prix_achat || 0);
+                html += `<div class="vente-card ${calc.beneficeNet >= 0 ? 'profit' : 'loss'}">
+                    <h3>${v.vehicules?.marque} ${v.vehicules?.modele}</h3>
+                    <div class="vente-info">
+                        <div class="info-row"><span>Date:</span><span>${new Date(v.date_vente).toLocaleDateString()}</span></div>
+                        <div class="info-row"><span>Achat:</span><span>${v.vehicules?.prix_achat} €</span></div>
+                        <div class="info-row"><span>Vente:</span><span>${v.prix_vente} €</span></div>
+                    </div>
+                    <div class="amount ${calc.beneficeNet >= 0 ? 'positive' : 'negative'}">${Math.round(calc.beneficeNet)} €</div>
+                </div>`;
+            }
+            document.getElementById('ventesContainer').innerHTML = html + '</div>';
+        }
+
+        function showVehiculesStock() { navigateToPage('vehicules'); setTimeout(() => { document.getElementById('filterStatut').value = 'en_stock'; filterVehicules(); }, 300); }
+        function showVehiculesVendus() { navigateToPage('vehicules'); setTimeout(() => { document.getElementById('filterStatut').value = 'vendu'; filterVehicules(); }, 300); }
+        function showVentesDetails() { navigateToPage('ventes'); }
+        function logout() { localStorage.removeItem('autovox_session'); location.reload(); }
+
+        // ========== GESTION CAISSE ==========
+        function openModalAjoutCaisse() {
+            document.getElementById('modalAjoutCaisse').classList.add('active');
+            document.querySelector('#formAjoutCaisse input[name="date"]').value = new Date().toISOString().split('T')[0];
+        }
+        function closeModalAjoutCaisse() { document.getElementById('modalAjoutCaisse').classList.remove('active'); }
+
+        async function loadCaisse() {
+            const { data } = await supabaseClient.from('caisse').select('*').order('date', { ascending: false });
+            allCaisse = data || [];
+            displayCaisse(allCaisse);
+            updateSoldeCaisse();
+            updateFilterPersonnes();
+        }
+
+        async function loadFraisAnalysis() {
+            const { data: frais } = await supabaseClient.from('frais').select('type, montant');
+            if (!frais || frais.length === 0) {
+                document.getElementById('fraisTableContainer').innerHTML = "Aucun frais";
+                return;
+            }
+            const map = {}; let tot = 0;
+            frais.forEach(f => { map[f.type] = (map[f.type] || 0) + f.montant; tot += f.montant; });
+            const tri = Object.entries(map).sort((a,b) => b[1] - a[1]);
+            document.getElementById('fraisTableContainer').innerHTML = `<table class="frais-table">${tri.map(([t,m]) => `<tr><td>${t}</td><td>${Math.round(m)} €</td></tr>`).join('')}</table>`;
+            document.getElementById('totalFraisGlobal').textContent = Math.round(tot).toLocaleString() + ' €';
+        }
+
+        function displayCaisse(caisse) {
+            const tbody = document.getElementById('caisseTableBody');
+            tbody.innerHTML = caisse.map(c => `
+                <tr>
+                    <td>${new Date(c.date).toLocaleDateString()}</td>
+                    <td><span class="caisse-type-badge ${c.type==='entree'?'caisse-type-entree':'caisse-type-sortie'}">${c.type}</span></td>
+                    <td style="color:${c.type==='entree'?'green':'red'}">${c.montant.toFixed(2)} €</td>
+                    <td>${c.motif || '-'}</td>
+                    <td>${c.personne || '-'}</td>
+                </tr>`).join('');
+        }
+
+        async function updateSoldeCaisse() {
+            const { data: solde } = await supabaseClient.rpc('get_solde_caisse');
+            document.getElementById('soldeCaisseGrand').textContent = (solde || 0).toFixed(2) + ' €';
+            document.getElementById('soldeCaisse').textContent = (solde || 0).toFixed(2) + ' €';
+            document.getElementById('derniereMaj').textContent = new Date().toLocaleString();
+        }
+
+        async function ajouterArgentCaisse(e) {
+            e.preventDefault();
+            const fd = new FormData(e.target);
+            await supabaseClient.from('caisse').insert([{ id: generateId(), date: fd.get('date'), type: 'entree', montant: parseFloat(fd.get('montant')), personne: fd.get('personne'), motif: fd.get('motif') }]);
+            closeModalAjoutCaisse(); loadCaisse();
+        }
+
+        function filterCaisse() {
+            const t = document.getElementById('filterTypeCaisse').value;
+            const p = document.getElementById('filterPersonne').value;
+            let f = allCaisse;
+            if (t) f = f.filter(x => x.type === t);
+            if (p) f = f.filter(x => x.personne === p);
+            displayCaisse(f);
+        }
+
+        function updateFilterPersonnes() {
+            const p = [...new Set(allCaisse.filter(c => c.personne).map(c => c.personne))];
+            document.getElementById('filterPersonne').innerHTML = '<option value="">Toutes</option>' + p.map(x => `<option value="${x}">${x}</option>`).join('');
+        }
+
+        // ==========================================
+        // EXPORT EXCEL PREMIUM (STYLE PHOTO)
+        // ==========================================
         async function exportGlobalExcel() {
-            if (!confirm("Générer le rapport de rentabilité ?")) return;
-            const [vehRes, fraisRes, vntRes, cssRes] = await Promise.all([
-                supabaseClient.from('vehicules').select('*').order('marque'),
-                supabaseClient.from('frais').select('*'),
-                supabaseClient.from('ventes').select('*'),
-                supabaseClient.from('caisse').select('*')
-            ]);
+            if (!confirm("Voulez-vous générer le rapport de rentabilité ?")) return;
+            try {
+                const [vR, fR, sR, cR] = await Promise.all([
+                    supabaseClient.from('vehicules').select('*').order('marque'),
+                    supabaseClient.from('frais').select('*'),
+                    supabaseClient.from('ventes').select('*'),
+                    supabaseClient.from('caisse').select('*')
+                ]);
 
-            const table = [];
-            table.push(["MARQUE", "MODÈLE", "PLAQUE", "Kilométrage", "PIÈCES ET MAIN D'OEUVRE", "CARROSSERIE", "DÉPANNEUSE", "FRAIS ADMINISTRATIFS", "LAVAGE", "ESSENCE", "PRIX D'ACHAT", "PRIX TOTAL", "PRIX DE VENTE", "BÉNÉFICE"]);
+                const rows = [];
+                // EN-TÊTES EXACTES IMAGE
+                rows.push(["MARQUE", "MODÈLE", "PLAQUE", "Kilométrage", "PIÈCES ET MAIN D'OEUVRE", "CARROSSERIE", "DÉPANNEUSE", "FRAIS ADMINISTRATIFS", "LAVAGE", "ESSENCE", "PRIX D'ACHAT", "PRIX TOTAL", "PRIX DE VENTE", "BÉNÉFICE"]);
 
-            for (let v of vehRes.data) {
-                const vf = fraisRes.data.filter(f => f.vehicule_id === v.id);
-                const vs = vntRes.data.find(s => s.vehicule_id === v.id);
-                let p = 0, c = 0, d = 0, admStr = "", l = 0, e = 0, sumF = 0;
+                vR.data.forEach(v => {
+                    const vf = fR.data.filter(f => f.vehicule_id === v.id);
+                    const vs = sR.data.find(s => s.vehicule_id === v.id);
+                    let p=0, c=0, d=0, adm="", l=0, e=0, sumF=0;
 
-                vf.forEach(f => {
-                    const m = parseFloat(f.montant); sumF += m;
-                    const t = f.type.toLowerCase();
-                    if (t.includes('pièces') || t.includes('entretien')) p += m;
-                    else if (t.includes('carrosserie')) c += m;
-                    else if (t.includes('dépanneuse')) d += m;
-                    else if (t.includes('lavage')) l += m;
-                    else if (t.includes('essence')) e += m;
-                    else {
-                        let lbl = t.includes('déclaration') ? 'DA' : t.includes('contrôle') ? 'CT' : 'LBC';
-                        admStr += (admStr ? " + " : "") + `${lbl} ${m}€`;
-                    }
+                    vf.forEach(f => {
+                        const m = parseFloat(f.montant); sumF += m;
+                        const t = f.type.toLowerCase();
+                        if (t.includes('pièces') || t.includes('entretien') || t.includes('pneus') || t.includes('clés')) p += m;
+                        else if (t.includes('carrosserie')) c += m;
+                        else if (t.includes('dépanneuse')) d += m;
+                        else if (t.includes('lavage')) l += m;
+                        else if (t.includes('essence')) e += m;
+                        else {
+                            let lbl = t.includes('déclaration') ? 'DA' : t.includes('contrôle') ? 'CT' : 'LBC';
+                            adm += (adm ? " + " : "") + `${lbl} ${m}€`;
+                        }
+                    });
+
+                    const total = v.prix_achat + sumF;
+                    const vente = vs ? vs.prix_vente : 0;
+                    const benef = vente > 0 ? (vente - total) : "";
+
+                    rows.push([v.marque, v.modele, v.immatriculation, v.kilometrage, p||"", c||"", d||"", adm||"", l||"", e||"", v.prix_achat+"€", total+"€", vente ? vente+"€" : "", benef ? benef+"€" : ""]);
                 });
 
-                const total = v.prix_achat + sumF;
-                const vente = vs ? vs.prix_vente : 0;
-                const benef = vente > 0 ? (vente - total) : "";
+                rows.push([]); rows.push(["APPORTS PAR PERSONNE"]);
+                ["Fouad", "Walid", "Tarek", "Riad"].forEach(p => {
+                    const tot = cR.data.filter(c => c.personne === p && c.type === 'entree').reduce((a, b) => a + b.montant, 0);
+                    rows.push([p.toUpperCase(), tot + " €"]);
+                });
 
-                table.push([v.marque, v.modele, v.immatriculation, v.kilometrage, p||"", c||"", d||"", admStr||"", l||"", e||"", v.prix_achat+"€", total+"€", vente ? vente+"€" : "", benef ? benef+"€" : ""]);
-            }
-
-            table.push([]); table.push(["APPORTS PAR PERSONNE"]);
-            ["Fouad", "Walid", "Tarek", "Riad"].forEach(p => {
-                const tot = cssRes.data.filter(c => c.personne === p && c.type === 'entree').reduce((a, b) => a + b.montant, 0);
-                table.push([p.toUpperCase(), tot + " €"]);
-            });
-
-            const wb = XLSX.utils.book_new(), ws = XLSX.utils.aoa_to_sheet(table);
-            XLSX.utils.book_append_sheet(wb, ws, "Rentabilité");
-            XLSX.writeFile(wb, `Autovox_Compta_${new Date().toISOString().slice(0,10)}.xlsx`);
+                const wb = XLSX.utils.book_new(), ws = XLSX.utils.aoa_to_sheet(rows);
+                XLSX.utils.book_append_sheet(wb, ws, "Rentabilité");
+                XLSX.writeFile(wb, `Autovox_Rentabilite_${new Date().toISOString().slice(0,10)}.xlsx`);
+                alert("✅ Excel généré !");
+            } catch (err) { alert("Erreur d'export"); }
         }
 
-        // UTILS ORIGINAUX
-        function toggleTheme() { document.body.classList.toggle('dark-mode'); }
-        function loadTheme() { if(localStorage.getItem('theme')==='dark') toggleTheme(); }
-        function logout() { localStorage.removeItem('autovox_session'); location.reload(); }
-        function toggleMobileMenu() { document.getElementById('mobileMenu').classList.toggle('active'); }
-        function openModalAjoutCaisse() { document.getElementById('modalAjoutCaisse').classList.add('active'); }
-        function closeModalAjoutCaisse() { document.getElementById('modalAjoutCaisse').classList.remove('active'); }
-        function generateId() { return 'id_' + Date.now(); }
-        async function loadCaisse() {
-            const { data } = await supabaseClient.from('caisse').select('*').order('date', {ascending:false});
-            document.getElementById('caisseTableBody').innerHTML = data.map(c => `<tr><td>${new Date(c.date).toLocaleDateString()}</td><td>${c.type}</td><td style="color:${c.type==='entree'?'green':'red'}">${c.montant}€</td><td>${c.motif}</td><td>${c.personne}</td></tr>`).join('');
-            const { data: s } = await supabaseClient.rpc('get_solde_caisse');
-            document.getElementById('soldeCaisseGrand').textContent = (s || 0).toFixed(2) + ' €';
-        }
-        async function loadFrais() {
-            const { data } = await supabaseClient.from('frais').select('*, vehicules(marque, modele)');
-            document.getElementById('fraisContainer').innerHTML = data.map(f => `<div class="frais-card"><h3>${f.type}</h3><p>${f.vehicules.marque} - ${f.montant}€</p></div>`).join('');
-            const { data: vs } = await supabaseClient.from('vehicules').select('id, marque, modele').eq('statut','en_stock');
-            document.getElementById('selectVehicule').innerHTML = vs.map(v=>`<option value="${v.id}">${v.marque} ${v.modele}</option>`).join('');
-        }
-        function loadCharts() { /* Vos graphiques originaux ici */ }
-        function loadFraisAnalysis() { /* Votre analyse de frais ici */ }
-
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (document.getElementById('username').value === 'admin' && document.getElementById('password').value === 'autovox2026') {
-                localStorage.setItem('autovox_session', 'active'); showDashboard();
-            } else { document.getElementById('errorAlert').classList.add('show'); }
-        });
     </script>
 </body>
 </html>
