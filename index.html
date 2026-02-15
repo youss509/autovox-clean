@@ -678,10 +678,11 @@
 /* Wrapper pour éviter le débordement des graphiques */
 .chart-wrapper {
     width: 100%;
-    max-width: 100%; /* AJOUTÉ */
+    max-width: 100%;
     overflow: hidden;
-    padding: 0;
-    box-sizing: border-box; /* AJOUTÉ */
+    padding: 0; /* DÉJÀ BON */
+    box-sizing: border-box;
+    margin: 0 -5px; /* AJOUTÉ : Compense la marge du canvas */
 }
 
 .chart-canvas {
