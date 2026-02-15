@@ -1160,7 +1160,7 @@
                     </div>
                 </div>
 
-                <!-- PAGE STATISTIQUES (NOUVELLE) -->
+                               <!-- PAGE STATISTIQUES (NOUVELLE) -->
                 <div class="page-content" id="pageStatistiques">
                     <div class="page-header">
                         <div class="page-header-left">
@@ -1172,14 +1172,26 @@
                     <!-- SECTION GRAPHIQUES -->
                     <div class="charts-section">
                         <h2>📊 Vue d'ensemble</h2>
-                        <div class="charts-grid">
+                        
+                        <!-- LIGNE 1 : ACTIVITÉ & VENTES -->
+                        <div class="charts-grid-2x2">
+                            <div class="chart-container">
+                                <h3>🚗 Véhicules vendus par mois</h3>
+                                <div class="chart-canvas">
+                                    <canvas id="chartVentes"></canvas>
+                                </div>
+                            </div>
+                            
                             <div class="chart-container">
                                 <h3>📈 Chiffre d'affaires mensuel</h3>
                                 <div class="chart-canvas">
                                     <canvas id="chartCA"></canvas>
                                 </div>
                             </div>
-                            
+                        </div>
+                        
+                        <!-- LIGNE 2 : RENTABILITÉ -->
+                        <div class="charts-grid-2x2" style="margin-top: 20px;">
                             <div class="chart-container">
                                 <h3>💰 Bénéfice net mensuel</h3>
                                 <div class="chart-canvas">
@@ -1187,10 +1199,14 @@
                                 </div>
                             </div>
                             
-                            <div class="chart-container" style="grid-column: 1 / -1;">
-                                <h3>🚗 Véhicules vendus par mois</h3>
-                                <div class="chart-canvas">
-                                    <canvas id="chartVentes"></canvas>
+                            <div class="chart-container">
+                                <h3>💸 Analyse des frais</h3>
+                                <div class="frais-analysis">
+                                    <div id="fraisTableContainer"></div>
+                                    <div class="frais-total">
+                                        <span>TOTAL DES FRAIS</span>
+                                        <span id="totalFraisGlobal" style="font-size: 24px; font-weight: 700; color: var(--danger);">0 €</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
