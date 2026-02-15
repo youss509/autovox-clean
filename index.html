@@ -1090,7 +1090,23 @@
             font-weight: 600;
             font-size: 13px;
         }
-        
+        /* Scroll horizontal pour le tableau caisse sur mobile */
+.caisse-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 20px 0;
+}
+
+.caisse-table-wrapper table {
+    min-width: 600px;
+}
+
+@media (max-width: 768px) {
+    .caisse-table-wrapper {
+        margin: 20px -20px;
+    }
+}
+
         .caisse-type-entree {
             background: rgba(16, 185, 129, 0.1);
             color: var(--success);
@@ -1430,29 +1446,30 @@
                         </div>
                     </div>
 
-                    <!-- TABLEAU HISTORIQUE -->
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Type</th>
-                                    <th>Montant</th>
-                                    <th>Personne</th>
-                                    <th>Motif</th>
-                                </tr>
-                            </thead>
-                            <tbody id="caisseTableBody">
-                                <tr>
-                                    <td colspan="5" style="text-align: center; padding: 40px;">
-                                        Chargement...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
+                  <!-- TABLEAU HISTORIQUE -->
+<div class="table-container">
+    <div class="caisse-table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Montant</th>
+                    <th>Motif</th>
+                    <th>Personne</th>
+                </tr>
+            </thead>
+            <tbody id="caisseTableBody">
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 40px;">
+                        Chargement...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+      
                 <!-- PAGE VEHICULES -->
                 <div class="page-content" id="pageVehicules">
                     <div class="page-header">
@@ -3785,22 +3802,22 @@ function displayCaisse(caisse) {
         const montantSign = isEntree ? '+' : '-';
         const montantColor = isEntree ? 'var(--success)' : 'var(--danger)';
         
-        return `
-            <tr>
-                <td>${formatDate(c.date)}</td>
-                <td>
-                    <span class="caisse-type-badge ${typeClass}">
-                        ${typeIcon} ${isEntree ? 'Entrée' : 'Sortie'}
-                    </span>
-                </td>
-                <td class="caisse-montant" style="color: ${montantColor};">
-                    ${montantSign}${c.montant.toFixed(2)} €
-                </td>
-                <td>${c.personne || '-'}</td>
-                <td>${c.motif || '-'}</td>
-            </tr>
-        `;
-    }).join('');
+       return `
+    <tr>
+        <td>${formatDate(c.date)}</td>
+        <td>
+            <span class="caisse-type-badge ${typeClass}">
+                ${typeIcon} ${isEntree ? 'Entrée' : 'Sortie'}
+            </span>
+        </td>
+        <td class="caisse-montant" style="color: ${montantColor};">
+            ${montantSign}${c.montant.toFixed(2)} €
+        </td>
+        <td>${c.motif || '-'}</td>
+        <td>${c.personne || '-'}</td>
+    </tr>
+`;
+}).join('');
 }
 
         // Mettre à jour le solde de la caisse
