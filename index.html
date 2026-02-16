@@ -1468,19 +1468,71 @@
                             <h1>💼 Gestion de la Caisse</h1>
                             <p>Suivi des entrées et sorties d'argent</p>
                         </div>
-                        <div class="page-header-right">
-                            <button class="btn btn-primary" onclick="openModalAjoutCaisse()">
-                                ➕ Ajouter de l'argent
-                            </button>
-                        </div>
+                        <div class="page-header-right" style="display: flex; gap: 10px; flex-wrap: wrap;">
+    <!-- Nouveau bouton pour les associés -->
+    <button class="btn btn-warning" onclick="openModalRetraitCaisse()">
+        💸 Retrait Associé
+    </button>
+    <!-- Ton bouton actuel -->
+    <button class="btn btn-primary" onclick="openModalAjoutCaisse()">
+        ➕ Ajouter de l'argent
+    </button>
+</div>
                     </div>
 
-                    <!-- SOLDE ACTUEL EN GRAND -->
-                    <div class="caisse-solde-card">
-                        <div class="caisse-solde-label">Solde actuel</div>
-                        <div class="caisse-solde-value" id="soldeCaisseGrand">0 €</div>
-                        <div class="caisse-solde-subtitle">Dernière mise à jour : <span id="derniereMaj">-</span></div>
-                    </div>
+                    <!-- NOUVELLE GRILLE : SOLDE + 4 ASSOCIÉS -->
+<div class="stats" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 20px; margin-bottom: 30px;">
+    
+    <!-- 1. CARTE SOLDE (BLEUE) -->
+    <div class="stat-card" style="background: linear-gradient(135deg, var(--primary), #1e40af); color: white; border: none;">
+        <div class="stat-card-header">
+            <div class="stat-card-title" style="color: rgba(255,255,255,0.8);">SOLDE DISPONIBLE</div>
+            <div class="stat-card-icon">💼</div>
+        </div>
+        <div class="stat-card-value" id="soldeCaisseGrand">0 €</div>
+        <div class="stat-card-subtitle" style="color: rgba(255,255,255,0.8);">En caisse actuellement</div>
+    </div>
+
+    <!-- 2. CARTE FOUAD -->
+    <div class="stat-card" id="cardFouad" style="cursor: pointer;" onclick="filterCaisseParPersonne('Fouad')">
+        <div class="stat-card-header">
+            <div class="stat-card-title">Retrait Fouad</div>
+            <div class="stat-card-icon">👤</div>
+        </div>
+        <div class="stat-card-value" id="retraitFouad" style="color: var(--warning);">0 €</div>
+        <div class="stat-card-subtitle">Total retiré</div>
+    </div>
+
+    <!-- 3. CARTE TAREK -->
+    <div class="stat-card" id="cardTarek" style="cursor: pointer;" onclick="filterCaisseParPersonne('Tarek')">
+        <div class="stat-card-header">
+            <div class="stat-card-title">Retrait Tarek</div>
+            <div class="stat-card-icon">👤</div>
+        </div>
+        <div class="stat-card-value" id="retraitTarek" style="color: var(--warning);">0 €</div>
+        <div class="stat-card-subtitle">Total retiré</div>
+    </div>
+
+    <!-- 4. CARTE WALID -->
+    <div class="stat-card" id="cardWalid" style="cursor: pointer;" onclick="filterCaisseParPersonne('Walid')">
+        <div class="stat-card-header">
+            <div class="stat-card-title">Retrait Walid</div>
+            <div class="stat-card-icon">👤</div>
+        </div>
+        <div class="stat-card-value" id="retraitWalid" style="color: var(--warning);">0 €</div>
+        <div class="stat-card-subtitle">Total retiré</div>
+    </div>
+
+    <!-- 5. CARTE RIAD -->
+    <div class="stat-card" id="cardRiad" style="cursor: pointer;" onclick="filterCaisseParPersonne('Riad')">
+        <div class="stat-card-header">
+            <div class="stat-card-title">Retrait Riad</div>
+            <div class="stat-card-icon">👤</div>
+        </div>
+        <div class="stat-card-value" id="retraitRiad" style="color: var(--warning);">0 €</div>
+        <div class="stat-card-subtitle">Total retiré</div>
+    </div>
+</div>
 
                     <!-- FILTRES -->
                     <div class="filters">
