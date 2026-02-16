@@ -1572,6 +1572,7 @@
                                         <th>Montant</th>
                                         <th>Motif</th>
                                         <th>Personne</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody id="caisseTableBody">
@@ -3988,7 +3989,7 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
             let totaux = { 'Fouad': 0, 'Tarek': 0, 'Walid': 0, 'Riad': 0 };
 
             // 2. On calcule les totaux pour chaque associé
-            caisse.forEach(transaction => {
+            allCaisse.forEach(transaction => {
                 if (transaction.type === 'sortie' && transaction.motif && transaction.motif.includes('RETRAIT ASSOCIÉ')) {
                     if (totaux.hasOwnProperty(transaction.personne)) {
                         totaux[transaction.personne] += parseFloat(transaction.montant);
@@ -4269,6 +4270,29 @@ async function exportVehiculesExcel() {
             
             // On remonte doucement
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        // Fonction pour supprimer une ligne de la caisse
+        async function deleteTransactionCaisse(id) {
+            // Demande une confirmation
+            if (!confirm('⚠️ Voulez-vous vraiment supprimer cette transaction ?\nCela modifiera le solde de la caisse.')) return;
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('caisse')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) throw error;
+                
+                alert('✅ Transaction supprimée !');
+                
+                // On recharge les données depuis la base pour tout mettre à jour
+                loadCaisse(); 
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('❌ Erreur lors de la suppression');
+            }
         }
     </script>
 </body>
