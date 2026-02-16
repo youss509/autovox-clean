@@ -4157,52 +4157,48 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
 // EXPORT EXCEL (VERSION FINALE)
 // ==========================================
 async function exportVehiculesExcel() {
-    // Petit curseur de chargement
     document.body.style.cursor = 'wait';
 
     try {
-        // 1. Récupération des données
-        const { data: vehicules, error } = await supabaseClient
+        // 1. RÉCUPÉRATION DES DONNÉES (Véhicules + Caisse)
+        const { data: vehicules, error: errV } = await supabaseClient
             .from('vehicules')
             .select('*, frais(*), ventes(*)')
             .order('date_achat', { ascending: false });
 
-        if (error) throw error;
+        const { data: caisse, error: errC } = await supabaseClient
+            .from('caisse')
+            .select('*')
+            .order('date', { ascending: false });
 
-        // 2. En-tête du tableau
-        const rows = [
+        if (errV || errC) throw (errV || errC);
+
+        // ==========================================
+        // ONGLET 1 : FLOTTE AUTO (Ton code actuel)
+        // ==========================================
+        const rowsVehicules = [
             ["MARQUE", "MODELE", "PLAQUE", "KM", "PIECES MO", "CARROSSERIE", "DEPANNEUSE", "FRAIS ADMIN (DA+CT+LBC)", "LAVAGE", "ESSENCE", "PRIX ACHAT", "PRIX TOTAL", "PRIX VENTE", "BÉNÉFICE"]
         ];
 
-        // 3. Remplissage
         vehicules.forEach(v => {
             const frais = v.frais || [];
-            
-            // Fonction helper pour sommer
             const sum = (type) => frais.filter(f => f.type === type).reduce((t, f) => t + parseFloat(f.montant), 0);
-
-            // Calculs frais techniques
+            
             const mtPieces = sum("Pièces et main d'oeuvre");
             const mtCarrosserie = sum("Carrosserie/Peinture");
             const mtDepanneuse = sum("Dépanneuse");
             const mtLavage = sum("Lavage");
             const mtEssence = sum("Essence");
 
-            // Calculs frais admin groupés (Texte combiné)
             const typesAdmin = ["Déclaration d'achat", "Contrôle technique", "Annonce LeBonCoin", "Clés", "Autre"];
             const fraisAdmin = frais.filter(f => typesAdmin.includes(f.type));
             const mtAdminTotal = fraisAdmin.reduce((t, f) => t + parseFloat(f.montant), 0);
             
-            // Création du texte "DA 10 + CT 60"
             const texteAdmin = fraisAdmin.map(f => {
-                let nom = f.type
-                    .replace("Déclaration d'achat", "DA")
-                    .replace("Contrôle technique", "CT")
-                    .replace("Annonce LeBonCoin", "LBC");
+                let nom = f.type.replace("Déclaration d'achat", "DA").replace("Contrôle technique", "CT").replace("Annonce LeBonCoin", "LBC");
                 return `${nom} ${Math.round(f.montant)}€`;
             }).join(" + ");
 
-            // Calculs financiers
             const prixAchat = parseFloat(v.prix_achat || 0);
             const prixTotal = prixAchat + mtPieces + mtCarrosserie + mtDepanneuse + mtAdminTotal + mtLavage + mtEssence;
             
@@ -4212,26 +4208,75 @@ async function exportVehiculesExcel() {
                 benefice = prixVente - prixTotal;
             }
 
-            // Ajout ligne
-            rows.push([
+            rowsVehicules.push([
                 v.marque, v.modele, v.immatriculation, v.kilometrage,
                 mtPieces || "", mtCarrosserie || "", mtDepanneuse || "",
                 texteAdmin, mtLavage || "", mtEssence || "",
-                prixAchat + "€", Math.round(prixTotal) + "€", 
-                prixVente ? prixVente + "€" : "", 
-                benefice !== "" ? Math.round(benefice) + "€" : ""
+                prixAchat, Math.round(prixTotal), 
+                prixVente || "", 
+                benefice !== "" ? Math.round(benefice) : ""
             ]);
         });
 
-        // 4. Génération du fichier
+        // ==========================================
+        // ONGLET 2 : JOURNAL DE CAISSE (Nouveau)
+        // ==========================================
+        const rowsCaisse = [
+            ["DATE", "TYPE", "MONTANT", "PERSONNE", "MOTIF"]
+        ];
+
+        caisse.forEach(c => {
+            const montantSigne = c.type === 'entree' ? parseFloat(c.montant) : -parseFloat(c.montant);
+            rowsCaisse.push([
+                c.date,
+                c.type.toUpperCase(),
+                montantSigne,
+                c.personne || "Système",
+                c.motif || ""
+            ]);
+        });
+
+        // ==========================================
+        // ONGLET 3 : RÉCAP ASSOCIÉS (Nouveau)
+        // ==========================================
+        const totaux = { 'Fouad': 0, 'Tarek': 0, 'Walid': 0, 'Riad': 0 };
+        caisse.forEach(c => {
+            if (c.motif && c.motif.includes('RETRAIT ASSOCIÉ')) {
+                if (totaux.hasOwnProperty(c.personne)) {
+                    totaux[c.personne] += parseFloat(c.montant);
+                }
+            }
+        });
+
+        const rowsAssocies = [
+            ["ASSOCIÉ", "TOTAL RETIRÉ"],
+            ["Fouad", totaux['Fouad']],
+            ["Tarek", totaux['Tarek']],
+            ["Walid", totaux['Walid']],
+            ["Riad", totaux['Riad']],
+            ["", ""],
+            ["TOTAL DISTRIBUÉ", totaux['Fouad'] + totaux['Tarek'] + totaux['Walid'] + totaux['Riad']]
+        ];
+
+        // ==========================================
+        // GÉNÉRATION DU FICHIER MULTI-ONGLETS
+        // ==========================================
         const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.aoa_to_sheet(rows);
 
-        // Largeurs colonnes
-        ws['!cols'] = [{wch:15}, {wch:15}, {wch:12}, {wch:8}, {wch:15}, {wch:15}, {wch:12}, {wch:35}, {wch:10}, {wch:10}, {wch:12}, {wch:12}, {wch:12}, {wch:12}];
+        // Ajout feuille 1
+        const ws1 = XLSX.utils.aoa_to_sheet(rowsVehicules);
+        XLSX.utils.book_append_sheet(wb, ws1, "Flotte Auto");
 
-        XLSX.utils.book_append_sheet(wb, ws, "Flotte Auto");
-        XLSX.writeFile(wb, "Autovox_Export.xlsx");
+        // Ajout feuille 2
+        const ws2 = XLSX.utils.aoa_to_sheet(rowsCaisse);
+        XLSX.utils.book_append_sheet(wb, ws2, "Historique Caisse");
+
+        // Ajout feuille 3
+        const ws3 = XLSX.utils.aoa_to_sheet(rowsAssocies);
+        XLSX.utils.book_append_sheet(wb, ws3, "Résumé Associés");
+
+        // Téléchargement
+        XLSX.writeFile(wb, "Autovox_Compta_Complete.xlsx");
         
     } catch (err) {
         console.error(err);
