@@ -1540,10 +1540,11 @@
                             <div class="filter-group">
                                 <label>Type</label>
                                 <select id="filterTypeCaisse" onchange="filterCaisse()">
-                                    <option value="">Tous</option>
-                                    <option value="entree">Entrées</option>
-                                    <option value="sortie">Sorties</option>
-                                </select>
+    <option value="">Tous</option>
+    <option value="entree">Entrées</option>
+    <option value="sortie_pure">Sorties (Frais uniquement)</option>
+    <option value="retrait">Retraits Associés</option>
+</select>
                             </div>
                             <div class="filter-group">
                                 <label>Personne</label>
@@ -4115,31 +4116,44 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
         
         // Filtrer la caisse
         function filterCaisse() {
-            const typeCaisse = document.getElementById('filterTypeCaisse').value;
-            const personne = document.getElementById('filterPersonne').value;
-            const dateDebut = document.getElementById('filterDateDebut').value;
-            const dateFin = document.getElementById('filterDateFin').value;
-            
-            let filtered = allCaisse;
-            
-            if (typeCaisse) {
-                filtered = filtered.filter(c => c.type === typeCaisse);
-            }
-            
-            if (personne) {
-                filtered = filtered.filter(c => c.personne === personne);
-            }
-            
-            if (dateDebut) {
-                filtered = filtered.filter(c => c.date >= dateDebut);
-            }
-            
-            if (dateFin) {
-                filtered = filtered.filter(c => c.date <= dateFin);
-            }
-            
-            displayCaisse(filtered);
-        }
+    const typeCaisse = document.getElementById('filterTypeCaisse').value;
+    const personne = document.getElementById('filterPersonne').value;
+    const dateDebut = document.getElementById('filterDateDebut').value;
+    const dateFin = document.getElementById('filterDateFin').value;
+    
+    let filtered = allCaisse;
+    
+    // --- NOUVELLE LOGIQUE DE FILTRE ---
+    if (typeCaisse === 'entree') {
+        // Uniquement les entrées d'argent
+        filtered = filtered.filter(c => c.type === 'entree');
+    } 
+    else if (typeCaisse === 'sortie_pure') {
+        // Uniquement les sorties (Frais) qui ne sont PAS des retraits associés
+        filtered = filtered.filter(c => c.type === 'sortie' && (!c.motif || !c.motif.includes('RETRAIT ASSOCIÉ')));
+    } 
+    else if (typeCaisse === 'retrait') {
+        // Uniquement les retraits associés
+        filtered = filtered.filter(c => c.type === 'sortie' && c.motif && c.motif.includes('RETRAIT ASSOCIÉ'));
+    }
+    // Si c'est "Tous" (vide), on ne filtre pas sur le type, on garde tout.
+
+    // Filtre par Personne (Associé)
+    if (personne) {
+        filtered = filtered.filter(c => c.personne === personne);
+    }
+    
+    // Filtres par Date
+    if (dateDebut) {
+        filtered = filtered.filter(c => c.date >= dateDebut);
+    }
+    if (dateFin) {
+        filtered = filtered.filter(c => c.date <= dateFin);
+    }
+    
+    // On affiche le résultat filtré
+    displayCaisse(filtered);
+}
         
         // Mettre à jour le filtre des personnes
         function updateFilterPersonnes() {
