@@ -4235,6 +4235,24 @@ async function exportVehiculesExcel() {
         document.body.style.cursor = 'default';
     }
 }
+        function filterCaisseParPersonne(nom) {
+            // On cherche le menu déroulant des personnes
+            const filterPersonne = document.getElementById('filterPersonne');
+            const filterType = document.getElementById('filterTypeCaisse');
+            
+            if (filterPersonne) {
+                // On change la valeur du filtre
+                filterPersonne.value = nom;
+                // On force aussi le filtre sur "Sorties" pour ne voir que ses retraits
+                if (filterType) filterType.value = 'sortie';
+                
+                // On lance la fonction de filtrage que tu as déjà dans ton code
+                filterCaisse();
+                
+                // On fait un petit effet visuel : on remonte vers le tableau
+                window.scrollTo({ top: document.querySelector('.table-container').offsetTop - 100, behavior: 'smooth' });
+            }
+        }
     </script>
 </body>
 </html>
