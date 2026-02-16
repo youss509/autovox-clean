@@ -3980,43 +3980,62 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
             }, 3000);
         }
 
-        // Afficher l'historique de la caisse
+       // Nouvelle fonction pour afficher l'historique et les cartes des associés
         function displayCaisse(caisse) {
             const tbody = document.getElementById('caisseTableBody');
             
+            // 1. On réinitialise les compteurs à zéro
+            let totaux = { 'Fouad': 0, 'Tarek': 0, 'Walid': 0, 'Riad': 0 };
+
+            // 2. On calcule les totaux pour chaque associé
+            caisse.forEach(transaction => {
+                if (transaction.type === 'sortie' && transaction.motif && transaction.motif.includes('RETRAIT ASSOCIÉ')) {
+                    if (totaux.hasOwnProperty(transaction.personne)) {
+                        totaux[transaction.personne] += parseFloat(transaction.montant);
+                    }
+                }
+            });
+
+            // 3. On met à jour les chiffres dans les cartes en haut
+            if(document.getElementById('retraitFouad')) {
+                document.getElementById('retraitFouad').textContent = totaux['Fouad'].toLocaleString('fr-FR') + ' €';
+                document.getElementById('retraitTarek').textContent = totaux['Tarek'].toLocaleString('fr-FR') + ' €';
+                document.getElementById('retraitWalid').textContent = totaux['Walid'].toLocaleString('fr-FR') + ' €';
+                document.getElementById('retraitRiad').textContent = totaux['Riad'].toLocaleString('fr-FR') + ' €';
+            }
+
+            // 4. On dessine le tableau en bas
             if (!caisse || caisse.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="5" style="text-align: center; padding: 40px; color: var(--text-secondary);">
-                            💰 Aucune transaction pour le moment
-                        </td>
-                    </tr>
-                `;
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 40px;">💰 Aucune transaction</td></tr>`;
                 return;
             }
             
             tbody.innerHTML = caisse.map(c => {
                 const isEntree = c.type === 'entree';
-                const typeIcon = isEntree ? '↗' : '↘';
-                const typeClass = isEntree ? 'caisse-type-entree' : 'caisse-type-sortie';
-                const montantSign = isEntree ? '+' : '-';
-                const montantColor = isEntree ? 'var(--success)' : 'var(--danger)';
+                const isRetrait = c.motif && c.motif.includes('RETRAIT ASSOCIÉ');
                 
-            return `
-                <tr>
-                    <td>${formatDate(c.date)}</td>
-                    <td>
-                        <span class="caisse-type-badge ${typeClass}">
-                            ${typeIcon} ${isEntree ? 'Entrée' : 'Sortie'}
-                        </span>
-                    </td>
-                    <td class="caisse-montant" style="color: ${montantColor};">
-                        ${montantSign}${c.montant.toFixed(2)} €
-                    </td>
-                    <td>${c.motif || '-'}</td>
-                    <td>${c.personne || '-'}</td>
-                </tr>
-            `;
+                const typeIcon = isRetrait ? '💸' : (isEntree ? '↗' : '↘');
+                const typeClass = isRetrait ? 'caisse-type-sortie' : (isEntree ? 'caisse-type-entree' : 'caisse-type-sortie');
+                const typeLabel = isRetrait ? 'Retrait' : (isEntree ? 'Entrée' : 'Sortie');
+                const montantSign = isEntree ? '+' : '-';
+                
+                const montantColor = isRetrait ? 'var(--warning)' : (isEntree ? 'var(--success)' : 'var(--danger)');
+                
+                return `
+                    <tr>
+                        <td>${formatDate(c.date)}</td>
+                        <td>
+                            <span class="caisse-type-badge ${typeClass}" style="${isRetrait ? 'background: rgba(245, 158, 11, 0.1); color: var(--warning);' : ''}">
+                                ${typeIcon} ${typeLabel}
+                            </span>
+                        </td>
+                        <td class="caisse-montant" style="color: ${montantColor};">
+                            ${montantSign}${parseFloat(c.montant).toFixed(2)} €
+                        </td>
+                        <td style="font-size: 13px;">${c.motif || '-'}</td>
+                        <td style="font-weight: 600;">${c.personne || '-'}</td>
+                    </tr>
+                `;
             }).join('');
         }
 
