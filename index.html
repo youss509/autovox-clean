@@ -1811,6 +1811,45 @@
         </div>
     </div>
 
+    <!-- MODAL RETRAIT ASSOCIÉ (FENÊTRE POP-UP) -->
+    <div class="modal" id="modalRetraitCaisse">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>💸 Nouveau Retrait Associé</h2>
+                <button class="modal-close" onclick="closeModalRetraitCaisse()">✕</button>
+            </div>
+            <form id="formRetraitCaisse" onsubmit="effectuerRetraitCaisse(event)">
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Associé concerné *</label>
+                        <select name="personne" required>
+                            <option value="">Sélectionnez l'associé</option>
+                            <option value="Fouad">Fouad</option>
+                            <option value="Tarek">Tarek</option>
+                            <option value="Walid">Walid</option>
+                            <option value="Riad">Riad</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Montant (€) *</label>
+                        <input type="number" name="montant" step="0.01" min="0.01" required placeholder="Ex: 500">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Date du retrait *</label>
+                        <input type="date" name="date" id="dateRetraitAuto" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Motif / Note</label>
+                        <input type="text" name="motif" placeholder="Ex: Avance, Remboursement...">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-warning">Confirmer le retrait</button>
+            </form>
+        </div>
+    </div>
+    
     <!-- MODAL DÉTAILS VEHICULE -->
     <div class="modal" id="modalDetailsVehicule">
         <div class="modal-content">
@@ -3768,6 +3807,49 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
         function closeModalAjoutCaisse() {
             document.getElementById('modalAjoutCaisse').classList.remove('active');
             document.getElementById('formAjoutCaisse').reset();
+        }
+
+        // Ouvrir la fenêtre de retrait
+        function openModalRetraitCaisse() {
+            document.getElementById('modalRetraitCaisse').classList.add('active');
+            // Mettre la date du jour par défaut
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dateRetraitAuto').value = today;
+        }
+
+        // Fermer la fenêtre de retrait
+        function closeModalRetraitCaisse() {
+            document.getElementById('modalRetraitCaisse').classList.remove('active');
+            document.getElementById('formRetraitCaisse').reset();
+        }
+
+        async function effectuerRetraitCaisse(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const personne = formData.get('personne');
+            const montant = parseFloat(formData.get('montant'));
+
+            const retrait = {
+                id: generateId(),
+                date: formData.get('date'),
+                type: 'sortie', // On le garde en sortie pour que le solde baisse
+                montant: montant,
+                personne: personne,
+                // On ajoute un marqueur spécial dans le motif pour le reconnaître
+                motif: `RETRAIT ASSOCIÉ: ${formData.get('motif') || 'Sans motif'}`
+            };
+
+            try {
+                const { error } = await supabaseClient.from('caisse').insert([retrait]);
+                if (error) throw error;
+
+                alert('✅ Retrait enregistré !');
+                closeModalRetraitCaisse();
+                loadCaisse(); // Cette fonction va rafraîchir ton tableau et ton solde
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('❌ Erreur lors de l\'enregistrement');
+            }
         }
         
         // Charger les données de la caisse
