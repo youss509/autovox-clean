@@ -16,6 +16,7 @@
     <title>Autovox - Gestion de flotte automobile</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     
     <style>
         :root {
@@ -216,6 +217,34 @@
             width: auto;
         }
 
+        /* BOUTON EXCEL STYLE NAVIGATEUR */
+        .btn-download {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: transparent; /* Fond transparent */
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-right: 8px; /* Espace avec déconnexion */
+        }
+
+        .btn-download:hover {
+            border-color: #10b981; /* Bordure verte au survol */
+            color: #10b981;        /* Texte vert au survol */
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        /* Caché sur mobile en haut (sera dans le menu déroulant) */
+        @media (max-width: 768px) {
+            .btn-download { display: none; }
+        }
+        
         .btn-logout {
             padding: 8px 20px;
             background: var(--bg-secondary);
@@ -1246,10 +1275,20 @@
             </div>
             
             <div class="header-right">
+                <!-- 1. BOUTON THEME -->
                 <button class="theme-toggle-btn" onclick="toggleTheme()">
                     <span id="themeIcon">🌙</span>
                 </button>
+
+                <!-- 2. NOUVEAU BOUTON EXCEL (FLÈCHE BAS) -->
+                <button class="btn-download" onclick="exportVehiculesExcel()" title="Télécharger le fichier Excel">
+                    <span style="font-size: 16px;">⬇️</span> Excel
+                </button>
+                
+                <!-- 3. BOUTON DÉCONNEXION -->
                 <button class="btn-logout" onclick="logout()">Déconnexion</button>
+                
+                <!-- 4. MENU MOBILE (HAMBURGER) -->
                 <button class="hamburger" onclick="toggleMobileMenu()">
                     <span id="hamburgerIcon">☰</span>
                 </button>
@@ -1286,6 +1325,10 @@
             <div class="mobile-menu-item" data-page="statistiques">
                 <span class="nav-icon">📊</span>
                 <span>Statistiques</span>
+            </div>
+            <div class="mobile-menu-item" onclick="exportVehiculesExcel()">
+                <span class="nav-icon">⬇️</span>
+                <span>Télécharger Excel</span>
             </div>
             <div style="border-top: 1px solid var(--border-color); margin: 20px 0; padding-top: 20px;">
                 <button class="btn btn-secondary" onclick="logout()" style="width: 100%;">Déconnexion</button>
@@ -3952,6 +3995,93 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
                 select.innerHTML += `<option value="${p}">${p}</option>`;
             });
         }
+        // ==========================================
+// EXPORT EXCEL (VERSION FINALE)
+// ==========================================
+async function exportVehiculesExcel() {
+    // Petit curseur de chargement
+    document.body.style.cursor = 'wait';
+
+    try {
+        // 1. Récupération des données
+        const { data: vehicules, error } = await supabaseClient
+            .from('vehicules')
+            .select('*, frais(*), ventes(*)')
+            .order('date_achat', { ascending: false });
+
+        if (error) throw error;
+
+        // 2. En-tête du tableau
+        const rows = [
+            ["MARQUE", "MODELE", "PLAQUE", "KM", "PIECES MO", "CARROSSERIE", "DEPANNEUSE", "FRAIS ADMIN (DA+CT+LBC)", "LAVAGE", "ESSENCE", "PRIX ACHAT", "PRIX TOTAL", "PRIX VENTE", "BÉNÉFICE"]
+        ];
+
+        // 3. Remplissage
+        vehicules.forEach(v => {
+            const frais = v.frais || [];
+            
+            // Fonction helper pour sommer
+            const sum = (type) => frais.filter(f => f.type === type).reduce((t, f) => t + parseFloat(f.montant), 0);
+
+            // Calculs frais techniques
+            const mtPieces = sum("Pièces et main d'oeuvre");
+            const mtCarrosserie = sum("Carrosserie/Peinture");
+            const mtDepanneuse = sum("Dépanneuse");
+            const mtLavage = sum("Lavage");
+            const mtEssence = sum("Essence");
+
+            // Calculs frais admin groupés (Texte combiné)
+            const typesAdmin = ["Déclaration d'achat", "Contrôle technique", "Annonce LeBonCoin", "Clés", "Autre"];
+            const fraisAdmin = frais.filter(f => typesAdmin.includes(f.type));
+            const mtAdminTotal = fraisAdmin.reduce((t, f) => t + parseFloat(f.montant), 0);
+            
+            // Création du texte "DA 10 + CT 60"
+            const texteAdmin = fraisAdmin.map(f => {
+                let nom = f.type
+                    .replace("Déclaration d'achat", "DA")
+                    .replace("Contrôle technique", "CT")
+                    .replace("Annonce LeBonCoin", "LBC");
+                return `${nom} ${Math.round(f.montant)}€`;
+            }).join(" + ");
+
+            // Calculs financiers
+            const prixAchat = parseFloat(v.prix_achat || 0);
+            const prixTotal = prixAchat + mtPieces + mtCarrosserie + mtDepanneuse + mtAdminTotal + mtLavage + mtEssence;
+            
+            let prixVente = "", benefice = "";
+            if (v.ventes && v.ventes.length > 0) {
+                prixVente = parseFloat(v.ventes[0].prix_vente);
+                benefice = prixVente - prixTotal;
+            }
+
+            // Ajout ligne
+            rows.push([
+                v.marque, v.modele, v.immatriculation, v.kilometrage,
+                mtPieces || "", mtCarrosserie || "", mtDepanneuse || "",
+                texteAdmin, mtLavage || "", mtEssence || "",
+                prixAchat + "€", Math.round(prixTotal) + "€", 
+                prixVente ? prixVente + "€" : "", 
+                benefice !== "" ? Math.round(benefice) + "€" : ""
+            ]);
+        });
+
+        // 4. Génération du fichier
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+
+        // Largeurs colonnes
+        ws['!cols'] = [{wch:15}, {wch:15}, {wch:12}, {wch:8}, {wch:15}, {wch:15}, {wch:12}, {wch:35}, {wch:10}, {wch:10}, {wch:12}, {wch:12}, {wch:12}, {wch:12}];
+
+        XLSX.utils.book_append_sheet(wb, ws, "Flotte Auto");
+        XLSX.writeFile(wb, "Autovox_Export.xlsx");
+        
+    } catch (err) {
+        console.error(err);
+        alert("Erreur lors du téléchargement Excel");
+    } finally {
+        document.body.style.cursor = 'default';
+    }
+}
     </script>
 </body>
 </html>
