@@ -1484,7 +1484,7 @@
 <div class="stats" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 20px; margin-bottom: 30px;">
     
     <!-- 1. CARTE SOLDE (BLEUE) -->
-    <div class="stat-card" style="background: linear-gradient(135deg, var(--primary), #1e40af); color: white; border: none;">
+    <div class="stat-card" style="background: linear-gradient(135deg, var(--primary), #1e40af); color: white; border: none; cursor: pointer;" onclick="resetFilterCaisse()">
         <div class="stat-card-header">
             <div class="stat-card-title" style="color: rgba(255,255,255,0.8);">SOLDE DISPONIBLE</div>
             <div class="stat-card-icon">💼</div>
@@ -4034,6 +4034,10 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
                         </td>
                         <td style="font-size: 13px;">${c.motif || '-'}</td>
                         <td style="font-weight: 600;">${c.personne || '-'}</td>
+                        <!-- On ajoute cette colonne pour la poubelle -->
+                        <td style="text-align: right;">
+                            <button onclick="deleteTransactionCaisse('${c.id}')" style="background: none; border: none; cursor: pointer; font-size: 16px; padding: 5px;" title="Supprimer">🗑️</button>
+                        </td>
                     </tr>
                 `;
             }).join('');
@@ -4252,6 +4256,19 @@ async function exportVehiculesExcel() {
                 // On fait un petit effet visuel : on remonte vers le tableau
                 window.scrollTo({ top: document.querySelector('.table-container').offsetTop - 100, behavior: 'smooth' });
             }
+        }
+        function resetFilterCaisse() {
+            // On remet tous les filtres à zéro
+            document.getElementById('filterPersonne').value = "";
+            document.getElementById('filterTypeCaisse').value = "";
+            document.getElementById('filterDateDebut').value = "";
+            document.getElementById('filterDateFin').value = "";
+            
+            // On relance l'affichage complet
+            filterCaisse();
+            
+            // On remonte doucement
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
 </body>
