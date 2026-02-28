@@ -2114,18 +2114,43 @@
             }
         });
 
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        // --- NOUVEAU MOTEUR DE CONNEXION SÉCURISÉ ---
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
             
-            if (username === 'admin' && password === 'autovox2026') {
+            // 1. On récupère l'email et le mot de passe tapés par l'utilisateur
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
+            const alertBox = document.getElementById('errorAlert');
+            
+            // On change l'aspect du bouton pour montrer que ça charge
+            btn.textContent = "Connexion en cours...";
+            btn.style.opacity = "0.7";
+            
+            try {
+                // 2. On demande à Supabase de vérifier si le compte existe et si le mot de passe est bon
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password,
+                });
+
+                if (error) throw error;
+
+                // 3. Si c'est bon, on sauvegarde la session et on affiche le tableau de bord
                 localStorage.setItem('autovox_session', 'active');
                 showDashboard();
-            } else {
-                const alert = document.getElementById('errorAlert');
-                alert.classList.add('show');
-                setTimeout(() => alert.classList.remove('show'), 3000);
+                
+            } catch (error) {
+                // 4. Si c'est faux (mauvais email ou mauvais mot de passe)
+                console.error('Erreur de connexion:', error.message);
+                alertBox.textContent = "Identifiants incorrects.";
+                alertBox.classList.add('show');
+                setTimeout(() => alertBox.classList.remove('show'), 3000);
+            } finally {
+                // On remet le bouton à la normale
+                btn.textContent = "Se connecter";
+                btn.style.opacity = "1";
             }
         });
 
