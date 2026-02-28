@@ -2130,7 +2130,13 @@
             loadTheme();
             // On initialise Supabase en premier
             initSupabase();
-            
+            // Détection du retour de mail "Mot de passe oublié"
+            supabaseClient.auth.onAuthStateChange(async (event, session) => {
+                if (event == "PASSWORD_RECOVERY") {
+                    // On ouvre la fenêtre du nouveau mot de passe
+                    document.getElementById('modalNewPassword').classList.add('active');
+                }
+            });
             // On vérifie si Supabase connaît cet utilisateur (s'il s'était déjà connecté)
             const { data: { session } } = await supabaseClient.auth.getSession();
             
@@ -4054,6 +4060,33 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
             } else {
                 alert("📩 Un lien de récupération a été envoyé sur votre boîte mail !");
                 closeForgotModal();
+            }
+        }
+        // 4. Mettre à jour le mot de passe après le mail
+        async function updatePassword() {
+            const newPassword = document.getElementById('newPasswordInput').value;
+            const btn = document.getElementById('btnUpdatePassword');
+
+            if (newPassword.length < 6) {
+                alert("Le mot de passe doit faire au moins 6 caractères.");
+                return;
+            }
+
+            btn.textContent = "Mise à jour...";
+            btn.disabled = true;
+
+            const { error } = await supabaseClient.auth.updateUser({
+                password: newPassword
+            });
+
+            if (error) {
+                alert("Erreur : " + error.message);
+                btn.textContent = "Enregistrer";
+                btn.disabled = false;
+            } else {
+                alert("✅ Mot de passe mis à jour avec succès ! Vous êtes maintenant connecté.");
+                document.getElementById('modalNewPassword').classList.remove('active');
+                showDashboard(); // On ouvre directement le dashboard
             }
         }
     </script>
