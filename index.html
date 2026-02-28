@@ -2107,10 +2107,23 @@
             document.getElementById('hamburgerIcon').textContent = '☰';
         }
 
-        window.addEventListener('DOMContentLoaded', function() {
+       window.addEventListener('DOMContentLoaded', async function() {
             loadTheme();
-            if (localStorage.getItem('autovox_session') === 'active') {
+            // On initialise Supabase en premier
+            initSupabase();
+            
+            // On vérifie si Supabase connaît cet utilisateur (s'il s'était déjà connecté)
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            
+            if (session) {
+                // Si oui, on affiche direct le tableau de bord
+                localStorage.setItem('autovox_session', 'active');
                 showDashboard();
+            } else {
+                // Sinon on nettoie tout par sécurité
+                localStorage.removeItem('autovox_session');
+                document.getElementById('loginPage').style.display = 'flex';
+                document.getElementById('dashboardPage').classList.remove('active');
             }
         });
 
