@@ -16,7 +16,6 @@
     <title>Autovox - Gestion de flotte automobile</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     
     <style>
         :root {
@@ -217,34 +216,6 @@
             width: auto;
         }
 
-        /* BOUTON EXCEL STYLE NAVIGATEUR */
-        .btn-download {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: transparent; /* Fond transparent */
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-right: 8px; /* Espace avec déconnexion */
-        }
-
-        .btn-download:hover {
-            border-color: #10b981; /* Bordure verte au survol */
-            color: #10b981;        /* Texte vert au survol */
-            background: rgba(16, 185, 129, 0.05);
-        }
-
-        /* Caché sur mobile en haut (sera dans le menu déroulant) */
-        @media (max-width: 768px) {
-            .btn-download { display: none; }
-        }
-        
         .btn-logout {
             padding: 8px 20px;
             background: var(--bg-secondary);
@@ -1214,16 +1185,21 @@
                 Identifiant ou mot de passe incorrect
             </div>
             
-            <form id="loginForm">
+           <form id="loginForm">
                 <div class="input-group">
-                    <label>Identifiant</label>
-                    <input type="text" id="username" placeholder="Votre identifiant" required autocomplete="username">
+                    <label>Adresse Email</label>
+                    <!-- Changement ici : type="email" et id="email" -->
+                    <input type="email" id="email" placeholder="votre@email.com" required autocomplete="email">
                 </div>
                 <div class="input-group">
                     <label>Mot de passe</label>
                     <input type="password" id="password" placeholder="Votre mot de passe" required autocomplete="current-password">
                 </div>
-                <button type="submit" class="btn">Se connecter</button>
+                <!-- On prépare le terrain pour le "Mot de passe oublié" plus tard -->
+                <div style="text-align: right; margin-bottom: 20px;">
+                    <a href="#" style="color: var(--primary); font-size: 13px; text-decoration: none;" onclick="alert('Fonctionnalité à venir !')">Mot de passe oublié ?</a>
+                </div>
+                <button type="submit" class="btn" id="loginBtn">Se connecter</button>
             </form>
         </div>
         <div class="footer">© 2026 Autovox • Design Premium</div>
@@ -1275,20 +1251,10 @@
             </div>
             
             <div class="header-right">
-                <!-- 1. BOUTON THEME -->
                 <button class="theme-toggle-btn" onclick="toggleTheme()">
                     <span id="themeIcon">🌙</span>
                 </button>
-
-                <!-- 2. NOUVEAU BOUTON EXCEL (FLÈCHE BAS) -->
-                <button class="btn-download" onclick="exportVehiculesExcel()" title="Télécharger le fichier Excel">
-                    <span style="font-size: 16px;">⬇️</span> Excel
-                </button>
-                
-                <!-- 3. BOUTON DÉCONNEXION -->
                 <button class="btn-logout" onclick="logout()">Déconnexion</button>
-                
-                <!-- 4. MENU MOBILE (HAMBURGER) -->
                 <button class="hamburger" onclick="toggleMobileMenu()">
                     <span id="hamburgerIcon">☰</span>
                 </button>
@@ -1325,10 +1291,6 @@
             <div class="mobile-menu-item" data-page="statistiques">
                 <span class="nav-icon">📊</span>
                 <span>Statistiques</span>
-            </div>
-            <div class="mobile-menu-item" onclick="exportVehiculesExcel()">
-                <span class="nav-icon">⬇️</span>
-                <span>Télécharger Excel</span>
             </div>
             <div style="border-top: 1px solid var(--border-color); margin: 20px 0; padding-top: 20px;">
                 <button class="btn btn-secondary" onclick="logout()" style="width: 100%;">Déconnexion</button>
@@ -1468,71 +1430,19 @@
                             <h1>💼 Gestion de la Caisse</h1>
                             <p>Suivi des entrées et sorties d'argent</p>
                         </div>
-                        <div class="page-header-right" style="display: flex; gap: 10px; flex-wrap: wrap;">
-    <!-- Nouveau bouton pour les associés -->
-    <button class="btn btn-warning" onclick="openModalRetraitCaisse()">
-        💸 Retrait Associé
-    </button>
-    <!-- Ton bouton actuel -->
-    <button class="btn btn-primary" onclick="openModalAjoutCaisse()">
-        ➕ Ajouter de l'argent
-    </button>
-</div>
+                        <div class="page-header-right">
+                            <button class="btn btn-primary" onclick="openModalAjoutCaisse()">
+                                ➕ Ajouter de l'argent
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- NOUVELLE GRILLE : SOLDE + 4 ASSOCIÉS -->
-<div class="stats" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 20px; margin-bottom: 30px;">
-    
-    <!-- 1. CARTE SOLDE (BLEUE) -->
-    <div class="stat-card" style="background: linear-gradient(135deg, var(--primary), #1e40af); color: white; border: none; cursor: pointer;" onclick="resetFilterCaisse()">
-        <div class="stat-card-header">
-            <div class="stat-card-title" style="color: rgba(255,255,255,0.8);">SOLDE DISPONIBLE</div>
-            <div class="stat-card-icon">💼</div>
-        </div>
-        <div class="stat-card-value" id="soldeCaisseGrand">0 €</div>
-        <div class="stat-card-subtitle" style="color: rgba(255,255,255,0.8);">En caisse actuellement</div>
-    </div>
-
-    <!-- 2. CARTE FOUAD -->
-    <div class="stat-card" id="cardFouad" style="cursor: pointer;" onclick="filterCaisseParPersonne('Fouad')">
-        <div class="stat-card-header">
-            <div class="stat-card-title">Retrait Fouad</div>
-            <div class="stat-card-icon">👤</div>
-        </div>
-        <div class="stat-card-value" id="retraitFouad" style="color: var(--warning);">0 €</div>
-        <div class="stat-card-subtitle">Total retiré</div>
-    </div>
-
-    <!-- 3. CARTE TAREK -->
-    <div class="stat-card" id="cardTarek" style="cursor: pointer;" onclick="filterCaisseParPersonne('Tarek')">
-        <div class="stat-card-header">
-            <div class="stat-card-title">Retrait Tarek</div>
-            <div class="stat-card-icon">👤</div>
-        </div>
-        <div class="stat-card-value" id="retraitTarek" style="color: var(--warning);">0 €</div>
-        <div class="stat-card-subtitle">Total retiré</div>
-    </div>
-
-    <!-- 4. CARTE WALID -->
-    <div class="stat-card" id="cardWalid" style="cursor: pointer;" onclick="filterCaisseParPersonne('Walid')">
-        <div class="stat-card-header">
-            <div class="stat-card-title">Retrait Walid</div>
-            <div class="stat-card-icon">👤</div>
-        </div>
-        <div class="stat-card-value" id="retraitWalid" style="color: var(--warning);">0 €</div>
-        <div class="stat-card-subtitle">Total retiré</div>
-    </div>
-
-    <!-- 5. CARTE RIAD -->
-    <div class="stat-card" id="cardRiad" style="cursor: pointer;" onclick="filterCaisseParPersonne('Riad')">
-        <div class="stat-card-header">
-            <div class="stat-card-title">Retrait Riad</div>
-            <div class="stat-card-icon">👤</div>
-        </div>
-        <div class="stat-card-value" id="retraitRiad" style="color: var(--warning);">0 €</div>
-        <div class="stat-card-subtitle">Total retiré</div>
-    </div>
-</div>
+                    <!-- SOLDE ACTUEL EN GRAND -->
+                    <div class="caisse-solde-card">
+                        <div class="caisse-solde-label">Solde actuel</div>
+                        <div class="caisse-solde-value" id="soldeCaisseGrand">0 €</div>
+                        <div class="caisse-solde-subtitle">Dernière mise à jour : <span id="derniereMaj">-</span></div>
+                    </div>
 
                     <!-- FILTRES -->
                     <div class="filters">
@@ -1540,11 +1450,10 @@
                             <div class="filter-group">
                                 <label>Type</label>
                                 <select id="filterTypeCaisse" onchange="filterCaisse()">
-    <option value="">Tous</option>
-    <option value="entree">Entrées</option>
-    <option value="sortie_pure">Sorties (Frais uniquement)</option>
-    <option value="retrait">Retraits Associés</option>
-</select>
+                                    <option value="">Tous</option>
+                                    <option value="entree">Entrées</option>
+                                    <option value="sortie">Sorties</option>
+                                </select>
                             </div>
                             <div class="filter-group">
                                 <label>Personne</label>
@@ -1573,7 +1482,6 @@
                                         <th>Montant</th>
                                         <th>Motif</th>
                                         <th>Personne</th>
-                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody id="caisseTableBody">
@@ -1813,45 +1721,6 @@
         </div>
     </div>
 
-    <!-- MODAL RETRAIT ASSOCIÉ (FENÊTRE POP-UP) -->
-    <div class="modal" id="modalRetraitCaisse">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>💸 Nouveau Retrait Associé</h2>
-                <button class="modal-close" onclick="closeModalRetraitCaisse()">✕</button>
-            </div>
-            <form id="formRetraitCaisse" onsubmit="effectuerRetraitCaisse(event)">
-                <div class="form-row">
-                    <div class="input-group">
-                        <label>Associé concerné *</label>
-                        <select name="personne" required>
-                            <option value="">Sélectionnez l'associé</option>
-                            <option value="Fouad">Fouad</option>
-                            <option value="Tarek">Tarek</option>
-                            <option value="Walid">Walid</option>
-                            <option value="Riad">Riad</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label>Montant (€) *</label>
-                        <input type="number" name="montant" step="0.01" min="0.01" required placeholder="Ex: 500">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="input-group">
-                        <label>Date du retrait *</label>
-                        <input type="date" name="date" id="dateRetraitAuto" required>
-                    </div>
-                    <div class="input-group">
-                        <label>Motif / Note</label>
-                        <input type="text" name="motif" placeholder="Ex: Avance, Remboursement...">
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-warning">Confirmer le retrait</button>
-            </form>
-        </div>
-    </div>
-    
     <!-- MODAL DÉTAILS VEHICULE -->
     <div class="modal" id="modalDetailsVehicule">
         <div class="modal-content">
@@ -3810,49 +3679,6 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
             document.getElementById('modalAjoutCaisse').classList.remove('active');
             document.getElementById('formAjoutCaisse').reset();
         }
-
-        // Ouvrir la fenêtre de retrait
-        function openModalRetraitCaisse() {
-            document.getElementById('modalRetraitCaisse').classList.add('active');
-            // Mettre la date du jour par défaut
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('dateRetraitAuto').value = today;
-        }
-
-        // Fermer la fenêtre de retrait
-        function closeModalRetraitCaisse() {
-            document.getElementById('modalRetraitCaisse').classList.remove('active');
-            document.getElementById('formRetraitCaisse').reset();
-        }
-
-        async function effectuerRetraitCaisse(e) {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const personne = formData.get('personne');
-            const montant = parseFloat(formData.get('montant'));
-
-            const retrait = {
-                id: generateId(),
-                date: formData.get('date'),
-                type: 'sortie', // On le garde en sortie pour que le solde baisse
-                montant: montant,
-                personne: personne,
-                // On ajoute un marqueur spécial dans le motif pour le reconnaître
-                motif: `RETRAIT ASSOCIÉ: ${formData.get('motif') || 'Sans motif'}`
-            };
-
-            try {
-                const { error } = await supabaseClient.from('caisse').insert([retrait]);
-                if (error) throw error;
-
-                alert('✅ Retrait enregistré !');
-                closeModalRetraitCaisse();
-                loadCaisse(); // Cette fonction va rafraîchir ton tableau et ton solde
-            } catch (error) {
-                console.error('Erreur:', error);
-                alert('❌ Erreur lors de l\'enregistrement');
-            }
-        }
         
         // Charger les données de la caisse
         async function loadCaisse() {
@@ -3982,66 +3808,43 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
             }, 3000);
         }
 
-       // Nouvelle fonction pour afficher l'historique et les cartes des associés
+        // Afficher l'historique de la caisse
         function displayCaisse(caisse) {
             const tbody = document.getElementById('caisseTableBody');
             
-            // 1. On réinitialise les compteurs à zéro
-            let totaux = { 'Fouad': 0, 'Tarek': 0, 'Walid': 0, 'Riad': 0 };
-
-            // 2. On calcule les totaux pour chaque associé
-            allCaisse.forEach(transaction => {
-                if (transaction.type === 'sortie' && transaction.motif && transaction.motif.includes('RETRAIT ASSOCIÉ')) {
-                    if (totaux.hasOwnProperty(transaction.personne)) {
-                        totaux[transaction.personne] += parseFloat(transaction.montant);
-                    }
-                }
-            });
-
-            // 3. On met à jour les chiffres dans les cartes en haut
-            if(document.getElementById('retraitFouad')) {
-                document.getElementById('retraitFouad').textContent = totaux['Fouad'].toLocaleString('fr-FR') + ' €';
-                document.getElementById('retraitTarek').textContent = totaux['Tarek'].toLocaleString('fr-FR') + ' €';
-                document.getElementById('retraitWalid').textContent = totaux['Walid'].toLocaleString('fr-FR') + ' €';
-                document.getElementById('retraitRiad').textContent = totaux['Riad'].toLocaleString('fr-FR') + ' €';
-            }
-
-            // 4. On dessine le tableau en bas
             if (!caisse || caisse.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 40px;">💰 Aucune transaction</td></tr>`;
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                            💰 Aucune transaction pour le moment
+                        </td>
+                    </tr>
+                `;
                 return;
             }
             
             tbody.innerHTML = caisse.map(c => {
                 const isEntree = c.type === 'entree';
-                const isRetrait = c.motif && c.motif.includes('RETRAIT ASSOCIÉ');
-                
-                const typeIcon = isRetrait ? '💸' : (isEntree ? '↗' : '↘');
-                const typeClass = isRetrait ? 'caisse-type-sortie' : (isEntree ? 'caisse-type-entree' : 'caisse-type-sortie');
-                const typeLabel = isRetrait ? 'Retrait' : (isEntree ? 'Entrée' : 'Sortie');
+                const typeIcon = isEntree ? '↗' : '↘';
+                const typeClass = isEntree ? 'caisse-type-entree' : 'caisse-type-sortie';
                 const montantSign = isEntree ? '+' : '-';
+                const montantColor = isEntree ? 'var(--success)' : 'var(--danger)';
                 
-                const montantColor = isRetrait ? 'var(--warning)' : (isEntree ? 'var(--success)' : 'var(--danger)');
-                
-                return `
-                    <tr>
-                        <td>${formatDate(c.date)}</td>
-                        <td>
-                            <span class="caisse-type-badge ${typeClass}" style="${isRetrait ? 'background: rgba(245, 158, 11, 0.1); color: var(--warning);' : ''}">
-                                ${typeIcon} ${typeLabel}
-                            </span>
-                        </td>
-                        <td class="caisse-montant" style="color: ${montantColor};">
-                            ${montantSign}${parseFloat(c.montant).toFixed(2)} €
-                        </td>
-                        <td style="font-size: 13px;">${c.motif || '-'}</td>
-                        <td style="font-weight: 600;">${c.personne || '-'}</td>
-                        <!-- On ajoute cette colonne pour la poubelle -->
-                        <td style="text-align: right;">
-                            <button onclick="deleteTransactionCaisse('${c.id}')" style="background: none; border: none; cursor: pointer; font-size: 16px; padding: 5px;" title="Supprimer">🗑️</button>
-                        </td>
-                    </tr>
-                `;
+            return `
+                <tr>
+                    <td>${formatDate(c.date)}</td>
+                    <td>
+                        <span class="caisse-type-badge ${typeClass}">
+                            ${typeIcon} ${isEntree ? 'Entrée' : 'Sortie'}
+                        </span>
+                    </td>
+                    <td class="caisse-montant" style="color: ${montantColor};">
+                        ${montantSign}${c.montant.toFixed(2)} €
+                    </td>
+                    <td>${c.motif || '-'}</td>
+                    <td>${c.personne || '-'}</td>
+                </tr>
+            `;
             }).join('');
         }
 
@@ -4116,44 +3919,31 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
         
         // Filtrer la caisse
         function filterCaisse() {
-    const typeCaisse = document.getElementById('filterTypeCaisse').value;
-    const personne = document.getElementById('filterPersonne').value;
-    const dateDebut = document.getElementById('filterDateDebut').value;
-    const dateFin = document.getElementById('filterDateFin').value;
-    
-    let filtered = allCaisse;
-    
-    // --- NOUVELLE LOGIQUE DE FILTRE ---
-    if (typeCaisse === 'entree') {
-        // Uniquement les entrées d'argent
-        filtered = filtered.filter(c => c.type === 'entree');
-    } 
-    else if (typeCaisse === 'sortie_pure') {
-        // Uniquement les sorties (Frais) qui ne sont PAS des retraits associés
-        filtered = filtered.filter(c => c.type === 'sortie' && (!c.motif || !c.motif.includes('RETRAIT ASSOCIÉ')));
-    } 
-    else if (typeCaisse === 'retrait') {
-        // Uniquement les retraits associés
-        filtered = filtered.filter(c => c.type === 'sortie' && c.motif && c.motif.includes('RETRAIT ASSOCIÉ'));
-    }
-    // Si c'est "Tous" (vide), on ne filtre pas sur le type, on garde tout.
-
-    // Filtre par Personne (Associé)
-    if (personne) {
-        filtered = filtered.filter(c => c.personne === personne);
-    }
-    
-    // Filtres par Date
-    if (dateDebut) {
-        filtered = filtered.filter(c => c.date >= dateDebut);
-    }
-    if (dateFin) {
-        filtered = filtered.filter(c => c.date <= dateFin);
-    }
-    
-    // On affiche le résultat filtré
-    displayCaisse(filtered);
-}
+            const typeCaisse = document.getElementById('filterTypeCaisse').value;
+            const personne = document.getElementById('filterPersonne').value;
+            const dateDebut = document.getElementById('filterDateDebut').value;
+            const dateFin = document.getElementById('filterDateFin').value;
+            
+            let filtered = allCaisse;
+            
+            if (typeCaisse) {
+                filtered = filtered.filter(c => c.type === typeCaisse);
+            }
+            
+            if (personne) {
+                filtered = filtered.filter(c => c.personne === personne);
+            }
+            
+            if (dateDebut) {
+                filtered = filtered.filter(c => c.date >= dateDebut);
+            }
+            
+            if (dateFin) {
+                filtered = filtered.filter(c => c.date <= dateFin);
+            }
+            
+            displayCaisse(filtered);
+        }
         
         // Mettre à jour le filtre des personnes
         function updateFilterPersonnes() {
@@ -4166,192 +3956,6 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
             personnes.forEach(p => {
                 select.innerHTML += `<option value="${p}">${p}</option>`;
             });
-        }
-        // ==========================================
-// EXPORT EXCEL (VERSION FINALE)
-// ==========================================
-async function exportVehiculesExcel() {
-    document.body.style.cursor = 'wait';
-
-    try {
-        // 1. RÉCUPÉRATION DES DONNÉES (Véhicules + Caisse)
-        const { data: vehicules, error: errV } = await supabaseClient
-            .from('vehicules')
-            .select('*, frais(*), ventes(*)')
-            .order('date_achat', { ascending: false });
-
-        const { data: caisse, error: errC } = await supabaseClient
-            .from('caisse')
-            .select('*')
-            .order('date', { ascending: false });
-
-        if (errV || errC) throw (errV || errC);
-
-        // ==========================================
-        // ONGLET 1 : FLOTTE AUTO (Ton code actuel)
-        // ==========================================
-        const rowsVehicules = [
-            ["MARQUE", "MODELE", "PLAQUE", "KM", "PIECES MO", "CARROSSERIE", "DEPANNEUSE", "FRAIS ADMIN (DA+CT+LBC)", "LAVAGE", "ESSENCE", "PRIX ACHAT", "PRIX TOTAL", "PRIX VENTE", "BÉNÉFICE"]
-        ];
-
-        vehicules.forEach(v => {
-            const frais = v.frais || [];
-            const sum = (type) => frais.filter(f => f.type === type).reduce((t, f) => t + parseFloat(f.montant), 0);
-            
-            const mtPieces = sum("Pièces et main d'oeuvre");
-            const mtCarrosserie = sum("Carrosserie/Peinture");
-            const mtDepanneuse = sum("Dépanneuse");
-            const mtLavage = sum("Lavage");
-            const mtEssence = sum("Essence");
-
-            const typesAdmin = ["Déclaration d'achat", "Contrôle technique", "Annonce LeBonCoin", "Clés", "Autre"];
-            const fraisAdmin = frais.filter(f => typesAdmin.includes(f.type));
-            const mtAdminTotal = fraisAdmin.reduce((t, f) => t + parseFloat(f.montant), 0);
-            
-            const texteAdmin = fraisAdmin.map(f => {
-                let nom = f.type.replace("Déclaration d'achat", "DA").replace("Contrôle technique", "CT").replace("Annonce LeBonCoin", "LBC");
-                return `${nom} ${Math.round(f.montant)}€`;
-            }).join(" + ");
-
-            const prixAchat = parseFloat(v.prix_achat || 0);
-            const prixTotal = prixAchat + mtPieces + mtCarrosserie + mtDepanneuse + mtAdminTotal + mtLavage + mtEssence;
-            
-            let prixVente = "", benefice = "";
-            if (v.ventes && v.ventes.length > 0) {
-                prixVente = parseFloat(v.ventes[0].prix_vente);
-                benefice = prixVente - prixTotal;
-            }
-
-            rowsVehicules.push([
-                v.marque, v.modele, v.immatriculation, v.kilometrage,
-                mtPieces || "", mtCarrosserie || "", mtDepanneuse || "",
-                texteAdmin, mtLavage || "", mtEssence || "",
-                prixAchat, Math.round(prixTotal), 
-                prixVente || "", 
-                benefice !== "" ? Math.round(benefice) : ""
-            ]);
-        });
-
-        // ==========================================
-        // ONGLET 2 : JOURNAL DE CAISSE (Nouveau)
-        // ==========================================
-        const rowsCaisse = [
-            ["DATE", "TYPE", "MONTANT", "PERSONNE", "MOTIF"]
-        ];
-
-        caisse.forEach(c => {
-            const montantSigne = c.type === 'entree' ? parseFloat(c.montant) : -parseFloat(c.montant);
-            rowsCaisse.push([
-                c.date,
-                c.type.toUpperCase(),
-                montantSigne,
-                c.personne || "Système",
-                c.motif || ""
-            ]);
-        });
-
-        // ==========================================
-        // ONGLET 3 : RÉCAP ASSOCIÉS (Nouveau)
-        // ==========================================
-        const totaux = { 'Fouad': 0, 'Tarek': 0, 'Walid': 0, 'Riad': 0 };
-        caisse.forEach(c => {
-            if (c.motif && c.motif.includes('RETRAIT ASSOCIÉ')) {
-                if (totaux.hasOwnProperty(c.personne)) {
-                    totaux[c.personne] += parseFloat(c.montant);
-                }
-            }
-        });
-
-        const rowsAssocies = [
-            ["ASSOCIÉ", "TOTAL RETIRÉ"],
-            ["Fouad", totaux['Fouad']],
-            ["Tarek", totaux['Tarek']],
-            ["Walid", totaux['Walid']],
-            ["Riad", totaux['Riad']],
-            ["", ""],
-            ["TOTAL DISTRIBUÉ", totaux['Fouad'] + totaux['Tarek'] + totaux['Walid'] + totaux['Riad']]
-        ];
-
-        // ==========================================
-        // GÉNÉRATION DU FICHIER MULTI-ONGLETS
-        // ==========================================
-        const wb = XLSX.utils.book_new();
-
-        // Ajout feuille 1
-        const ws1 = XLSX.utils.aoa_to_sheet(rowsVehicules);
-        XLSX.utils.book_append_sheet(wb, ws1, "Flotte Auto");
-
-        // Ajout feuille 2
-        const ws2 = XLSX.utils.aoa_to_sheet(rowsCaisse);
-        XLSX.utils.book_append_sheet(wb, ws2, "Historique Caisse");
-
-        // Ajout feuille 3
-        const ws3 = XLSX.utils.aoa_to_sheet(rowsAssocies);
-        XLSX.utils.book_append_sheet(wb, ws3, "Résumé Associés");
-
-        // Téléchargement
-        XLSX.writeFile(wb, "Autovox_Compta_Complete.xlsx");
-        
-    } catch (err) {
-        console.error(err);
-        alert("Erreur lors du téléchargement Excel");
-    } finally {
-        document.body.style.cursor = 'default';
-    }
-}
-        function filterCaisseParPersonne(nom) {
-            // On cherche le menu déroulant des personnes
-            const filterPersonne = document.getElementById('filterPersonne');
-            const filterType = document.getElementById('filterTypeCaisse');
-            
-            if (filterPersonne) {
-                // On change la valeur du filtre
-                filterPersonne.value = nom;
-                // On force aussi le filtre sur "Sorties" pour ne voir que ses retraits
-                if (filterType) filterType.value = 'sortie';
-                
-                // On lance la fonction de filtrage que tu as déjà dans ton code
-                filterCaisse();
-                
-                // On fait un petit effet visuel : on remonte vers le tableau
-                window.scrollTo({ top: document.querySelector('.table-container').offsetTop - 100, behavior: 'smooth' });
-            }
-        }
-        function resetFilterCaisse() {
-            // On remet tous les filtres à zéro
-            document.getElementById('filterPersonne').value = "";
-            document.getElementById('filterTypeCaisse').value = "";
-            document.getElementById('filterDateDebut').value = "";
-            document.getElementById('filterDateFin').value = "";
-            
-            // On relance l'affichage complet
-            filterCaisse();
-            
-            // On remonte doucement
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        // Fonction pour supprimer une ligne de la caisse
-        async function deleteTransactionCaisse(id) {
-            // Demande une confirmation
-            if (!confirm('⚠️ Voulez-vous vraiment supprimer cette transaction ?\nCela modifiera le solde de la caisse.')) return;
-            
-            try {
-                const { error } = await supabaseClient
-                    .from('caisse')
-                    .delete()
-                    .eq('id', id);
-                
-                if (error) throw error;
-                
-                alert('✅ Transaction supprimée !');
-                
-                // On recharge les données depuis la base pour tout mettre à jour
-                loadCaisse(); 
-                
-            } catch (error) {
-                console.error('Erreur:', error);
-                alert('❌ Erreur lors de la suppression');
-            }
         }
     </script>
 </body>
