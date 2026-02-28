@@ -2154,12 +2154,12 @@
                 localStorage.setItem('autovox_session', 'active');
                 showDashboard();
                 
-            } catch (error) {
-                // 4. Si c'est faux (mauvais email ou mauvais mot de passe)
+           } catch (error) {
+                // 4. On affiche la VRAIE erreur renvoyée par Supabase
                 console.error('Erreur de connexion:', error.message);
-                alertBox.textContent = "Identifiants incorrects.";
+                alertBox.textContent = "Erreur Supabase : " + error.message; // <-- La modification est ici
                 alertBox.classList.add('show');
-                setTimeout(() => alertBox.classList.remove('show'), 3000);
+                setTimeout(() => alertBox.classList.remove('show'), 6000); // J'ai mis 6 secondes pour avoir le temps de lire
             } finally {
                 // On remet le bouton à la normale
                 btn.textContent = "Se connecter";
