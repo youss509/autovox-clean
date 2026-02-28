@@ -2145,45 +2145,29 @@
 
        window.addEventListener('DOMContentLoaded', async function() {
             loadTheme();
-            initSupabase();
+            initSupabase(); // On initialise la connexion à la base
             
-            // 1. DÉTECTION "BLINDÉE" DU MAIL DE RÉCUPÉRATION
-            // On cherche "recovery" dans l'adresse internet (URL)
-            const isRecovery = window.location.href.includes('recovery') || window.location.hash.includes('type=recovery');
+            // 1. Détection du mail de récupération
+            // On regarde si le mot "recovery" est présent dans l'adresse du site
+            const isRecovery = window.location.href.includes('recovery');
 
             if (isRecovery) {
-                console.log("Mode récupération détecté !");
-                // On attend 200 millisecondes pour être sûr que tout est chargé
-                setTimeout(() => {
-                    document.getElementById('loginPage').style.display = 'flex';
-                    document.getElementById('modalNewPassword').classList.add('active');
-                }, 200);
+                // Si on vient du mail, on ouvre la fenêtre du nouveau mot de passe
+                document.getElementById('modalNewPassword').classList.add('active');
             }
 
-            // 2. ÉCOUTEUR DE SECOURS SUPABASE
-            supabaseClient.auth.onAuthStateChange(async (event, session) => {
-                if (event === "PASSWORD_RECOVERY") {
-                    document.getElementById('modalNewPassword').classList.add('active');
-                }
-            });
-
-            // 3. VÉRIFICATION DE LA SESSION NORMALE
-            // On ne connecte pas le dashboard si on est en mode récupération
-            try {
-                const { data: { session } } = await supabaseClient.auth.getSession();
-                
-                if (session && !isRecovery) {
-                    localStorage.setItem('autovox_session', 'active');
-                    showDashboard();
-                } else if (!isRecovery) {
-                    localStorage.removeItem('autovox_session');
-                    document.getElementById('loginPage').style.display = 'flex';
-                    if (document.getElementById('dashboardPage')) {
-                        document.getElementById('dashboardPage').classList.remove('active');
-                    }
-                }
-            } catch (e) {
-                console.log("Erreur session:", e);
+            // 2. Vérification de la session (est-ce qu'on est déjà connecté ?)
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            
+            if (session && !isRecovery) {
+                // On est connecté normalement -> Dashboard
+                localStorage.setItem('autovox_session', 'active');
+                showDashboard();
+            } else if (!isRecovery) {
+                // On n'est pas connecté -> Page de Login
+                localStorage.removeItem('autovox_session');
+                document.getElementById('loginPage').style.display = 'flex';
+                document.getElementById('dashboardPage').classList.remove('active');
             }
         });
             loadTheme();
