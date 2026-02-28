@@ -2147,24 +2147,25 @@
             loadTheme();
             initSupabase();
             
-            // 1. On vérifie immédiatement l'adresse URL
-            // Si l'adresse contient "type=recovery", c'est qu'on vient du mail
+            // 1. DÉTECTION IMMÉDIATE DU MAIL DE RÉCUPÉRATION
+            // On regarde si l'adresse finit par #type=recovery
             const isRecovery = window.location.hash.includes('type=recovery');
 
             if (isRecovery) {
-                // On force l'affichage de la fenêtre du nouveau mot de passe
+                // On force l'affichage du popup pour le nouveau mot de passe
+                document.getElementById('loginPage').style.display = 'flex';
                 document.getElementById('modalNewPassword').classList.add('active');
             }
 
-            // 2. Écouteur de secours Supabase
+            // 2. ÉCOUTEUR DE SECOURS (Si Supabase met du temps à répondre)
             supabaseClient.auth.onAuthStateChange(async (event, session) => {
                 if (event === "PASSWORD_RECOVERY") {
                     document.getElementById('modalNewPassword').classList.add('active');
                 }
             });
 
-            // 3. Vérification de la session normale
-            // On ne connecte pas automatiquement si on est en mode récupération
+            // 3. VÉRIFICATION DE LA SESSION NORMALE
+            // On ne connecte pas le dashboard si on est en train de changer de mot de passe
             const { data: { session } } = await supabaseClient.auth.getSession();
             
             if (session && !isRecovery) {
@@ -2173,6 +2174,7 @@
             } else if (!isRecovery) {
                 localStorage.removeItem('autovox_session');
                 document.getElementById('loginPage').style.display = 'flex';
+                document.getElementById('dashboardPage').classList.remove('active');
             }
         });
 
