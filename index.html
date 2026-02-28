@@ -4018,6 +4018,44 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
                 select.innerHTML += `<option value="${p}">${p}</option>`;
             });
         }
+        // 1. Ouvrir la fenêtre de récupération
+        function openForgotModal() {
+            document.getElementById('modalForgot').classList.add('active');
+        }
+
+        // 2. Fermer la fenêtre de récupération
+        function closeForgotModal() {
+            document.getElementById('modalForgot').classList.remove('active');
+            document.getElementById('forgotEmail').value = ""; // On vide le champ
+        }
+
+        // 3. Envoyer la demande à Supabase
+        async function sendResetEmail() {
+            const email = document.getElementById('forgotEmail').value;
+            const btn = document.getElementById('btnForgot');
+
+            if (!email) {
+                alert("Veuillez entrer votre adresse email.");
+                return;
+            }
+
+            btn.textContent = "Envoi en cours...";
+            btn.disabled = true;
+
+            // On demande à Supabase d'envoyer le mail de récupération
+            const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.href, // Renvoie l'utilisateur sur ton site après le clic dans le mail
+            });
+
+            if (error) {
+                alert("Erreur : " + error.message);
+                btn.textContent = "Envoyer le lien";
+                btn.disabled = false;
+            } else {
+                alert("📩 Un lien de récupération a été envoyé sur votre boîte mail !");
+                closeForgotModal();
+            }
+        }
     </script>
 </body>
 </html>
