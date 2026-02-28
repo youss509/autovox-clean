@@ -1197,50 +1197,14 @@
                 </div>
                 <!-- On prépare le terrain pour le "Mot de passe oublié" plus tard -->
                 <div style="text-align: right; margin-bottom: 20px;">
-                    <a href="#" style="color: var(--primary); font-size: 13px; text-decoration: none;" onclick="openForgotModal()">Mot de passe oublié ?</a>
+                    <a href="#" style="color: var(--primary); font-size: 13px; text-decoration: none;" onclick="alert('Fonctionnalité à venir !')">Mot de passe oublié ?</a>
                 </div>
                 <button type="submit" class="btn" id="loginBtn">Se connecter</button>
             </form>
         </div>
         <div class="footer">© 2026 Autovox • Design Premium</div>
     </div>
-    <!-- MODAL MOT DE PASSE OUBLIÉ -->
-<div class="modal" id="modalForgot">
-    <div class="modal-content" style="max-width: 400px;">
-        <div class="modal-header">
-            <h2>Récupération</h2>
-            <button class="modal-close" onclick="closeForgotModal()">✕</button>
-        </div>
-        <div style="padding: 24px;">
-            <p style="margin-bottom: 20px; font-size: 14px; color: var(--text-secondary);">
-                Entrez votre e-mail pour recevoir un lien de réinitialisation.
-            </p>
-            <div class="input-group">
-                <label>Votre Adresse Email</label>
-                <input type="email" id="forgotEmail" placeholder="votre@email.com">
-            </div>
-            <button class="btn" onclick="sendResetEmail()" id="btnForgot">Envoyer le lien</button>
-        </div>
-    </div>
-</div>
-<!-- MODAL NOUVEAU MOT DE PASSE -->
-<div class="modal" id="modalNewPassword">
-    <div class="modal-content" style="max-width: 400px;">
-        <div class="modal-header">
-            <h2>Nouveau mot de passe</h2>
-        </div>
-        <div style="padding: 24px;">
-            <p style="margin-bottom: 20px; font-size: 14px; color: var(--text-secondary);">
-                Choisissez votre nouveau mot de passe sécurisé.
-            </p>
-            <div class="input-group">
-                <label>Nouveau mot de passe</label>
-                <input type="password" id="newPasswordInput" placeholder="Minimum 6 caractères">
-            </div>
-            <button class="btn btn-success" onclick="updatePassword()" id="btnUpdatePassword">Enregistrer</button>
-        </div>
-    </div>
-</div>
+
     <!-- DASHBOARD -->
     <div class="dashboard" id="dashboardPage">
         <!-- HEADER HORIZONTAL -->
@@ -2145,59 +2109,18 @@
 
        window.addEventListener('DOMContentLoaded', async function() {
             loadTheme();
-            initSupabase(); // On initialise la connexion à la base
-            
-            // 1. Détection du mail de récupération
-            // On regarde si le mot "recovery" est présent dans l'adresse du site
-            const isRecovery = window.location.href.includes('recovery');
-
-            if (isRecovery) {
-                // Si on vient du mail, on ouvre la fenêtre du nouveau mot de passe
-                document.getElementById('modalNewPassword').classList.add('active');
-            }
-
-            // 2. Vérification de la session (est-ce qu'on est déjà connecté ?)
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            
-            if (session && !isRecovery) {
-                // On est connecté normalement -> Dashboard
-                localStorage.setItem('autovox_session', 'active');
-                showDashboard();
-            } else if (!isRecovery) {
-                // On n'est pas connecté -> Page de Login
-                localStorage.removeItem('autovox_session');
-                document.getElementById('loginPage').style.display = 'flex';
-                document.getElementById('dashboardPage').classList.remove('active');
-            }
-        });
-            loadTheme();
+            // On initialise Supabase en premier
             initSupabase();
             
-            // 1. DÉTECTION IMMÉDIATE DU MAIL DE RÉCUPÉRATION
-            // On regarde si l'adresse finit par #type=recovery
-            const isRecovery = window.location.hash.includes('type=recovery');
-
-            if (isRecovery) {
-                // On force l'affichage du popup pour le nouveau mot de passe
-                document.getElementById('loginPage').style.display = 'flex';
-                document.getElementById('modalNewPassword').classList.add('active');
-            }
-
-            // 2. ÉCOUTEUR DE SECOURS (Si Supabase met du temps à répondre)
-            supabaseClient.auth.onAuthStateChange(async (event, session) => {
-                if (event === "PASSWORD_RECOVERY") {
-                    document.getElementById('modalNewPassword').classList.add('active');
-                }
-            });
-
-            // 3. VÉRIFICATION DE LA SESSION NORMALE
-            // On ne connecte pas le dashboard si on est en train de changer de mot de passe
+            // On vérifie si Supabase connaît cet utilisateur (s'il s'était déjà connecté)
             const { data: { session } } = await supabaseClient.auth.getSession();
             
-            if (session && !isRecovery) {
+            if (session) {
+                // Si oui, on affiche direct le tableau de bord
                 localStorage.setItem('autovox_session', 'active');
                 showDashboard();
-            } else if (!isRecovery) {
+            } else {
+                // Sinon on nettoie tout par sécurité
                 localStorage.removeItem('autovox_session');
                 document.getElementById('loginPage').style.display = 'flex';
                 document.getElementById('dashboardPage').classList.remove('active');
@@ -3774,12 +3697,8 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
             navigateToPage('ventes');
         }
 
-        async function logout() {
-            // 1. On dit à Supabase de fermer la session
-            await supabaseClient.auth.signOut();
-            // 2. On nettoie la mémoire locale
+        function logout() {
             localStorage.removeItem('autovox_session');
-            // 3. On recharge la page pour revenir à l'écran de connexion
             location.reload();
         }
         
@@ -4076,72 +3995,6 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
                 select.innerHTML += `<option value="${p}">${p}</option>`;
             });
         }
-        // 1. Ouvrir la fenêtre de récupération
-        function openForgotModal() {
-            document.getElementById('modalForgot').classList.add('active');
-        }
-
-        // 2. Fermer la fenêtre de récupération
-        function closeForgotModal() {
-            document.getElementById('modalForgot').classList.remove('active');
-            document.getElementById('forgotEmail').value = ""; // On vide le champ
-        }
-
-        // 3. Envoyer la demande à Supabase
-        async function sendResetEmail() {
-            const email = document.getElementById('forgotEmail').value;
-            const btn = document.getElementById('btnForgot');
-
-            if (!email) {
-                alert("Veuillez entrer votre adresse email.");
-                return;
-            }
-
-            btn.textContent = "Envoi en cours...";
-            btn.disabled = true;
-
-            // On demande à Supabase d'envoyer le mail de récupération
-            const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-                redirectTo: window.location.href, // Renvoie l'utilisateur sur ton site après le clic dans le mail
-            });
-
-            if (error) {
-                alert("Erreur : " + error.message);
-                btn.textContent = "Envoyer le lien";
-                btn.disabled = false;
-            } else {
-                alert("📩 Un lien de récupération a été envoyé sur votre boîte mail !");
-                closeForgotModal();
-            }
-        }
-        // 4. Mettre à jour le mot de passe après le mail
-        async function updatePassword() {
-            const newPassword = document.getElementById('newPasswordInput').value;
-            const btn = document.getElementById('btnUpdatePassword');
-
-            if (newPassword.length < 6) {
-                alert("Le mot de passe doit faire au moins 6 caractères.");
-                return;
-            }
-
-            btn.textContent = "Mise à jour...";
-            btn.disabled = true;
-
-            const { error } = await supabaseClient.auth.updateUser({
-                password: newPassword
-            });
-
-            if (error) {
-                alert("Erreur : " + error.message);
-                btn.textContent = "Enregistrer";
-                btn.disabled = false;
-            } else {
-                alert("✅ Mot de passe mis à jour avec succès ! Vous êtes maintenant connecté.");
-                document.getElementById('modalNewPassword').classList.remove('active');
-                location.reload(); // On recharge la page pour se connecter proprement
-            }
-        }
-        
     </script>
 </body>
 </html>
