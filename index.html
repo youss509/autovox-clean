@@ -2128,27 +2128,30 @@
 
        window.addEventListener('DOMContentLoaded', async function() {
             loadTheme();
-            // On initialise Supabase en premier
             initSupabase();
-            // Détection du retour de mail "Mot de passe oublié"
+            
+            // 1. Détection automatique via l'événement Supabase
             supabaseClient.auth.onAuthStateChange(async (event, session) => {
-                if (event == "PASSWORD_RECOVERY") {
-                    // On ouvre la fenêtre du nouveau mot de passe
+                if (event === "PASSWORD_RECOVERY") {
                     document.getElementById('modalNewPassword').classList.add('active');
+                    return; // On s'arrête là pour laisser l'utilisateur taper son mot de passe
                 }
             });
-            // On vérifie si Supabase connaît cet utilisateur (s'il s'était déjà connecté)
+
+            // 2. Sécurité supplémentaire : On vérifie l'URL (si l'événement a été raté)
+            if (window.location.hash.includes('type=recovery')) {
+                document.getElementById('modalNewPassword').classList.add('active');
+            }
+
+            // 3. Vérification de la session normale (si on n'est pas en train de récupérer un mot de passe)
             const { data: { session } } = await supabaseClient.auth.getSession();
             
-            if (session) {
-                // Si oui, on affiche direct le tableau de bord
+            if (session && !window.location.hash.includes('type=recovery')) {
                 localStorage.setItem('autovox_session', 'active');
                 showDashboard();
-            } else {
-                // Sinon on nettoie tout par sécurité
+            } else if (!window.location.hash.includes('type=recovery')) {
                 localStorage.removeItem('autovox_session');
                 document.getElementById('loginPage').style.display = 'flex';
-                document.getElementById('dashboardPage').classList.remove('active');
             }
         });
 
