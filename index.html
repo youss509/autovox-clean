@@ -4112,9 +4112,10 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
             } else {
                 alert("✅ Mot de passe mis à jour avec succès ! Vous êtes maintenant connecté.");
                 document.getElementById('modalNewPassword').classList.remove('active');
-                showDashboard(); // On ouvre directement le dashboard
+                location.reload(); // On recharge la page pour se connecter proprement
             }
         }
+        
     </script>
 </body>
 </html>
