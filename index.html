@@ -1223,7 +1223,24 @@
         </div>
     </div>
 </div>
-
+<!-- MODAL NOUVEAU MOT DE PASSE -->
+<div class="modal" id="modalNewPassword">
+    <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-header">
+            <h2>Nouveau mot de passe</h2>
+        </div>
+        <div style="padding: 24px;">
+            <p style="margin-bottom: 20px; font-size: 14px; color: var(--text-secondary);">
+                Choisissez votre nouveau mot de passe sécurisé.
+            </p>
+            <div class="input-group">
+                <label>Nouveau mot de passe</label>
+                <input type="password" id="newPasswordInput" placeholder="Minimum 6 caractères">
+            </div>
+            <button class="btn btn-success" onclick="updatePassword()" id="btnUpdatePassword">Enregistrer</button>
+        </div>
+    </div>
+</div>
     <!-- DASHBOARD -->
     <div class="dashboard" id="dashboardPage">
         <!-- HEADER HORIZONTAL -->
@@ -2130,26 +2147,30 @@
             loadTheme();
             initSupabase();
             
-            // 1. Détection automatique via l'événement Supabase
-            supabaseClient.auth.onAuthStateChange(async (event, session) => {
-                if (event === "PASSWORD_RECOVERY") {
-                    document.getElementById('modalNewPassword').classList.add('active');
-                    return; // On s'arrête là pour laisser l'utilisateur taper son mot de passe
-                }
-            });
+            // 1. On vérifie immédiatement l'adresse URL
+            // Si l'adresse contient "type=recovery", c'est qu'on vient du mail
+            const isRecovery = window.location.hash.includes('type=recovery');
 
-            // 2. Sécurité supplémentaire : On vérifie l'URL (si l'événement a été raté)
-            if (window.location.hash.includes('type=recovery')) {
+            if (isRecovery) {
+                // On force l'affichage de la fenêtre du nouveau mot de passe
                 document.getElementById('modalNewPassword').classList.add('active');
             }
 
-            // 3. Vérification de la session normale (si on n'est pas en train de récupérer un mot de passe)
+            // 2. Écouteur de secours Supabase
+            supabaseClient.auth.onAuthStateChange(async (event, session) => {
+                if (event === "PASSWORD_RECOVERY") {
+                    document.getElementById('modalNewPassword').classList.add('active');
+                }
+            });
+
+            // 3. Vérification de la session normale
+            // On ne connecte pas automatiquement si on est en mode récupération
             const { data: { session } } = await supabaseClient.auth.getSession();
             
-            if (session && !window.location.hash.includes('type=recovery')) {
+            if (session && !isRecovery) {
                 localStorage.setItem('autovox_session', 'active');
                 showDashboard();
-            } else if (!window.location.hash.includes('type=recovery')) {
+            } else if (!isRecovery) {
                 localStorage.removeItem('autovox_session');
                 document.getElementById('loginPage').style.display = 'flex';
             }
