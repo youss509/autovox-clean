@@ -1197,13 +1197,32 @@
                 </div>
                 <!-- On prépare le terrain pour le "Mot de passe oublié" plus tard -->
                 <div style="text-align: right; margin-bottom: 20px;">
-                    <a href="#" style="color: var(--primary); font-size: 13px; text-decoration: none;" onclick="alert('Fonctionnalité à venir !')">Mot de passe oublié ?</a>
+                    <a href="#" style="color: var(--primary); font-size: 13px; text-decoration: none;" onclick="openForgotModal()">Mot de passe oublié ?</a>
                 </div>
                 <button type="submit" class="btn" id="loginBtn">Se connecter</button>
             </form>
         </div>
         <div class="footer">© 2026 Autovox • Design Premium</div>
     </div>
+    <!-- MODAL MOT DE PASSE OUBLIÉ -->
+<div class="modal" id="modalForgot">
+    <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-header">
+            <h2>Récupération</h2>
+            <button class="modal-close" onclick="closeForgotModal()">✕</button>
+        </div>
+        <div style="padding: 24px;">
+            <p style="margin-bottom: 20px; font-size: 14px; color: var(--text-secondary);">
+                Entrez votre e-mail pour recevoir un lien de réinitialisation.
+            </p>
+            <div class="input-group">
+                <label>Votre Adresse Email</label>
+                <input type="email" id="forgotEmail" placeholder="votre@email.com">
+            </div>
+            <button class="btn" onclick="sendResetEmail()" id="btnForgot">Envoyer le lien</button>
+        </div>
+    </div>
+</div>
 
     <!-- DASHBOARD -->
     <div class="dashboard" id="dashboardPage">
