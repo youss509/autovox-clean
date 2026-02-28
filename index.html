@@ -2147,6 +2147,48 @@
             loadTheme();
             initSupabase();
             
+            // 1. DÉTECTION "BLINDÉE" DU MAIL DE RÉCUPÉRATION
+            // On cherche "recovery" dans l'adresse internet (URL)
+            const isRecovery = window.location.href.includes('recovery') || window.location.hash.includes('type=recovery');
+
+            if (isRecovery) {
+                console.log("Mode récupération détecté !");
+                // On attend 200 millisecondes pour être sûr que tout est chargé
+                setTimeout(() => {
+                    document.getElementById('loginPage').style.display = 'flex';
+                    document.getElementById('modalNewPassword').classList.add('active');
+                }, 200);
+            }
+
+            // 2. ÉCOUTEUR DE SECOURS SUPABASE
+            supabaseClient.auth.onAuthStateChange(async (event, session) => {
+                if (event === "PASSWORD_RECOVERY") {
+                    document.getElementById('modalNewPassword').classList.add('active');
+                }
+            });
+
+            // 3. VÉRIFICATION DE LA SESSION NORMALE
+            // On ne connecte pas le dashboard si on est en mode récupération
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                
+                if (session && !isRecovery) {
+                    localStorage.setItem('autovox_session', 'active');
+                    showDashboard();
+                } else if (!isRecovery) {
+                    localStorage.removeItem('autovox_session');
+                    document.getElementById('loginPage').style.display = 'flex';
+                    if (document.getElementById('dashboardPage')) {
+                        document.getElementById('dashboardPage').classList.remove('active');
+                    }
+                }
+            } catch (e) {
+                console.log("Erreur session:", e);
+            }
+        });
+            loadTheme();
+            initSupabase();
+            
             // 1. DÉTECTION IMMÉDIATE DU MAIL DE RÉCUPÉRATION
             // On regarde si l'adresse finit par #type=recovery
             const isRecovery = window.location.hash.includes('type=recovery');
