@@ -2146,24 +2146,34 @@
 
        window.addEventListener('DOMContentLoaded', async function() {
             loadTheme();
-            initSupabase(); // Toujours initialiser la base en premier
-            
-            // 1. Détection du retour de mail (On cherche le mot "recovery" dans l'adresse)
-            const isRecovery = window.location.hash.includes('type=recovery');
+            initSupabase();
+
+            // 1. DÉTECTION BRUTE : On cherche le mot "recovery" n'importe où dans l'adresse
+            const currentUrl = window.location.href;
+            const isRecovery = currentUrl.includes('recovery');
 
             if (isRecovery) {
-                // On affiche directement la fenêtre du nouveau mot de passe
+                // Si on voit 'recovery', on ne se pose pas de question : on affiche la fenêtre
                 document.getElementById('loginPage').style.display = 'flex';
                 document.getElementById('modalNewPassword').classList.add('active');
+                return; // On arrête l'exécution du reste pour ne rien perturber
             }
 
-            // 2. Écouteur de sécurité Supabase
-            supabaseClient.auth.onAuthStateChange(async (event, session) => {
-                if (event === "PASSWORD_RECOVERY") {
-                    document.getElementById('modalNewPassword').classList.add('active');
+            // 2. VÉRIFICATION DE LA SESSION NORMALE (Si on n'est pas en mode récupération)
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                
+                if (session) {
+                    localStorage.setItem('autovox_session', 'active');
+                    showDashboard();
+                } else {
+                    localStorage.removeItem('autovox_session');
+                    document.getElementById('loginPage').style.display = 'flex';
                 }
-            });
-
+            } catch (error) {
+                console.error("Erreur de session:", error);
+            }
+        });
             // 3. Vérification de la session normale
             const { data: { session } } = await supabaseClient.auth.getSession();
             
