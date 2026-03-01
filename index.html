@@ -3697,8 +3697,14 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
             navigateToPage('ventes');
         }
 
-        function logout() {
+        async function logout() {
+            // On demande à Supabase de fermer la session officielle
+            await supabaseClient.auth.signOut();
+            
+            // On nettoie la mémoire locale par sécurité
             localStorage.removeItem('autovox_session');
+            
+            // On recharge la page pour revenir à l'écran de connexion
             location.reload();
         }
         
