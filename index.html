@@ -1197,51 +1197,14 @@
                 </div>
                 <!-- On prépare le terrain pour le "Mot de passe oublié" plus tard -->
                 <div style="text-align: right; margin-bottom: 20px;">
-                    <a href="#" style="color: var(--primary); font-size: 13px; text-decoration: none;" onclick="openForgotModal()">Mot de passe oublié ?</a>
+                    <a href="#" style="color: var(--primary); font-size: 13px; text-decoration: none;" onclick="alert('Fonctionnalité à venir !')">Mot de passe oublié ?</a>
                 </div>
                 <button type="submit" class="btn" id="loginBtn">Se connecter</button>
             </form>
         </div>
         <div class="footer">© 2026 Autovox • Design Premium</div>
     </div>
-<!-- MODAL MOT DE PASSE OUBLIÉ -->
-    <div class="modal" id="modalForgot">
-        <div class="modal-content" style="max-width: 400px;">
-            <div class="modal-header">
-                <h2>Récupération</h2>
-                <button class="modal-close" onclick="closeForgotModal()">✕</button>
-            </div>
-            <div style="padding: 24px;">
-                <p style="margin-bottom: 20px; font-size: 14px; color: var(--text-secondary);">
-                    Entrez votre e-mail pour recevoir un lien de réinitialisation.
-                </p>
-                <div class="input-group">
-                    <label>Votre Adresse Email</label>
-                    <input type="email" id="forgotEmail" placeholder="votre@email.com">
-                </div>
-                <button class="btn" onclick="sendResetEmail()" id="btnForgot">Envoyer le lien</button>
-            </div>
-        </div>
-    </div>
 
-    <!-- MODAL NOUVEAU MOT DE PASSE -->
-    <div class="modal" id="modalNewPassword">
-        <div class="modal-content" style="max-width: 400px;">
-            <div class="modal-header">
-                <h2>Nouveau mot de passe</h2>
-            </div>
-            <div style="padding: 24px;">
-                <p style="margin-bottom: 20px; font-size: 14px; color: var(--text-secondary);">
-                    Choisissez votre nouveau mot de passe sécurisé.
-                </p>
-                <div class="input-group">
-                    <label>Nouveau mot de passe</label>
-                    <input type="password" id="newPasswordInput" placeholder="Minimum 6 caractères">
-                </div>
-                <button class="btn btn-success" onclick="updatePassword()" id="btnUpdatePassword">Enregistrer</button>
-            </div>
-        </div>
-    </div>
     <!-- DASHBOARD -->
     <div class="dashboard" id="dashboardPage">
         <!-- HEADER HORIZONTAL -->
@@ -2146,49 +2109,24 @@
 
        window.addEventListener('DOMContentLoaded', async function() {
             loadTheme();
+            // On initialise Supabase en premier
             initSupabase();
-
-            // 1. DÉTECTION BRUTE : On cherche le mot "recovery" n'importe où dans l'adresse
-            const currentUrl = window.location.href;
-            const isRecovery = currentUrl.includes('recovery');
-
-            if (isRecovery) {
-                // Si on voit 'recovery', on ne se pose pas de question : on affiche la fenêtre
-                document.getElementById('loginPage').style.display = 'flex';
-                document.getElementById('modalNewPassword').classList.add('active');
-                return; // On arrête l'exécution du reste pour ne rien perturber
-            }
-
-            // 2. VÉRIFICATION DE LA SESSION NORMALE (Si on n'est pas en mode récupération)
-            try {
-                const { data: { session } } = await supabaseClient.auth.getSession();
-                
-                if (session) {
-                    localStorage.setItem('autovox_session', 'active');
-                    showDashboard();
-                } else {
-                    localStorage.removeItem('autovox_session');
-                    document.getElementById('loginPage').style.display = 'flex';
-                }
-            } catch (error) {
-                console.error("Erreur de session:", error);
-            }
-        });
-            // 3. Vérification de la session normale
+            
+            // On vérifie si Supabase connaît cet utilisateur (s'il s'était déjà connecté)
             const { data: { session } } = await supabaseClient.auth.getSession();
             
-            if (session && !isRecovery) {
+            if (session) {
+                // Si oui, on affiche direct le tableau de bord
                 localStorage.setItem('autovox_session', 'active');
                 showDashboard();
-            } else if (!isRecovery) {
+            } else {
+                // Sinon on nettoie tout par sécurité
                 localStorage.removeItem('autovox_session');
                 document.getElementById('loginPage').style.display = 'flex';
-                if (document.getElementById('dashboardPage')) {
-                    document.getElementById('dashboardPage').classList.remove('active');
-                }
+                document.getElementById('dashboardPage').classList.remove('active');
             }
         });
-        
+
         // --- NOUVEAU MOTEUR DE CONNEXION SÉCURISÉ ---
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -4062,71 +4000,6 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
             personnes.forEach(p => {
                 select.innerHTML += `<option value="${p}">${p}</option>`;
             });
-        }
-        // --- FONCTIONS MOT DE PASSE OUBLIÉ ---
-        function openForgotModal() { 
-            document.getElementById('modalForgot').classList.add('active'); 
-        }
-        
-        function closeForgotModal() { 
-            document.getElementById('modalForgot').classList.remove('active'); 
-            document.getElementById('forgotEmail').value = ""; 
-        }
-
-        async function sendResetEmail() {
-            const email = document.getElementById('forgotEmail').value;
-            const btn = document.getElementById('btnForgot');
-            if (!email) return alert("Veuillez entrer votre email.");
-
-            btn.textContent = "Envoi...";
-            btn.disabled = true;
-
-            const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-                redirectTo: window.location.href, 
-            });
-
-            if (error) {
-                alert("Erreur : " + error.message);
-                btn.textContent = "Envoyer le lien";
-                btn.disabled = false;
-            } else {
-                alert("📩 Lien envoyé ! Vérifiez vos emails.");
-                closeForgotModal();
-                btn.textContent = "Envoyer le lien";
-                btn.disabled = false;
-            }
-        }
-
-       async function updatePassword() {
-            const newPassword = document.getElementById('newPasswordInput').value;
-            const btn = document.getElementById('btnUpdatePassword');
-
-            if (newPassword.length < 6) return alert("6 caractères minimum.");
-
-            btn.textContent = "Mise à jour...";
-            btn.disabled = true;
-
-            // NOUVEAU : On vérifie que le lien cliqué est toujours valide
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) {
-                alert("⚠️ Le lien a expiré ou a déjà été utilisé. Veuillez refaire une demande de mot de passe oublié.");
-                document.getElementById('modalNewPassword').classList.remove('active');
-                window.location.href = window.location.pathname; // Nettoie l'adresse du site
-                return;
-            }
-
-            // Si le lien est valide, on met à jour
-            const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
-
-            if (error) {
-                alert("Erreur : " + error.message);
-                btn.textContent = "Enregistrer";
-                btn.disabled = false;
-            } else {
-                alert("✅ Mot de passe mis à jour avec succès !");
-                // On redirige vers la page d'accueil "propre" (sans le code de récupération dans l'adresse)
-                window.location.href = window.location.pathname; 
-            }
         }
     </script>
 </body>
