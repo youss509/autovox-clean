@@ -4087,7 +4087,7 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
             }
         }
 
-        async function updatePassword() {
+       async function updatePassword() {
             const newPassword = document.getElementById('newPasswordInput').value;
             const btn = document.getElementById('btnUpdatePassword');
 
@@ -4096,6 +4096,16 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
             btn.textContent = "Mise à jour...";
             btn.disabled = true;
 
+            // NOUVEAU : On vérifie que le lien cliqué est toujours valide
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                alert("⚠️ Le lien a expiré ou a déjà été utilisé. Veuillez refaire une demande de mot de passe oublié.");
+                document.getElementById('modalNewPassword').classList.remove('active');
+                window.location.href = window.location.pathname; // Nettoie l'adresse du site
+                return;
+            }
+
+            // Si le lien est valide, on met à jour
             const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
 
             if (error) {
@@ -4103,8 +4113,9 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
                 btn.textContent = "Enregistrer";
                 btn.disabled = false;
             } else {
-                alert("✅ Mot de passe mis à jour !");
-                location.reload(); 
+                alert("✅ Mot de passe mis à jour avec succès !");
+                // On redirige vers la page d'accueil "propre" (sans le code de récupération dans l'adresse)
+                window.location.href = window.location.pathname; 
             }
         }
     </script>
