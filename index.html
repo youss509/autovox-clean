@@ -3979,87 +3979,96 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
             }, 3000);
         }
 
-        // Afficher l'historique de la caisse
-        function displayCaisse(caisse) {
+       // Afficher l'historique de la caisse et calculer les cartes
+        function displayCaisse(caisseData) {
             const tbody = document.getElementById('caisseTableBody');
             
-            if (!caisse || caisse.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="5" style="text-align: center; padding: 40px; color: var(--text-secondary);">
-                            💰 Aucune transaction pour le moment
-                        </td>
-                    </tr>
-                `;
+            // --- 1. CALCUL DES CARTES ASSOCIÉS ---
+            let totaux = { 'Fouad': 0, 'Tarek': 0, 'Walid': 0, 'Riad': 0 };
+
+            // On calcule toujours sur allCaisse pour que les cartes ne tombent pas à zéro
+            allCaisse.forEach(transaction => {
+                if (transaction.type === 'sortie' && transaction.motif && transaction.motif.includes('RETRAIT ASSOCIÉ')) {
+                    if (totaux.hasOwnProperty(transaction.personne)) {
+                        totaux[transaction.personne] += parseFloat(transaction.montant);
+                    }
+                }
+            });
+
+            // Mise à jour de l'affichage des 4 cartes
+            if(document.getElementById('retraitFouad')) {
+                document.getElementById('retraitFouad').textContent = totaux['Fouad'].toLocaleString('fr-FR') + ' €';
+                document.getElementById('retraitTarek').textContent = totaux['Tarek'].toLocaleString('fr-FR') + ' €';
+                document.getElementById('retraitWalid').textContent = totaux['Walid'].toLocaleString('fr-FR') + ' €';
+                document.getElementById('retraitRiad').textContent = totaux['Riad'].toLocaleString('fr-FR') + ' €';
+            }
+
+            // --- 2. AFFICHAGE DU TABLEAU ---
+            if (!caisseData || caisseData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--text-secondary);">💰 Aucune transaction</td></tr>`;
                 return;
             }
             
-            tbody.innerHTML = caisse.map(c => {
+            tbody.innerHTML = caisseData.map(c => {
                 const isEntree = c.type === 'entree';
-                const typeIcon = isEntree ? '↗' : '↘';
-                const typeClass = isEntree ? 'caisse-type-entree' : 'caisse-type-sortie';
-                const montantSign = isEntree ? '+' : '-';
-                const montantColor = isEntree ? 'var(--success)' : 'var(--danger)';
+                const isRetrait = c.motif && c.motif.includes('RETRAIT ASSOCIÉ');
                 
-            return `
-                <tr>
-                    <td>${formatDate(c.date)}</td>
-                    <td>
-                        <span class="caisse-type-badge ${typeClass}">
-                            ${typeIcon} ${isEntree ? 'Entrée' : 'Sortie'}
-                        </span>
-                    </td>
-                    <td class="caisse-montant" style="color: ${montantColor};">
-                        ${montantSign}${c.montant.toFixed(2)} €
-                    </td>
-                    <td>${c.motif || '-'}</td>
-                    <td>${c.personne || '-'}</td>
-                </tr>
-            `;
+                const typeIcon = isRetrait ? '💸' : (isEntree ? '↗' : '↘');
+                const typeClass = isRetrait ? 'caisse-type-sortie' : (isEntree ? 'caisse-type-entree' : 'caisse-type-sortie');
+                const typeLabel = isRetrait ? 'Retrait' : (isEntree ? 'Entrée' : 'Sortie');
+                
+                const montantSign = isEntree ? '+' : '-';
+                const montantColor = isRetrait ? 'var(--warning)' : (isEntree ? 'var(--success)' : 'var(--danger)');
+                
+                return `
+                    <tr>
+                        <td>${formatDate(c.date)}</td>
+                        <td>
+                            <span class="caisse-type-badge ${typeClass}" style="${isRetrait ? 'background: rgba(245, 158, 11, 0.1); color: var(--warning);' : ''}">
+                                ${typeIcon} ${typeLabel}
+                            </span>
+                        </td>
+                        <td class="caisse-montant" style="color: ${montantColor};">
+                            ${montantSign}${parseFloat(c.montant).toFixed(2)} €
+                        </td>
+                        <td style="font-size: 13px;">${c.motif || '-'}</td>
+                        <td style="font-weight: 600;">${c.personne || '-'}</td>
+                        <td style="text-align: right;">
+                            <button onclick="deleteTransactionCaisse('${c.id}')" style="background: none; border: none; cursor: pointer; font-size: 16px; padding: 4px;" title="Supprimer">🗑️</button>
+                        </td>
+                    </tr>
+                `;
             }).join('');
         }
 
         // Mettre à jour le solde de la caisse
         async function updateSoldeCaisse() {
             try {
-                const { data, error } = await supabaseClient
-                    .rpc('get_solde_caisse');
-                
+                const { data, error } = await supabaseClient.rpc('get_solde_caisse');
                 if (error) throw error;
                 
                 const solde = data || 0;
                 const soldeFormate = solde.toFixed(2) + ' €';
                 
-                // Mettre à jour le solde dans la page Caisse
-                const soldeCaisseGrand = document.getElementById('soldeCaisseGrand');
-                if (soldeCaisseGrand) {
-                    soldeCaisseGrand.textContent = soldeFormate;
-                    soldeCaisseGrand.style.color = solde >= 0 ? 'var(--success-color)' : 'var(--danger-color)';
+                if (document.getElementById('soldeCaisseGrand')) {
+                    document.getElementById('soldeCaisseGrand').textContent = soldeFormate;
+                    document.getElementById('soldeCaisseGrand').style.color = solde >= 0 ? 'white' : 'var(--danger)';
                 }
                 
-                // Mettre à jour le solde dans la carte du dashboard
-                const soldeCaisse = document.getElementById('soldeCaisse');
-                if (soldeCaisse) {
-                    soldeCaisse.textContent = soldeFormate;
+                if (document.getElementById('soldeCaisse')) {
+                    document.getElementById('soldeCaisse').textContent = soldeFormate;
                 }
                 
-                // Mettre à jour la date
-                const derniereMaj = document.getElementById('derniereMaj');
-                if (derniereMaj) {
-                    derniereMaj.textContent = new Date().toLocaleString('fr-FR');
+                if (document.getElementById('derniereMaj')) {
+                    document.getElementById('derniereMaj').textContent = new Date().toLocaleString('fr-FR');
                 }
-                
-            } catch (error) {
-                console.error('Erreur calcul solde:', error);
-            }
+            } catch (error) { console.error('Erreur calcul solde:', error); }
         }
         
         // Ajouter de l'argent dans la caisse
         async function ajouterArgentCaisse(e) {
             e.preventDefault();
-            
-            const form = e.target;
-            const formData = new FormData(form);
+            const formData = new FormData(e.target);
             
             const caisse = {
                 id: generateId(),
@@ -4071,21 +4080,12 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
             };
             
             try {
-                const { data, error } = await supabaseClient
-                    .from('caisse')
-                    .insert([caisse])
-                    .select();
-                
+                const { error } = await supabaseClient.from('caisse').insert([caisse]);
                 if (error) throw error;
-                
                 showNotification('💰 Argent ajouté avec succès !', 'success');
                 closeModalAjoutCaisse();
                 loadCaisse();
-                
-            } catch (error) {
-                console.error('Erreur ajout argent:', error);
-                showNotification('Erreur lors de l\'ajout', 'error');
-            }
+            } catch (error) { showNotification('Erreur lors de l\'ajout', 'error'); }
         }
         
         // Filtrer la caisse
@@ -4097,34 +4097,48 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
             
             let filtered = allCaisse;
             
-            if (typeCaisse) {
-                filtered = filtered.filter(c => c.type === typeCaisse);
+            if (typeCaisse === 'entree') {
+                filtered = filtered.filter(c => c.type === 'entree');
+            } else if (typeCaisse === 'sortie_pure') {
+                filtered = filtered.filter(c => c.type === 'sortie' && (!c.motif || !c.motif.includes('RETRAIT ASSOCIÉ')));
+            } else if (typeCaisse === 'retrait') {
+                filtered = filtered.filter(c => c.motif && c.motif.includes('RETRAIT ASSOCIÉ'));
             }
             
-            if (personne) {
-                filtered = filtered.filter(c => c.personne === personne);
-            }
-            
-            if (dateDebut) {
-                filtered = filtered.filter(c => c.date >= dateDebut);
-            }
-            
-            if (dateFin) {
-                filtered = filtered.filter(c => c.date <= dateFin);
-            }
+            if (personne) { filtered = filtered.filter(c => c.personne === personne); }
+            if (dateDebut) { filtered = filtered.filter(c => c.date >= dateDebut); }
+            if (dateFin) { filtered = filtered.filter(c => c.date <= dateFin); }
             
             displayCaisse(filtered);
+        }
+
+        // Action au clic sur une carte associé
+        function filterCaisseParPersonne(nom) {
+            document.getElementById('filterPersonne').value = nom;
+            document.getElementById('filterTypeCaisse').value = 'retrait';
+            filterCaisse();
+            window.scrollTo({ top: document.querySelector('.table-container').offsetTop - 100, behavior: 'smooth' });
+        }
+
+        // Action au clic sur la carte bleue Solde
+        function resetFilterCaisse() {
+            document.getElementById('filterPersonne').value = "";
+            document.getElementById('filterTypeCaisse').value = "";
+            document.getElementById('filterDateDebut').value = "";
+            document.getElementById('filterDateFin').value = "";
+            filterCaisse();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         
         // Mettre à jour le filtre des personnes
         function updateFilterPersonnes() {
             const select = document.getElementById('filterPersonne');
-            const personnes = [...new Set(allCaisse
-                .filter(c => c.personne)
-                .map(c => c.personne))];
+            // On s'assure que les 4 associés sont toujours là en plus des autres
+            const personnes = ['Fouad', 'Tarek', 'Walid', 'Riad', ...new Set(allCaisse.filter(c => c.personne).map(c => c.personne))];
+            const uniquePersonnes = [...new Set(personnes)];
             
             select.innerHTML = '<option value="">Toutes</option>';
-            personnes.forEach(p => {
+            uniquePersonnes.forEach(p => {
                 select.innerHTML += `<option value="${p}">${p}</option>`;
             });
         }
