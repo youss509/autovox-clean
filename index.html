@@ -1753,7 +1753,44 @@
             </form>
         </div>
     </div>
-
+<!-- MODAL RETRAIT ASSOCIÉ -->
+    <div class="modal" id="modalRetraitCaisse">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>💸 Nouveau Retrait Associé</h2>
+                <button class="modal-close" onclick="closeModalRetraitCaisse()">✕</button>
+            </div>
+            <form id="formRetraitCaisse" onsubmit="effectuerRetraitCaisse(event)">
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Associé concerné *</label>
+                        <select name="personne" required>
+                            <option value="">Sélectionnez l'associé</option>
+                            <option value="Fouad">Fouad</option>
+                            <option value="Tarek">Tarek</option>
+                            <option value="Walid">Walid</option>
+                            <option value="Riad">Riad</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Montant (€) *</label>
+                        <input type="number" name="montant" step="0.01" min="0.01" required placeholder="Ex: 500">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Date du retrait *</label>
+                        <input type="date" name="date" id="dateRetraitAuto" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Motif / Note</label>
+                        <input type="text" name="motif" placeholder="Ex: Avance, Dividende...">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-warning">Confirmer le retrait</button>
+            </form>
+        </div>
+    </div>
     <!-- MODAL DÉTAILS VEHICULE -->
     <div class="modal" id="modalDetailsVehicule">
         <div class="modal-content">
