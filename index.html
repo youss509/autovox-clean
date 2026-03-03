@@ -3793,6 +3793,63 @@ await supabaseClient.from('caisse').delete().eq('vehicule_id', id);
             document.getElementById('modalAjoutCaisse').classList.remove('active');
             document.getElementById('formAjoutCaisse').reset();
         }
+
+        // --- NOUVEAU : FONCTIONS DE RETRAIT ET SUPPRESSION ---
+        function openModalRetraitCaisse() {
+            document.getElementById('modalRetraitCaisse').classList.add('active');
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dateRetraitAuto').value = today;
+        }
+
+        function closeModalRetraitCaisse() {
+            document.getElementById('modalRetraitCaisse').classList.remove('active');
+            document.getElementById('formRetraitCaisse').reset();
+        }
+
+        async function effectuerRetraitCaisse(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            const retrait = {
+                id: generateId(),
+                date: formData.get('date'),
+                type: 'sortie',
+                montant: parseFloat(formData.get('montant')),
+                personne: formData.get('personne'),
+                motif: `RETRAIT ASSOCIÉ: ${formData.get('motif') || ''}`
+            };
+
+            try {
+                const { error } = await supabaseClient.from('caisse').insert([retrait]);
+                if (error) throw error;
+                showNotification('💸 Retrait enregistré avec succès !', 'success');
+                closeModalRetraitCaisse();
+                loadCaisse();
+            } catch (error) {
+                console.error('Erreur ajout retrait:', error);
+                showNotification('Erreur lors de l\'enregistrement', 'error');
+            }
+        }
+
+        async function deleteTransactionCaisse(id) {
+            if (!confirm('⚠️ Voulez-vous vraiment supprimer cette transaction ?\nCela modifiera immédiatement le solde de la caisse.')) return;
+            try {
+                const { error } = await supabaseClient.from('caisse').delete().eq('id', id);
+                if (error) throw error;
+                showNotification('✅ Transaction supprimée !', 'success');
+                loadCaisse();
+            } catch (error) {
+                console.error('Erreur suppression:', error);
+                showNotification('❌ Erreur lors de la suppression', 'error');
+            }
+        }
+        // --- FIN DES NOUVEAUTÉS ---
+        
+        // Charger les données de la caisse
+        async function loadCaisse() {
+            try {
+                const { data, error } = await supabaseClient
+            // ... (la suite de ton code ne change pas)
         
         // Charger les données de la caisse
         async function loadCaisse() {
